@@ -1,0 +1,40 @@
+name: Mise à jour quotidienne des données Deryball
+
+on:
+  # Déclenchement automatique tous les jours à 10h UTC (6h à Montréal)
+  schedule:
+    - cron: "0 10 * * *"
+  # Permet aussi de déclencher manuellement depuis l'onglet Actions de GitHub
+  workflow_dispatch:
+
+jobs:
+  mise-a-jour:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Nécessaire pour que le workflow puisse commiter
+    steps:
+      - name: Cloner le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pandas requests
+
+      - name: Exécuter le script de mise à jour
+        run: python mise_a_jour.py
+
+      - name: Commiter les changements (si le CSV a changé)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/All_Leagues_2025-26.csv
+          # Commit uniquement si quelque chose a changé
+          git diff --staged --quiet || git commit -m "🤖 Mise à jour automatique des données ($(date -u +%Y-%m-%d))"
+          git push
+        
