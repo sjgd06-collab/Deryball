@@ -340,7 +340,11 @@ def appliquer_couleurs(df, cols):
     # Badge "À VENIR" sur la colonne Score
     if "Score" in cols:
         styled = styled.map(styler_score_a_venir, subset=["Score"])
-
+    # Formater tous les floats avec 1 décimale maximum
+    cols_floats = [c for c in cols if df[c].dtype == "float64"]
+    if cols_floats:
+        styled = styled.format(formatter="{:.1f}", subset=cols_floats, na_rep="—")
+        
     return styled
 
 def filtrer_saison(df, saison_selection):
