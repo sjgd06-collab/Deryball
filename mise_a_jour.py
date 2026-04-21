@@ -182,7 +182,14 @@ def main():
     df_combine = pd.concat(tous_les_df, ignore_index=True)
     # Nettoyer : retirer les lignes sans Date ou sans équipes
     df_combine = df_combine.dropna(subset=["Date", "HomeTeam", "AwayTeam"])
-
+    # Filtrer pour ne garder que les 2 dernières saisons (2024-25 et 2025-26)
+    df_combine["Date_dt"] = pd.to_datetime(df_combine["Date"], errors="coerce")
+    df_combine = df_combine.dropna(subset=["Date_dt"])
+    # On garde tout ce qui est à partir du 1er juillet 2024
+    df_combine = df_combine[df_combine["Date_dt"] >= "2024-07-01"]
+    df_combine = df_combine.drop(columns=["Date_dt"])
+    print(f"\n🔍 Filtrage : conservation des saisons 2024-25 et 2025-26 uniquement")
+    print(f"   Matchs après filtrage : {len(df_combine)}")
     # Créer le dossier data si nécessaire
     FICHIER_SORTIE.parent.mkdir(parents=True, exist_ok=True)
 
@@ -191,7 +198,22 @@ def main():
     print(f"\n✅ Sauvegardé : {FICHIER_SORTIE}")
     print(f"   Total : {len(df_combine)} matchs, {df_combine['League'].nunique()} ligues")
     print(f"   Période : {df_combine['Date'].min()} → {df_combine['Date'].max()}")
-
+# ============================================================
+    # RÉCUPÉRATION DES FIXTURES À VENIR (via football-data.org)
+    # ============================================================
+    try:
+        from fixtures import recuperer_fixtures_a_venir
+        df_fixtures = recuperer_fixtures_a_venir(jours=10)
+        if len(df_fixtures) > 0:
+            fichier_fixtures = Path("data/fixtures_a_venir.csv")
+            df_fixtures.to_csv(fichier_fixtures, index=False)
+            print(f"\n✅ Fixtures sauvegardés : {fichier_fixtures}")
+            print(f"   Total : {len(df_fixtures)} matchs à venir")
+        else:
+            print("\n(aucun fixture à venir récupéré)")
+    except Exception as e:
+        print(f"\n⚠️  Erreur lors de la récupération des fixtures : {e}")
+        print("   (Deryball continuera avec seulement les données football-data.co.uk)")
 
 if __name__ == "__main__":
     main()

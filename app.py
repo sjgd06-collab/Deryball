@@ -12,7 +12,10 @@ st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
 # ============================================================
 @st.cache_data(show_spinner="Calcul des stats en cours... (peut prendre ~1 minute au premier lancement)")
 def charger():
-    return calculer_tout("data/All_Leagues_2025-26.csv")
+    return calculer_tout(
+        "data/All_Leagues_2025-26.csv",
+        chemin_fixtures="data/fixtures_a_venir.csv"
+    )
 
 donnees = charger()
 df_brut = donnees["df"]

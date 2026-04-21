@@ -73,9 +73,9 @@ def charger_et_preparer(chemin_csv):
             return date.strftime("%Y-%m-%d")
     df["TimeNY"] = df.apply(lambda r: vers_ny_heure(r["Date"], r["Time"]), axis=1)
     df["DateNY"] = df.apply(lambda r: vers_ny_date(r["Date"], r["Time"]), axis=1)
+    df["IsUpcoming"] = False  # Par défaut tous les matchs de ce fichier sont joués
 
     return df
-
 # ============================================================
 # 2. STATS PAR ÉQUIPE
 # ============================================================
@@ -212,10 +212,33 @@ def probs_match(lam_h, lam_a, max_g=10):
                 p["btts"] += pr
     return p
 
-def h2h_stats(df, home_team, away_team, jusqu_a_date):
-    masque_duel = (((df["HomeTeam"] == home_team) & (df["AwayTeam"] == away_team)) |
-                   ((df["HomeTeam"] == away_team) & (df["AwayTeam"] == home_team)))
-    past = df[masque_duel & (df["Date"] < jusqu_a_date)]
+def construire_index_h2h(df):
+    """
+    Pré-calcule un index des confrontations par paire d'équipes.
+    Retourne un dict {frozenset({team_a, team_b}): DataFrame des matchs entre ces 2 équipes}
+    """
+    index = {}
+    for _, row in df.iterrows():
+        cle = frozenset({row["HomeTeam"], row["AwayTeam"]})
+        if cle not in index:
+            index[cle] = []
+        index[cle].append({
+            "Date": row["Date"],
+            "FTHG": row["FTHG"],
+            "FTAG": row["FTAG"],
+        })
+    # Convertir les listes en DataFrames une seule fois
+    return {k: pd.DataFrame(v) for k, v in index.items()}
+
+
+def h2h_stats(index_h2h, home_team, away_team, jusqu_a_date):
+    """Stats d'historique entre deux équipes (utilise l'index pré-calculé)."""
+    cle = frozenset({home_team, away_team})
+    past = index_h2h.get(cle)
+    if past is None or len(past) == 0:
+        return {"H2H_N": 0, "H2H_AvgGoals": None, "H2H_BTTS_pct": None,
+                "H2H_O25_pct": None, "H2H_00_pct": None}
+    past = past[past["Date"] < jusqu_a_date]
     if len(past) == 0:
         return {"H2H_N": 0, "H2H_AvgGoals": None, "H2H_BTTS_pct": None,
                 "H2H_O25_pct": None, "H2H_00_pct": None}
@@ -229,6 +252,7 @@ def h2h_stats(df, home_team, away_team, jusqu_a_date):
     }
 
 def construire_matchups(df, team_stats):
+    index_h2h = construire_index_h2h(df)  # ← AJOUTER CETTE LIGNE
     matchups = []
     for _, row in df.iterrows():
         hk = (row["HomeTeam"], row["DisplayLeague"], row["Season"])
@@ -240,7 +264,7 @@ def construire_matchups(df, team_stats):
         lam_h = h["HomeAttack"] * a["AwayDefense"] * h["_lg_h"]
         lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
         probs = probs_match(lam_h, lam_a)
-        h2h = h2h_stats(df, row["HomeTeam"], row["AwayTeam"], row["Date"])
+        h2h = h2h_stats(index_h2h, row["HomeTeam"], row["AwayTeam"], row["Date"])
 
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
@@ -274,13 +298,183 @@ def construire_matchups(df, team_stats):
 # ============================================================
 # 4. ORCHESTRATEUR
 # ============================================================
+def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique):
+    """
+    Construit des matchups pour df_a_traiter, mais utilise df_historique pour calculer le H2H.
+    Utile pour les fixtures à venir : on veut le H2H basé sur tous les matchs joués.
+    """
+    index_h2h = construire_index_h2h(df_historique)
+    matchups = []
+    for _, row in df_a_traiter.iterrows():
+        hk = (row["HomeTeam"], row["DisplayLeague"], row["Season"])
+        ak = (row["AwayTeam"], row["DisplayLeague"], row["Season"])
+        h = team_stats.get(hk)
+        a = team_stats.get(ak)
+        if not h or not a:
+            continue
+        lam_h = h["HomeAttack"] * a["AwayDefense"] * h["_lg_h"]
+        lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
+        probs = probs_match(lam_h, lam_a)
+        h2h = h2h_stats(index_h2h, row["HomeTeam"], row["AwayTeam"], row["Date"])
 
-def calculer_tout(chemin_csv):
+        matchups.append({
+            "Date": row["Date"].strftime("%Y-%m-%d"),
+            "DateNY": row["DateNY"],
+            "Time": row["Time"] if pd.notna(row["Time"]) else "",
+            "TimeNY": row["TimeNY"],
+            "League": row["DisplayLeague"],
+            "Season": row["Season"],
+            "HomeTeam": row["HomeTeam"],
+            "AwayTeam": row["AwayTeam"],
+            "Score": f"{int(row['FTHG'])}-{int(row['FTAG'])}",
+            "H_Pos": h["Pos"], "H_Form": h["Form5"],
+            "H_Over05": h["Over05_pct"], "H_Over15": h["Over15_pct"],
+            "H_Over25": h["Over25_pct"], "H_BTTS": h["BTTS_pct"],
+            "H_00_Count": h["Count00"], "H_00_Pct": h["Pct00"],
+            "A_Pos": a["Pos"], "A_Form": a["Form5"],
+            "A_Over05": a["Over05_pct"], "A_Over15": a["Over15_pct"],
+            "A_Over25": a["Over25_pct"], "A_BTTS": a["BTTS_pct"],
+            "A_00_Count": a["Count00"], "A_00_Pct": a["Pct00"],
+            "Combined_00_Pct": round((h["Pct00"] + a["Pct00"]) / 2, 1),
+            "xG_H": round(lam_h, 2), "xG_A": round(lam_a, 2),
+            "P_Over05": round(100 * probs["over05"], 1),
+            "P_Over15": round(100 * probs["over15"], 1),
+            "P_Over25": round(100 * probs["over25"], 1),
+            "P_BTTS": round(100 * probs["btts"], 1),
+            "P_00": round(100 * probs["p00"], 1),
+            **h2h,
+        })
+    return pd.DataFrame(matchups)
+def charger_fixtures_a_venir(chemin_fixtures, df_historique, stats_ref):
+    """
+    Charge les fixtures à venir et les transforme en matchups,
+    en réutilisant les stats d'équipes (calculées sur les matchs joués).
+    """
+    from pathlib import Path
+    if not Path(chemin_fixtures).exists():
+        return pd.DataFrame()
+
+    fx = pd.read_csv(chemin_fixtures)
+    if len(fx) == 0:
+        return pd.DataFrame()
+
+    # Harmoniser pour pouvoir passer dans construire_matchups
+    fx["Date"] = pd.to_datetime(fx["Date"], errors="coerce")
+    fx = fx.dropna(subset=["Date"])
+
+    # Appliquer la désambiguïsation des noms de ligues
+    compte_noms = df_historique.groupby("LeagueName")["Country"].nunique()
+    ambigus = compte_noms[compte_noms > 1].index.tolist()
+    def designer(row):
+        if row["LeagueName"] in ambigus:
+            return f"{row['LeagueName']} ({PAYS_COURT.get(row['Country'], row['Country'][:3].upper())})"
+        return row["LeagueName"]
+    fx["DisplayLeague"] = fx.apply(designer, axis=1)
+
+    # Inférer la saison
+    fx["Season"] = fx.apply(lambda r: inferer_saison(r["League"], r["Date"]), axis=1)
+
+    # Heures NY
+    uk_tz = ZoneInfo("Europe/London")
+    ny_tz = ZoneInfo("America/New_York")
+    def vers_ny(date, heure, fmt):
+        if pd.isna(heure) or not heure or pd.isna(date):
+            return date.strftime("%Y-%m-%d") if fmt == "%Y-%m-%d" else ""
+        try:
+            # football-data.org renvoie en UTC, pas UK
+            dt = datetime.strptime(f"{date.strftime('%Y-%m-%d')} {heure}", "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("UTC"))
+            return dt.astimezone(ny_tz).strftime(fmt)
+        except Exception:
+            return heure if fmt != "%Y-%m-%d" else date.strftime("%Y-%m-%d")
+    fx["TimeNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%H:%M"), axis=1)
+    fx["DateNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%Y-%m-%d"), axis=1)
+    fx["IsUpcoming"] = True
+
+    # Faire passer ces fixtures dans la même machinerie que les matchs joués
+    # On met des valeurs bidon pour FTHG/FTAG (ne seront pas affichées)
+    fx["FTHG"] = 0
+    fx["FTAG"] = 0
+    # Utiliser l'historique complet (df_historique) pour le H2H, pas juste les fixtures
+    matchups_fx = construire_matchups_avec_historique(fx, stats_ref, df_historique)
+    if len(matchups_fx) > 0:
+        matchups_fx["Score"] = "À VENIR"
+        matchups_fx["IsUpcoming"] = True
+    return matchups_fx
+
+
+def charger_fixtures_a_venir(chemin_fixtures, df_historique, stats_ref):
+    """
+    Charge les fixtures à venir et les transforme en matchups,
+    en réutilisant les stats d'équipes (calculées sur les matchs joués).
+    """
+    from pathlib import Path
+    if not Path(chemin_fixtures).exists():
+        return pd.DataFrame()
+
+    fx = pd.read_csv(chemin_fixtures)
+    if len(fx) == 0:
+        return pd.DataFrame()
+
+    # Harmoniser pour pouvoir passer dans construire_matchups
+    fx["Date"] = pd.to_datetime(fx["Date"], errors="coerce")
+    fx = fx.dropna(subset=["Date"])
+
+    # Appliquer la désambiguïsation des noms de ligues
+    compte_noms = df_historique.groupby("LeagueName")["Country"].nunique()
+    ambigus = compte_noms[compte_noms > 1].index.tolist()
+    def designer(row):
+        if row["LeagueName"] in ambigus:
+            return f"{row['LeagueName']} ({PAYS_COURT.get(row['Country'], row['Country'][:3].upper())})"
+        return row["LeagueName"]
+    fx["DisplayLeague"] = fx.apply(designer, axis=1)
+
+    # Inférer la saison
+    fx["Season"] = fx.apply(lambda r: inferer_saison(r["League"], r["Date"]), axis=1)
+
+    # Heures NY
+    uk_tz = ZoneInfo("Europe/London")
+    ny_tz = ZoneInfo("America/New_York")
+    def vers_ny(date, heure, fmt):
+        if pd.isna(heure) or not heure or pd.isna(date):
+            return date.strftime("%Y-%m-%d") if fmt == "%Y-%m-%d" else ""
+        try:
+            # football-data.org renvoie en UTC, pas UK
+            dt = datetime.strptime(f"{date.strftime('%Y-%m-%d')} {heure}", "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("UTC"))
+            return dt.astimezone(ny_tz).strftime(fmt)
+        except Exception:
+            return heure if fmt != "%Y-%m-%d" else date.strftime("%Y-%m-%d")
+    fx["TimeNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%H:%M"), axis=1)
+    fx["DateNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%Y-%m-%d"), axis=1)
+    fx["IsUpcoming"] = True
+
+    # Faire passer ces fixtures dans la même machinerie que les matchs joués
+    # On met des valeurs bidon pour FTHG/FTAG (ne seront pas affichées)
+    fx["FTHG"] = 0
+    fx["FTAG"] = 0
+    matchups_fx = construire_matchups(fx, stats_ref)
+    if len(matchups_fx) > 0:
+        matchups_fx["Score"] = "À VENIR"
+        matchups_fx["IsUpcoming"] = True
+    return matchups_fx
+
+
+def calculer_tout(chemin_csv, chemin_fixtures=None):
     df = charger_et_preparer(chemin_csv)
     stats = calculer_team_stats(df)
     team_df = pd.DataFrame([{k: v for k, v in s.items() if not k.startswith("_")}
                             for s in stats.values()])
+
+    # Matchups des matchs joués
     matchups_df = construire_matchups(df, stats)
+    matchups_df["IsUpcoming"] = False
+
+    # Ajouter les fixtures à venir si le fichier existe
+    if chemin_fixtures:
+        matchups_fx = charger_fixtures_a_venir(chemin_fixtures, df, stats)
+        if len(matchups_fx) > 0:
+            matchups_df = pd.concat([matchups_df, matchups_fx], ignore_index=True)
+            print(f"  ➕ {len(matchups_fx)} matchs à venir ajoutés aux matchups")
+
     courante = df.sort_values("Date").groupby("DisplayLeague").tail(1).set_index("DisplayLeague")["Season"].to_dict()
     return {
         "df": df,
