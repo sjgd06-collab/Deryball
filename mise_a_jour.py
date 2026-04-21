@@ -101,11 +101,19 @@ def normaliser_principal(df, code, nom, pays):
     cols_voulues = ["League", "LeagueName", "Country", "Season", "Date", "Time",
                     "HomeTeam", "AwayTeam", "FTHG", "FTAG", "FTR",
                     "HTHG", "HTAG", "TotalGoals", "Is_00",
-                    "AvgCH", "AvgCD", "AvgCA", "AvgC>2.5", "AvgC<2.5"]
+                    # Stats additionnelles (tirs, corners, cartons, fautes)
+                    "HS", "AS", "HST", "AST", "HC", "AC",
+                    "HY", "AY", "HR", "AR", "HF", "AF",
+                    # Cotes bookmakers
+                    "AvgCH", "AvgCD", "AvgCA", "AvgC>2.5", "AvgC<2.5",
+                    "B365H", "B365D", "B365A", "B365>2.5", "B365<2.5"]
     cols_existantes = [c for c in cols_voulues if c in df.columns]
     df = df[cols_existantes].copy()
     # Renommer pour coller au format All_Leagues
-    df = df.rename(columns={"AvgC>2.5": "AvgCOver25", "AvgC<2.5": "AvgCUnder25"})
+    df = df.rename(columns={
+        "AvgC>2.5": "AvgCOver25", "AvgC<2.5": "AvgCUnder25",
+        "B365>2.5": "B365Over25", "B365<2.5": "B365Under25",
+    })
     return df
 
 
@@ -145,6 +153,10 @@ def normaliser_extra(df, code, nom, pays):
     # Pour les extras, pas de AvgCOver25/Under25 directs — on les laisse vides
     df["AvgCOver25"] = None
     df["AvgCUnder25"] = None
+    # Les ligues extra n'ont pas de stats additionnelles — on met None pour que les colonnes existent
+    for col in ["HS", "AS", "HST", "AST", "HC", "AC", "HY", "AY", "HR", "AR", "HF", "AF",
+                "B365H", "B365D", "B365A", "B365Over25", "B365Under25"]:
+        df[col] = None
     return df
 
 
@@ -198,7 +210,8 @@ def main():
     print(f"\n✅ Sauvegardé : {FICHIER_SORTIE}")
     print(f"   Total : {len(df_combine)} matchs, {df_combine['League'].nunique()} ligues")
     print(f"   Période : {df_combine['Date'].min()} → {df_combine['Date'].max()}")
-# ============================================================
+
+    # ============================================================
     # RÉCUPÉRATION DES FIXTURES À VENIR (via football-data.org)
     # ============================================================
     try:

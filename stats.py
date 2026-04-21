@@ -81,14 +81,39 @@ def charger_et_preparer(chemin_csv):
 # ============================================================
 
 def construire_team_rows(df):
-    home = df[["League", "DisplayLeague", "Season", "Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"]].rename(
-        columns={"HomeTeam": "Team", "AwayTeam": "Opponent", "FTHG": "GF", "FTAG": "GA"}
-    )
+    # Colonnes de stats additionnelles (peuvent être absentes pour les ligues extra)
+    # H* = valeur domicile, A* = valeur extérieur
+    cols_extra = ["HS", "AS", "HST", "AST", "HC", "AC", "HY", "AY", "HR", "AR", "HF", "AF"]
+    cols_extra_dispo = [c for c in cols_extra if c in df.columns]
+
+    # Base home : on construit les colonnes de base + les extras si dispo
+    cols_base_home = ["League", "DisplayLeague", "Season", "Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG"] + cols_extra_dispo
+    home = df[cols_base_home].copy()
+    home = home.rename(columns={"HomeTeam": "Team", "AwayTeam": "Opponent", "FTHG": "GF", "FTAG": "GA"})
+    # Pour les stats extra, on renomme H* en "Pour" (fait) et A* en "Contre" (subi)
+    renames_home = {}
+    for c in cols_extra_dispo:
+        if c.startswith("H"):
+            renames_home[c] = c[1:] + "_pour"  # HS -> S_pour
+        elif c.startswith("A"):
+            renames_home[c] = c[1:] + "_contre"  # AS -> S_contre
+    home = home.rename(columns=renames_home)
     home["Venue"] = "H"
-    away = df[["League", "DisplayLeague", "Season", "Date", "AwayTeam", "HomeTeam", "FTAG", "FTHG"]].rename(
-        columns={"AwayTeam": "Team", "HomeTeam": "Opponent", "FTAG": "GF", "FTHG": "GA"}
-    )
+
+    # Base away : on fait pareil en inversant
+    cols_base_away = ["League", "DisplayLeague", "Season", "Date", "AwayTeam", "HomeTeam", "FTAG", "FTHG"] + cols_extra_dispo
+    away = df[cols_base_away].copy()
+    away = away.rename(columns={"AwayTeam": "Team", "HomeTeam": "Opponent", "FTAG": "GF", "FTHG": "GA"})
+    # Pour l'away, les stats sont inversées : A* = pour soi, H* = pour l'adversaire
+    renames_away = {}
+    for c in cols_extra_dispo:
+        if c.startswith("A"):
+            renames_away[c] = c[1:] + "_pour"  # AS -> S_pour
+        elif c.startswith("H"):
+            renames_away[c] = c[1:] + "_contre"  # HS -> S_contre
+    away = away.rename(columns=renames_away)
     away["Venue"] = "A"
+
     tr = pd.concat([home, away], ignore_index=True).sort_values(["Team", "Date"]).reset_index(drop=True)
     tr["Total"] = tr["GF"] + tr["GA"]
     tr["BTTS"] = (tr["GF"] > 0) & (tr["GA"] > 0)
@@ -183,6 +208,30 @@ def calculer_team_stats(df):
             "xG_away": round(away_attack * lg_a, 2),
             "_lg_h": lg_h, "_lg_a": lg_a,
         }
+
+        # Stats additionnelles (si colonnes disponibles)
+        for prefix, libelle in [("S", "Shots"), ("ST", "ShotsTarget"), ("C", "Corners"),
+                                 ("Y", "Yellow"), ("R", "Red"), ("F", "Fouls")]:
+            col_pour = f"{prefix}_pour"
+            col_contre = f"{prefix}_contre"
+            if col_pour in grp.columns and grp[col_pour].notna().any():
+                stats[(team, lg, saison)][f"{libelle}_pg"] = round(grp[col_pour].mean(), 2)
+                stats[(team, lg, saison)][f"{libelle}Contre_pg"] = round(grp[col_contre].mean(), 2)
+
+        # Stats corners : Over 9.5 (seuil classique pour les paris)
+        if "C_pour" in grp.columns and grp["C_pour"].notna().any():
+            corners_total = grp["C_pour"].fillna(0) + grp["C_contre"].fillna(0)
+            stats[(team, lg, saison)]["CornersTotal_pg"] = round(corners_total.mean(), 2)
+            stats[(team, lg, saison)]["CornersOver95_pct"] = round(100 * (corners_total > 9.5).mean(), 1)
+            stats[(team, lg, saison)]["CornersOver85_pct"] = round(100 * (corners_total > 8.5).mean(), 1)
+            stats[(team, lg, saison)]["CornersOver105_pct"] = round(100 * (corners_total > 10.5).mean(), 1)
+
+        # Stats cartons : Over 3.5 jaunes dans le match (équipe + adversaire)
+        if "Y_pour" in grp.columns and grp["Y_pour"].notna().any():
+            cartons_jaunes_total = grp["Y_pour"].fillna(0) + grp["Y_contre"].fillna(0)
+            stats[(team, lg, saison)]["YellowsTotal_pg"] = round(cartons_jaunes_total.mean(), 2)
+            stats[(team, lg, saison)]["YellowsOver35_pct"] = round(100 * (cartons_jaunes_total > 3.5).mean(), 1)
+
     return stats
 
 # ============================================================

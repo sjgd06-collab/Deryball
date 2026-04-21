@@ -50,7 +50,6 @@ SP1,La Liga,Spain,2026-04-26,14:15,Oviedo,Elche,,,,TIMED,True
 SP1,La Liga,Spain,2026-04-26,16:30,Osasuna,Sevilla,,,,TIMED,True
 SP1,La Liga,Spain,2026-04-26,19:00,Villarreal,Celta,,,,TIMED,True
 SP1,La Liga,Spain,2026-04-27,19:00,Espanol,Levante,,,,TIMED,True
-SP1,La Liga,Spain,2026-05-01,19:00,Girona,Mallorca,,,,TIMED,True
 F1,Ligue 1,France,2026-04-22,17:00,Paris SG,Nantes,,,,TIMED,True
 F1,Ligue 1,France,2026-04-24,18:45,Brest,Lens,,,,TIMED,True
 F1,Ligue 1,France,2026-04-25,13:00,Lyon,Auxerre,,,,TIMED,True
@@ -61,7 +60,6 @@ F1,Ligue 1,France,2026-04-26,15:15,Le Havre,Metz,,,,TIMED,True
 F1,Ligue 1,France,2026-04-26,15:15,Paris FC,Lille,,,,TIMED,True
 F1,Ligue 1,France,2026-04-26,15:15,Rennes,Nantes,,,,TIMED,True
 F1,Ligue 1,France,2026-04-26,18:45,Marseille,Nice,,,,TIMED,True
-F1,Ligue 1,France,2026-05-01,18:45,Nantes,Marseille,,,,TIMED,True
 N1,Eredivisie,Netherlands,2026-04-22,18:00,Telstar,Sparta Rotterdam,,,,TIMED,True
 N1,Eredivisie,Netherlands,2026-04-23,16:45,Go Ahead Eagles,AZ Alkmaar,,,,TIMED,True
 N1,Eredivisie,Netherlands,2026-04-23,19:00,PSV Eindhoven,Zwolle,,,,TIMED,True
@@ -86,8 +84,6 @@ BRA,Serie A,Brazil,2026-04-26,21:30,Athletico-PR,Vitoria,,,,TIMED,True
 BRA,Serie A,Brazil,2026-04-26,21:30,Bragantino,Palmeiras,,,,TIMED,True
 BRA,Serie A,Brazil,2026-04-26,23:30,Atletico-MG,Flamengo RJ,,,,TIMED,True
 BRA,Serie A,Brazil,2026-04-26,23:30,Fluminense,Chapecoense-SC,,,,TIMED,True
-CL,Champions League,UEFA,2026-04-28,19:00,Paris SG,Bayern Munich,,,,TIMED,True
-CL,Champions League,UEFA,2026-04-29,19:00,Ath Madrid,Arsenal,,,,TIMED,True
 ELC,Championship,England,2026-04-21,18:45,Coventry,Portsmouth,,,,TIMED,True
 ELC,Championship,England,2026-04-21,18:45,Norwich,Derby,,,,TIMED,True
 ELC,Championship,England,2026-04-21,18:45,Oxford,Wrexham,,,,TIMED,True
