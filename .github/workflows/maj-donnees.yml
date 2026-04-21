@@ -26,7 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pandas requests
 
-      - name: Exécuter le script de mise à jour
+      - name: Exécuter la mise à jour
+        env:
+          FOOTBALL_DATA_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: python mise_a_jour.py
 
       - name: Commiter les changements (si le CSV a changé)
