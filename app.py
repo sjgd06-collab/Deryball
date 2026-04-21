@@ -6,7 +6,222 @@ import pandas as pd
 from stats import calculer_tout
 
 st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
+# ============================================================
+# DESCRIPTIONS DES COLONNES (tooltips au survol de l'entête)
+# ============================================================
+DESCRIPTIONS_COLONNES = {
+    # Colonnes de base
+    "Team": "Nom de l'équipe",
+    "League": "Ligue / championnat",
+    "Season": "Saison concernée",
+    "Date": "Date du match",
+    "DateNY": "Date du match en heure de New York",
+    "TimeNY": "Heure de début du match (heure de New York)",
+    "HomeTeam": "Équipe à domicile",
+    "AwayTeam": "Équipe à l'extérieur",
+    "Score": "Score final du match (ou 'À VENIR' si pas encore joué)",
 
+    # Classement et forme
+    "Pos": "Position actuelle au classement",
+    "Pts": "Points accumulés cette saison",
+    "Form5": "Forme sur les 5 derniers matchs (V=victoire, N=nul, D=défaite)",
+    "MP": "Nombre de matchs joués",
+    "W": "Victoires",
+    "D": "Matchs nuls",
+    "L": "Défaites",
+    "GF_pg": "Buts marqués par match (moyenne)",
+    "GA_pg": "Buts encaissés par match (moyenne)",
+    "Total_pg": "Total de buts par match (moyenne)",
+
+    # Pourcentages généraux
+    "Over05_pct": "% des matchs avec au moins 1 but",
+    "Over15_pct": "% des matchs avec au moins 2 buts",
+    "Over25_pct": "% des matchs avec au moins 3 buts (plus de 2.5)",
+    "BTTS_pct": "% des matchs où les 2 équipes ont marqué",
+    "Count00": "Nombre de matchs terminés 0-0",
+    "Pct00": "% des matchs terminés 0-0",
+    "CS_pct": "% de matchs où l'équipe n'a pas encaissé (clean sheet)",
+    "FTS_pct": "% de matchs où l'équipe n'a pas marqué",
+
+    # Séquences en cours
+    "Streak_NoScore": "Nombre de matchs consécutifs sans marquer",
+    "Streak_NoConcede": "Matchs consécutifs sans encaisser",
+    "Streak_BTTS": "Matchs consécutifs où les 2 équipes ont marqué",
+    "Streak_NoBTTS": "Matchs consécutifs où au moins une équipe n'a pas marqué",
+    "Streak_Over05": "Matchs consécutifs avec au moins 1 but",
+    "Streak_Over15": "Matchs consécutifs avec au moins 2 buts",
+    "Streak_Over25": "Matchs consécutifs avec plus de 2.5 buts",
+    "Streak_Under25": "Matchs consécutifs avec moins de 2.5 buts",
+    "Streak_No00": "Matchs consécutifs sans 0-0",
+    "Streak_Win": "Victoires consécutives",
+    "Streak_NoWin": "Matchs consécutifs sans victoire",
+    "Streak_Loss": "Défaites consécutives",
+    "L10_Over25_pct": "% Over 2.5 sur les 10 derniers matchs",
+    "L10_BTTS_pct": "% BTTS sur les 10 derniers matchs",
+
+    # Force Poisson
+    "HomeAttack": "Force offensive à domicile (1.00 = moyenne de la ligue)",
+    "HomeDefense": "Force défensive à domicile (1.00 = moyenne, <1 = bon)",
+    "AwayAttack": "Force offensive à l'extérieur (1.00 = moyenne)",
+    "AwayDefense": "Force défensive à l'extérieur (1.00 = moyenne, <1 = bon)",
+    "xG_home": "Buts attendus à domicile (Poisson)",
+    "xG_away": "Buts attendus à l'extérieur (Poisson)",
+
+    # Colonnes matchup — Domicile (H_)
+    "H_Pos": "Classement actuel de l'équipe à domicile",
+    "H_Form": "Forme sur les 5 derniers matchs (domicile)",
+    "H_Over05": "% Over 0.5 de l'équipe à domicile",
+    "H_Over15": "% Over 1.5 de l'équipe à domicile",
+    "H_Over25": "% Over 2.5 de l'équipe à domicile",
+    "H_BTTS": "% BTTS de l'équipe à domicile",
+    "H_00_Count": "Nombre de 0-0 de l'équipe à domicile",
+    "H_00_Pct": "% de 0-0 de l'équipe à domicile",
+
+    # Colonnes matchup — Extérieur (A_)
+    "A_Pos": "Classement actuel de l'équipe à l'extérieur",
+    "A_Form": "Forme sur les 5 derniers matchs (extérieur)",
+    "A_Over05": "% Over 0.5 de l'équipe à l'extérieur",
+    "A_Over15": "% Over 1.5 de l'équipe à l'extérieur",
+    "A_Over25": "% Over 2.5 de l'équipe à l'extérieur",
+    "A_BTTS": "% BTTS de l'équipe à l'extérieur",
+    "A_00_Count": "Nombre de 0-0 de l'équipe à l'extérieur",
+    "A_00_Pct": "% de 0-0 de l'équipe à l'extérieur",
+
+    # Ligues (pour matchups personnalisés)
+    "H_Ligue": "Ligue de l'équipe à domicile",
+    "A_Ligue": "Ligue de l'équipe à l'extérieur",
+
+    # Combiné
+    "Combined_00_Pct": "Moyenne des % de 0-0 des 2 équipes",
+
+    # Poisson (P_)
+    "xG_H": "Buts attendus de l'équipe domicile (modèle Poisson)",
+    "xG_A": "Buts attendus de l'équipe extérieur (modèle Poisson)",
+    "P_Over05": "Probabilité Poisson qu'il y ait au moins 1 but",
+    "P_Over15": "Probabilité Poisson qu'il y ait au moins 2 buts",
+    "P_Over25": "Probabilité Poisson qu'il y ait plus de 2.5 buts",
+    "P_BTTS": "Probabilité Poisson que les 2 équipes marquent",
+    "P_00": "Probabilité Poisson que le match finisse 0-0",
+
+    # Head to Head (H2H_)
+    "H2H_N": "Nombre de confrontations passées entre ces 2 équipes",
+    "H2H_AvgGoals": "Moyenne de buts par match dans les confrontations passées",
+    "H2H_BTTS_pct": "% BTTS dans les confrontations passées",
+    "H2H_O25_pct": "% Over 2.5 dans les confrontations passées",
+    "H2H_00_pct": "% de 0-0 dans les confrontations passées",
+}
+# ============================================================
+# LABELS COURTS ET LISIBLES POUR LES COLONNES
+# ============================================================
+LABELS_COLONNES = {
+    # Base
+    "HomeTeam": "🏠 Domicile",
+    "AwayTeam": "✈️ Extérieur",
+    "TimeNY": "⏰ Heure (NY)",
+    "DateNY": "📅 Date (NY)",
+    "League": "🏆 Ligue",
+    "Season": "🗓️ Saison",
+    "Team": "⚽ Équipe",
+    "Score": "⚡ Score",
+
+    # Classement & forme globale
+    "Pos": "#",
+    "Pts": "Pts",
+    "MP": "J",
+    "W": "V", "D": "N", "L": "D",
+    "Form5": "📈 Forme",
+    "GF_pg": "⚽ BM/m",
+    "GA_pg": "🛡️ BE/m",
+    "Total_pg": "Total/m",
+    "Over05_pct": "O0.5",
+    "Over15_pct": "O1.5",
+    "Over25_pct": "O2.5",
+    "BTTS_pct": "BTTS",
+    "Count00": "# 0-0",
+    "Pct00": "% 0-0",
+    "CS_pct": "% CS",
+    "FTS_pct": "% FTS",
+
+    # Séquences
+    "Streak_NoScore": "❌🥅 sans marquer",
+    "Streak_NoConcede": "🛡️ sans encaisser",
+    "Streak_BTTS": "✅ BTTS",
+    "Streak_NoBTTS": "❌ BTTS",
+    "Streak_Over05": "✅ O0.5",
+    "Streak_Over15": "✅ O1.5",
+    "Streak_Over25": "✅ O2.5",
+    "Streak_Under25": "✅ U2.5",
+    "Streak_No00": "❌ 0-0",
+    "Streak_Win": "🏆 V",
+    "Streak_NoWin": "❌ V",
+    "Streak_Loss": "💀 D",
+    "L10_Over25_pct": "L10 O2.5",
+    "L10_BTTS_pct": "L10 BTTS",
+
+    # Force Poisson
+    "HomeAttack": "🏠⚔️ Attaque",
+    "HomeDefense": "🏠🛡️ Défense",
+    "AwayAttack": "✈️⚔️ Attaque",
+    "AwayDefense": "✈️🛡️ Défense",
+    "xG_home": "xG 🏠",
+    "xG_away": "xG ✈️",
+
+    # Zone DOMICILE (vert)
+    "H_Pos": "🏠 #",
+    "H_Form": "🏠 Forme",
+    "H_Over05": "🏠 O0.5",
+    "H_Over15": "🏠 O1.5",
+    "H_Over25": "🏠 O2.5",
+    "H_BTTS": "🏠 BTTS",
+    "H_00_Count": "🏠 # 0-0",
+    "H_00_Pct": "🏠 % 0-0",
+
+    # Zone EXTÉRIEUR (bleu)
+    "A_Pos": "✈️ #",
+    "A_Form": "✈️ Forme",
+    "A_Over05": "✈️ O0.5",
+    "A_Over15": "✈️ O1.5",
+    "A_Over25": "✈️ O2.5",
+    "A_BTTS": "✈️ BTTS",
+    "A_00_Count": "✈️ # 0-0",
+    "A_00_Pct": "✈️ % 0-0",
+
+    # Ligues pour matchup perso
+    "H_Ligue": "🏠 Ligue",
+    "A_Ligue": "✈️ Ligue",
+
+    # Combiné
+    "Combined_00_Pct": "🔗 % 0-0",
+
+    # Zone POISSON (jaune)
+    "xG_H": "🎯 xG 🏠",
+    "xG_A": "🎯 xG ✈️",
+    "P_Over05": "🎯 O0.5",
+    "P_Over15": "🎯 O1.5",
+    "P_Over25": "🎯 O2.5",
+    "P_BTTS": "🎯 BTTS",
+    "P_00": "🎯 0-0",
+
+    # Zone H2H (violet)
+    "H2H_N": "⚔️ N",
+    "H2H_AvgGoals": "⚔️ Buts/m",
+    "H2H_BTTS_pct": "⚔️ BTTS",
+    "H2H_O25_pct": "⚔️ O2.5",
+    "H2H_00_pct": "⚔️ 0-0",
+}
+
+def build_column_config(colonnes):
+    """Construit la column_config de Streamlit avec les tooltips et des labels lisibles."""
+    import streamlit as st
+    config = {}
+    for col in colonnes:
+        label = LABELS_COLONNES.get(col, col)  # nom court si disponible, sinon nom technique
+        help_text = DESCRIPTIONS_COLONNES.get(col)  # description pour tooltip
+        config[col] = st.column_config.Column(
+            label,
+            help=help_text,
+        )
+    return config
 # ============================================================
 # CHARGEMENT DES DONNÉES (avec cache)
 # ============================================================
@@ -42,6 +257,11 @@ idx_h2h = precalculer_index_h2h()
 # ============================================================
 # FONCTIONS UTILITAIRES
 # ============================================================
+def styler_score_a_venir(val):
+    """Applique un fond bleu au texte 'À VENIR' dans la colonne Score."""
+    if val == "À VENIR":
+        return "background-color: #1e3a5f; color: #60a5fa; font-weight: bold; border-radius: 4px;"
+    return ""
 def appliquer_couleurs(df, cols):
     """Applique les dégradés de couleurs aux colonnes d'un tableau."""
     cols_pct_haut = [c for c in cols if c in [
@@ -74,6 +294,11 @@ def appliquer_couleurs(df, cols):
         styled = styled.background_gradient(subset=cols_rating_haut, cmap="Greens", vmin=0.5, vmax=1.8)
     if cols_rating_bas:
         styled = styled.background_gradient(subset=cols_rating_bas, cmap="Greens_r", vmin=0.5, vmax=1.8)
+
+    # Badge "À VENIR" sur la colonne Score
+    if "Score" in cols:
+        styled = styled.map(styler_score_a_venir, subset=["Score"])
+
     return styled
 
 def filtrer_saison(df, saison_selection):
@@ -144,7 +369,13 @@ with tab1:
     ]
     cols_t = [c for c in cols_t if c in df_t.columns]
     df_t_sorted = df_t.sort_values(["League", "Pos"], na_position="last")
-    st.dataframe(appliquer_couleurs(df_t_sorted, cols_t), use_container_width=True, hide_index=True, height=600)
+    st.dataframe(
+        appliquer_couleurs(df_t_sorted, cols_t),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_t),
+    )
 
 # ============================================================
 # ONGLET SÉQUENCES EN COURS
@@ -178,7 +409,13 @@ with tab2:
         "L10_Over25_pct", "L10_BTTS_pct",
     ]
     cols_s = [c for c in cols_s if c in df_s.columns]
-    st.dataframe(appliquer_couleurs(df_s, cols_s), use_container_width=True, hide_index=True, height=600)
+    st.dataframe(
+        appliquer_couleurs(df_s, cols_s),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_s),
+    )
 
 # ============================================================
 # ONGLET FORCE POISSON
@@ -208,12 +445,75 @@ with tab3:
         "xG_home", "xG_away",
     ]
     cols_p = [c for c in cols_p if c in df_p.columns]
-    st.dataframe(appliquer_couleurs(df_p, cols_p), use_container_width=True, hide_index=True, height=600)
+    st.dataframe(
+        appliquer_couleurs(df_p, cols_p),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_p),
+    )
 
 # ============================================================
 # ONGLET MATCHS
 # ============================================================
 with tab4:
+    # ============================================================
+    # CHIPS DE FILTRES RAPIDES
+    # ============================================================
+    from datetime import date, timedelta
+    aujourdhui = date.today()
+    demain = aujourdhui + timedelta(days=1)
+    # Trouver le prochain samedi (0=lundi, 5=samedi, 6=dimanche)
+    jours_jusquau_samedi = (5 - aujourdhui.weekday()) % 7
+    if jours_jusquau_samedi == 0:  # si on est samedi, le "week-end" commence aujourd'hui
+        jours_jusquau_samedi = 0
+    prochain_samedi = aujourdhui + timedelta(days=jours_jusquau_samedi)
+    prochain_dimanche = prochain_samedi + timedelta(days=1)
+
+    # Init session state pour garder le filtre actif
+    if "filtre_rapide" not in st.session_state:
+        st.session_state.filtre_rapide = None
+    if "dates_filtrees" not in st.session_state:
+        st.session_state.dates_filtrees = None
+
+    chip0, chip1, chip2, chip3, chip4, chip5, _ = st.columns([1, 1.2, 1, 1.3, 1.5, 0.8, 2.2])
+    with chip0:
+        if st.button("⬅️ Hier", use_container_width=True, key="chip_yesterday"):
+            hier = aujourdhui - timedelta(days=1)
+            st.session_state.filtre_rapide = "yesterday"
+            st.session_state.dates_filtrees = [hier.strftime("%Y-%m-%d")]
+    with chip1:
+        if st.button("🕐 Aujourd'hui", use_container_width=True, key="chip_today"):
+            st.session_state.filtre_rapide = "today"
+            st.session_state.dates_filtrees = [aujourdhui.strftime("%Y-%m-%d")]
+    with chip2:
+        if st.button("➡️ Demain", use_container_width=True, key="chip_tomorrow"):
+            st.session_state.filtre_rapide = "tomorrow"
+            st.session_state.dates_filtrees = [demain.strftime("%Y-%m-%d")]
+    with chip3:
+        if st.button("🎯 Ce week-end", use_container_width=True, key="chip_weekend"):
+            st.session_state.filtre_rapide = "weekend"
+            st.session_state.dates_filtrees = [
+                prochain_samedi.strftime("%Y-%m-%d"),
+                prochain_dimanche.strftime("%Y-%m-%d"),
+            ]
+    with chip4:
+        if st.button("📅 7 prochains jours", use_container_width=True, key="chip_week"):
+            st.session_state.filtre_rapide = "week"
+            st.session_state.dates_filtrees = [
+                (aujourdhui + timedelta(days=i)).strftime("%Y-%m-%d")
+                for i in range(8)
+            ]
+    with chip5:
+        if st.button("🔙 Tout", use_container_width=True, key="chip_reset"):
+            st.session_state.filtre_rapide = None
+            st.session_state.dates_filtrees = None
+
+    # Afficher le filtre actif
+    if st.session_state.filtre_rapide:
+        labels = {"yesterday": "Hier", "today": "Aujourd'hui", "tomorrow": "Demain",
+                  "weekend": "Ce week-end", "week": "7 prochains jours"}
+        st.caption(f"🔍 Filtre actif : **{labels[st.session_state.filtre_rapide]}** — cliquez sur 🔙 Tout pour retirer.")
     fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
 
     with fcol1:
@@ -231,7 +531,11 @@ with tab4:
     with fcol4:
         recherche = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="m_search")
 
-    df_aff = matchups[matchups["DateNY"] == date_selectionnee].copy()
+    # Si un chip est actif, on filtre sur plusieurs dates possibles
+    if st.session_state.dates_filtrees:
+        df_aff = matchups[matchups["DateNY"].isin(st.session_state.dates_filtrees)].copy()
+    else:
+        df_aff = matchups[matchups["DateNY"] == date_selectionnee].copy()
     df_aff = filtrer_saison(df_aff, saison_selectionnee)
     if ligue_selectionnee != "Toutes les ligues":
         df_aff = df_aff[df_aff["League"] == ligue_selectionnee]
@@ -242,7 +546,30 @@ with tab4:
             df_aff["AwayTeam"].str.lower().str.contains(r_lower)
         ]
 
-    st.caption(f"{len(df_aff)} match(s) le {date_selectionnee}")
+    # Afficher clairement la période couverte par le tableau
+    if st.session_state.dates_filtrees:
+        labels = {"yesterday": "Hier", "today": "Aujourd'hui", "tomorrow": "Demain",
+                  "weekend": "Ce week-end", "week": "7 prochains jours"}
+        label = labels.get(st.session_state.filtre_rapide, "Période sélectionnée")
+
+        # Construire le résumé des dates couvertes
+        dates_cov = sorted(st.session_state.dates_filtrees)
+        if len(dates_cov) == 1:
+            resume_dates = dates_cov[0]
+        elif len(dates_cov) == 2:
+            resume_dates = f"{dates_cov[0]} et {dates_cov[1]}"
+        else:
+            resume_dates = f"du {dates_cov[0]} au {dates_cov[-1]}"
+
+        st.markdown(
+            f"#### 📅 {label} — {resume_dates}  \n"
+            f"**{len(df_aff)}** match(s) dans cette période"
+        )
+    else:
+        st.markdown(
+            f"#### 📅 {date_selectionnee}  \n"
+            f"**{len(df_aff)}** match(s) ce jour-là"
+        )
 
     colonnes = [
         "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
@@ -253,7 +580,13 @@ with tab4:
         "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
     ]
     colonnes = [c for c in colonnes if c in df_aff.columns]
-    st.dataframe(appliquer_couleurs(df_aff, colonnes), use_container_width=True, hide_index=True, height=600)
+    st.dataframe(
+        appliquer_couleurs(df_aff, colonnes),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(colonnes),
+    )
     
 # ============================================================
 # ONGLET 5 — MATCHUPS PERSONNALISÉS
@@ -440,6 +773,7 @@ with tab5:
                     use_container_width=True,
                     hide_index=True,
                     height=400,
+                    column_config=build_column_config(colonnes_custom),
                 )
             else:
                 st.warning("Aucun matchup valide. Vérifie que les équipes ont des stats disponibles.")
