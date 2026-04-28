@@ -18,10 +18,10 @@ st.markdown("""
 
 :root {
     --bg-deep: #0A0A12;
-    --bg-base: #0E0E18;
-    --bg-surface: #15151F;
-    --bg-elevated: #1C1C2A;
-    --bg-hover: #232333;
+    --bg-base: #11111B;
+    --bg-surface: #1A1830;
+    --bg-elevated: #211F3A;
+    --bg-hover: #2A2848;
     --border-subtle: #25253A;
     --border-default: #35354F;
     --border-strong: #4A4A6A;
@@ -98,8 +98,10 @@ h4 { font-size: 16px !important; }
 /* Le truc malin : on encadre les st.columns horizontaux contenant des selects/inputs/buttons */
 [data-testid="stHorizontalBlock"]:has(> div [data-testid="stSelectbox"]),
 [data-testid="stHorizontalBlock"]:has(> div [data-testid="stTextInput"]) {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-default);
+    background:
+        linear-gradient(135deg, rgba(130,102,255,0.06) 0%, rgba(130,102,255,0.02) 100%),
+        var(--bg-surface);
+    border: 1px solid rgba(130,102,255,0.20);
     border-radius: 12px;
     padding: 14px 16px;
     margin-bottom: 16px;
@@ -130,8 +132,11 @@ h4 { font-size: 16px !important; }
     background: rgba(130,102,255,0.05) !important;
 }
 .stTabs [aria-selected="true"] {
-    color: var(--accent) !important;
+    color: var(--text-strong) !important;
     border-bottom: 2px solid var(--accent) !important;
+    background: rgba(130,102,255,0.22) !important;
+    border-radius: 8px 8px 0 0 !important;
+    background: rgba(130,102,255,0.50) !important;
 }
 .stTabs [data-baseweb="tab-panel"] { padding-top: 24px !important; }
 
@@ -153,10 +158,36 @@ h4 { font-size: 16px !important; }
     border-radius: 8px !important;
     color: var(--text-strong) !important;
     font-family: 'Manrope', sans-serif !important;
-    font-size: 13.5px !important;
+    font-size: 13px !important;
     font-weight: 500 !important;
-    padding: 6px 10px !important;
     transition: all 0.15s ease !important;
+}
+
+/* Hauteur et padding cohérents pour les selectbox */
+.stSelectbox > div > div {
+    min-height: 42px !important;
+    padding: 4px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Le conteneur du texte affiché (BaseWeb) */
+.stSelectbox div[data-baseweb="select"] > div {
+    min-height: 36px !important;
+}
+
+/* Le texte de la valeur sélectionnée */
+.stSelectbox div[data-baseweb="select"] > div > div {
+    line-height: 1.5 !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    padding: 4px 0 !important;
+}
+
+/* Padding spécifique des inputs texte */
+.stTextInput > div > div > input {
+    padding: 10px 14px !important;
+    min-height: 42px !important;
 }
 .stSelectbox > div > div:hover,
 .stTextInput > div > div > input:hover {
@@ -611,7 +642,7 @@ def appliquer_couleurs(df, cols):
     if cols_pct_bas:
         styled = styled.background_gradient(subset=cols_pct_bas, cmap="Oranges", vmin=0, vmax=30)
     if cols_streak:
-        styled = styled.background_gradient(subset=cols_streak, cmap="YlOrRd", vmin=0, vmax=10)
+        styled = styled.background_gradient(subset=cols_streak, cmap="RdYlGn", vmin=0, vmax=10)
     if cols_xg:
         styled = styled.background_gradient(subset=cols_xg, cmap="Blues", vmin=0, vmax=3)
     if cols_rating_haut:
@@ -648,17 +679,6 @@ col_mode, _ = st.columns([1, 4])
 with col_mode:
     mode_mobile = st.toggle("📱 Mode mobile", value=False,
                              help="Simplifie l'affichage pour les écrans étroits")
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric("Matchs", f"{len(df_brut):,}".replace(",", " "))
-with col2:
-    st.metric("Équipes-saisons", len(team_stats))
-with col3:
-    st.metric("Ligues", df_brut["DisplayLeague"].nunique())
-with col4:
-    st.metric("Dernier match", df_brut["Date"].max().strftime("%Y-%m-%d"))
-
-st.divider()
 
 # ============================================================
 # ONGLETS
