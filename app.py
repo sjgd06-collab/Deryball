@@ -240,11 +240,43 @@ h4 { font-size: 16px !important; }
 }
 
 /* ======================================================
-   TOGGLE
+   TOGGLE / SWITCH (st.toggle) — couleur mauve assumée
    ====================================================== */
-.stCheckbox > label > div {
-    background: var(--bg-elevated) !important;
+
+/* Le rail (track) du toggle — état OFF */
+.stCheckbox [role="switch"],
+[data-baseweb="checkbox"] [role="checkbox"],
+[data-baseweb="switch"] > div {
+    background-color: var(--bg-elevated) !important;
     border: 1px solid var(--border-default) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Le rail — état ON (mauve plein) */
+.stCheckbox [role="switch"][aria-checked="true"],
+[data-baseweb="checkbox"][aria-checked="true"] [role="checkbox"],
+[data-baseweb="switch"][aria-checked="true"] > div {
+    background-color: var(--accent) !important;
+    border-color: var(--accent-soft) !important;
+    box-shadow: 0 0 0 4px rgba(130,102,255,0.20) !important;
+}
+
+/* Le knob (petit bouton rond qui glisse) — état OFF */
+.stCheckbox [role="switch"] > div,
+[data-baseweb="checkbox"] [role="checkbox"] > div {
+    background-color: var(--text-muted) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Le knob — état ON (blanc) */
+.stCheckbox [role="switch"][aria-checked="true"] > div,
+[data-baseweb="checkbox"][aria-checked="true"] [role="checkbox"] > div {
+    background-color: white !important;
+}
+
+/* Override la couleur primaire bleue par défaut de Streamlit */
+.stCheckbox div[data-testid="stCheckbox"] label > div:first-child[style*="background"] {
+    background-color: var(--accent) !important;
 }
 
 /* ======================================================
@@ -677,7 +709,9 @@ st.caption("Plateforme de stats et de prédictions Poisson pour le football")
 # Toggle mode mobile / compact
 col_mode, _ = st.columns([1, 4])
 with col_mode:
-    mode_mobile = st.toggle("📱 Mode mobile", value=False,
+    mode_mobile_etat = st.session_state.get("toggle_mobile", False)
+    label_toggle = "🖥️ Mode bureau" if mode_mobile_etat else "📱 Mode mobile"
+    mode_mobile = st.toggle(label_toggle, value=mode_mobile_etat, key="toggle_mobile",
                              help="Simplifie l'affichage pour les écrans étroits")
 
 # ============================================================
