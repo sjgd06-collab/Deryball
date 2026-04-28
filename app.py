@@ -7,6 +7,288 @@ from stats import calculer_tout
 
 st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
 # ============================================================
+# THÈME PERSONNALISÉ — Style Linear / FM24 (gris-mauve)
+# ============================================================
+# ============================================================
+# THÈME PERSONNALISÉ — Style Linear / FM24 (gris-mauve)
+# ============================================================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg-deep: #0A0A12;
+    --bg-base: #0E0E18;
+    --bg-surface: #15151F;
+    --bg-elevated: #1C1C2A;
+    --bg-hover: #232333;
+    --border-subtle: #25253A;
+    --border-default: #35354F;
+    --border-strong: #4A4A6A;
+    --text-strong: #F0F0F8;
+    --text-default: #C8C8D5;
+    --text-muted: #8B8BA0;
+    --text-faint: #5C5C70;
+    --accent: #8266FF;
+    --accent-soft: #6E5FE6;
+    --accent-deep: #4A3FA8;
+    --accent-glow: rgba(130,102,255,0.18);
+    --success: #4ADE80;
+    --danger: #F43F5E;
+    --warning: #FBBF24;
+    --info: #60A5FA;
+}
+
+/* FOND GLOBAL avec dégradés mauve visibles */
+.stApp {
+    background: var(--bg-deep) !important;
+    font-family: 'Manrope', sans-serif !important;
+}
+[data-testid="stAppViewContainer"] {
+    background:
+        radial-gradient(ellipse 1000px 700px at 0% 0%, rgba(130,102,255,0.18) 0%, transparent 50%),
+        radial-gradient(ellipse 900px 600px at 100% 100%, rgba(130,102,255,0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 600px 400px at 50% 50%, rgba(110,95,230,0.04) 0%, transparent 70%),
+        var(--bg-deep) !important;
+}
+
+/* Tous les textes par défaut */
+.stApp, .stApp p, .stApp span:not(.flag), .stApp label, .stApp div {
+    font-family: 'Manrope', sans-serif;
+    color: var(--text-default);
+}
+
+/* TITRES */
+h1, h2, h3, h4, h5, h6,
+.stApp h1, .stApp h2, .stApp h3, .stApp h4 {
+    font-family: 'Bricolage Grotesque', sans-serif !important;
+    color: var(--text-strong) !important;
+    letter-spacing: -0.02em !important;
+    font-weight: 600 !important;
+}
+h1 { font-size: 38px !important; font-weight: 700 !important; letter-spacing: -0.025em !important; }
+h4 { font-size: 16px !important; }
+
+/* st.metric */
+[data-testid="stMetricValue"] {
+    font-family: 'Bricolage Grotesque', sans-serif !important;
+    color: var(--text-strong) !important;
+    font-size: 32px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    font-variant-numeric: tabular-nums !important;
+}
+[data-testid="stMetricLabel"] {
+    color: var(--text-muted) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+/* CONTAINER PRINCIPAL */
+.block-container {
+    padding-top: 2.5rem !important;
+    padding-bottom: 4rem !important;
+    max-width: 1480px !important;
+}
+
+/* ======================================================
+   ENCADRER LES BLOCS HORIZONTAUX (filtres, chips)
+   ====================================================== */
+
+/* Le truc malin : on encadre les st.columns horizontaux contenant des selects/inputs/buttons */
+[data-testid="stHorizontalBlock"]:has(> div [data-testid="stSelectbox"]),
+[data-testid="stHorizontalBlock"]:has(> div [data-testid="stTextInput"]) {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+
+/* ======================================================
+   ONGLETS — look propre avec underline mauve
+   ====================================================== */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 4px !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    background: transparent !important;
+    padding-bottom: 0 !important;
+}
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 12px 18px !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.15s ease !important;
+    margin-bottom: -1px !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    color: var(--text-default) !important;
+    background: rgba(130,102,255,0.05) !important;
+}
+.stTabs [aria-selected="true"] {
+    color: var(--accent) !important;
+    border-bottom: 2px solid var(--accent) !important;
+}
+.stTabs [data-baseweb="tab-panel"] { padding-top: 24px !important; }
+
+/* ======================================================
+   INPUTS, SELECTS, TEXT
+   ====================================================== */
+.stSelectbox label, .stTextInput label {
+    color: var(--text-muted) !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 4px !important;
+}
+.stSelectbox > div > div,
+.stTextInput > div > div > input {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 8px !important;
+    color: var(--text-strong) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    padding: 6px 10px !important;
+    transition: all 0.15s ease !important;
+}
+.stSelectbox > div > div:hover,
+.stTextInput > div > div > input:hover {
+    border-color: var(--accent-soft) !important;
+    background-color: var(--bg-hover) !important;
+}
+
+/* Popover des selects */
+[data-baseweb="popover"] [role="listbox"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 8px !important;
+}
+[data-baseweb="popover"] [role="option"] {
+    background: var(--bg-elevated) !important;
+    color: var(--text-default) !important;
+    font-family: 'Manrope', sans-serif !important;
+}
+[data-baseweb="popover"] [role="option"]:hover {
+    background: var(--accent-glow) !important;
+    color: var(--text-strong) !important;
+}
+
+/* ======================================================
+   BOUTONS (les chips)
+   ====================================================== */
+.stButton > button {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 8px !important;
+    color: var(--text-default) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+    transition: all 0.12s ease !important;
+}
+.stButton > button:hover {
+    border-color: var(--accent-soft) !important;
+    color: var(--text-strong) !important;
+    background: var(--accent-glow) !important;
+    transform: translateY(-1px);
+}
+.stButton > button:active { transform: translateY(0); }
+.stButton > button[kind="primary"] {
+    background: linear-gradient(180deg, var(--accent-soft) 0%, var(--accent-deep) 100%) !important;
+    border-color: var(--accent) !important;
+    color: white !important;
+    box-shadow: 0 1px 6px rgba(130,102,255,0.3) !important;
+}
+
+/* ======================================================
+   TOGGLE
+   ====================================================== */
+.stCheckbox > label > div {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+}
+
+/* ======================================================
+   CAPTIONS et DIVIDERS
+   ====================================================== */
+[data-testid="stCaptionContainer"] {
+    color: var(--text-muted) !important;
+    font-size: 12.5px !important;
+}
+hr {
+    border: none !important;
+    border-top: 1px solid var(--border-default) !important;
+    margin: 18px 0 !important;
+}
+
+/* ======================================================
+   TABLEAUX (DATAFRAME) — la grosse partie
+   ====================================================== */
+.stDataFrame, [data-testid="stDataFrame"] {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-default) !important;
+    background: var(--bg-surface) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+}
+.stDataFrame thead tr th {
+    background: var(--bg-elevated) !important;
+    color: var(--text-muted) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    padding: 14px 10px !important;
+}
+.stDataFrame tbody tr td {
+    color: var(--text-default);
+    font-family: 'JetBrains Mono', monospace !important;
+    font-variant-numeric: tabular-nums !important;
+    font-size: 13px !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    padding: 10px 10px !important;
+}
+.stDataFrame tbody tr:hover td { filter: brightness(1.15); }
+.stDataFrame tbody tr td:first-child,
+.stDataFrame tbody tr td:nth-child(2),
+.stDataFrame tbody tr td:nth-child(3) {
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+/* ======================================================
+   ALERTES (st.info, st.warning, etc.)
+   ====================================================== */
+.stAlert {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-default) !important;
+    border-left: 3px solid var(--accent) !important;
+    border-radius: 8px !important;
+}
+
+/* ======================================================
+   SCROLLBARS personnalisées
+   ====================================================== */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+</style>
+""", unsafe_allow_html=True)
+# ============================================================
 # DESCRIPTIONS DES COLONNES (tooltips au survol de l'entête)
 # ============================================================
 DESCRIPTIONS_COLONNES = {
