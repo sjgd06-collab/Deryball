@@ -15,7 +15,6 @@ st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
     --bg-deep: #0A0A12;
     --bg-base: #11111B;
@@ -53,7 +52,7 @@ st.markdown("""
 }
 
 /* Tous les textes par défaut */
-.stApp, .stApp p, .stApp span:not(.flag), .stApp label, .stApp div {
+.stApp, .stApp p, .stApp span, .stApp label, .stApp div {
     font-family: 'Manrope', sans-serif;
     color: var(--text-default);
 }

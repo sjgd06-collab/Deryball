@@ -19,6 +19,29 @@ PAYS_COURT = {
     "Scotland": "ECO", "USA": "USA", "Mexico": "MEX", "Argentina": "ARG",
     "Norway": "NOR", "Poland": "POL",
 }
+# Codes pays courts (3 lettres) pour préfixer le nom des ligues
+CODES_PAYS = {
+    "England":     "ANG",
+    "Scotland":    "ECO",
+    "Germany":     "ALL",
+    "Italy":       "ITA",
+    "Spain":       "ESP",
+    "France":      "FRA",
+    "Netherlands": "PAY",
+    "Portugal":    "POR",
+    "Turkey":      "TUR",
+    "Greece":      "GRE",
+    "Belgium":     "BEL",
+    "Austria":     "AUT",
+    "Switzerland": "SUI",
+    "Poland":      "POL",
+    "Norway":      "NOR",
+    "Argentina":   "ARG",
+    "Brazil":      "BRE",
+    "Mexico":      "MEX",
+    "USA":         "USA",
+    "UEFA":        "UEFA",
+}
 
 LIGUES_ANNEE_CIVILE = {"ARG", "BRA", "NOR", "USA"}
 LIGUES_DOUBLE_SAISON = {"MEX"}
@@ -46,9 +69,8 @@ def charger_et_preparer(chemin_csv):
     compte_noms = df.groupby("LeagueName")["Country"].nunique()
     ambigus = compte_noms[compte_noms > 1].index.tolist()
     def designer(row):
-        if row["LeagueName"] in ambigus:
-            return f"{row['LeagueName']} ({PAYS_COURT.get(row['Country'], row['Country'][:3].upper())})"
-        return row["LeagueName"]
+        code = CODES_PAYS.get(row["Country"], row["Country"][:3].upper())
+        return f"[{code}] {row['LeagueName']}"
     df["DisplayLeague"] = df.apply(designer, axis=1)
 
     df["Season"] = df.apply(lambda r: inferer_saison(r["League"], r["Date"]), axis=1)
@@ -411,13 +433,10 @@ def charger_fixtures_a_venir(chemin_fixtures, df_historique, stats_ref):
     fx["Date"] = pd.to_datetime(fx["Date"], errors="coerce")
     fx = fx.dropna(subset=["Date"])
 
-    # Appliquer la désambiguïsation des noms de ligues
-    compte_noms = df_historique.groupby("LeagueName")["Country"].nunique()
-    ambigus = compte_noms[compte_noms > 1].index.tolist()
+    # Appliquer le drapeau aux noms de ligues
     def designer(row):
-        if row["LeagueName"] in ambigus:
-            return f"{row['LeagueName']} ({PAYS_COURT.get(row['Country'], row['Country'][:3].upper())})"
-        return row["LeagueName"]
+        code = CODES_PAYS.get(row["Country"], row["Country"][:3].upper())
+        return f"[{code}] {row['LeagueName']}"
     fx["DisplayLeague"] = fx.apply(designer, axis=1)
 
     # Inférer la saison
