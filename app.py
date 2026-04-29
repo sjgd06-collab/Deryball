@@ -473,6 +473,35 @@ DESCRIPTIONS_COLONNES = {
     "RedContre_pg": "Cartons rouges concédés par match",
     "Fouls_pg": "Fautes commises par match",
     "FoulsContre_pg": "Fautes subies par match",
+    # Stats additionnelles dans Matchs/Matchups — Domicile
+    "H_Shots_pg": "Tirs par match (équipe à domicile)",
+    "H_ShotsTarget_pg": "Tirs cadrés par match (équipe à domicile)",
+    "H_Corners_pg": "Corners par match (équipe à domicile)",
+    "H_CornersContre_pg": "Corners concédés par match (équipe à domicile)",
+    "H_CornersTotal_pg": "Total de corners dans les matchs (équipe à domicile)",
+    "H_CornersOver85": "% matchs avec plus de 8.5 corners (équipe à domicile)",
+    "H_CornersOver95": "% matchs avec plus de 9.5 corners (équipe à domicile)",
+    "H_CornersOver105": "% matchs avec plus de 10.5 corners (équipe à domicile)",
+    "H_Yellow_pg": "Cartons jaunes par match (équipe à domicile)",
+    "H_YellowsTotal_pg": "Total jaunes dans les matchs (équipe à domicile)",
+    "H_YellowsOver35": "% matchs avec plus de 3.5 jaunes (équipe à domicile)",
+    "H_Red_pg": "Cartons rouges par match (équipe à domicile)",
+    "H_Fouls_pg": "Fautes par match (équipe à domicile)",
+
+    # Stats additionnelles dans Matchs/Matchups — Extérieur
+    "A_Shots_pg": "Tirs par match (équipe à l'extérieur)",
+    "A_ShotsTarget_pg": "Tirs cadrés par match (équipe à l'extérieur)",
+    "A_Corners_pg": "Corners par match (équipe à l'extérieur)",
+    "A_CornersContre_pg": "Corners concédés par match (équipe à l'extérieur)",
+    "A_CornersTotal_pg": "Total de corners dans les matchs (équipe à l'extérieur)",
+    "A_CornersOver85": "% matchs avec plus de 8.5 corners (équipe à l'extérieur)",
+    "A_CornersOver95": "% matchs avec plus de 9.5 corners (équipe à l'extérieur)",
+    "A_CornersOver105": "% matchs avec plus de 10.5 corners (équipe à l'extérieur)",
+    "A_Yellow_pg": "Cartons jaunes par match (équipe à l'extérieur)",
+    "A_YellowsTotal_pg": "Total jaunes dans les matchs (équipe à l'extérieur)",
+    "A_YellowsOver35": "% matchs avec plus de 3.5 jaunes (équipe à l'extérieur)",
+    "A_Red_pg": "Cartons rouges par match (équipe à l'extérieur)",
+    "A_Fouls_pg": "Fautes par match (équipe à l'extérieur)",
 }
 # ============================================================
 # LABELS COURTS ET LISIBLES POUR LES COLONNES
@@ -592,6 +621,35 @@ LABELS_COLONNES = {
     "RedContre_pg": "🟥 Rouges adv/m",
     "Fouls_pg": "⚠️ Fautes/m",
     "FoulsContre_pg": "⚠️ Fautes subies/m",
+    # Stats additionnelles — Domicile (H_*)
+    "H_Shots_pg": "🏠 Tirs/m",
+    "H_ShotsTarget_pg": "🏠 Cadrés/m",
+    "H_Corners_pg": "🏠 Corners/m",
+    "H_CornersContre_pg": "🏠 Corners reçus/m",
+    "H_CornersTotal_pg": "🏠 Total corners/m",
+    "H_CornersOver85": "🏠 % O8.5",
+    "H_CornersOver95": "🏠 % O9.5",
+    "H_CornersOver105": "🏠 % O10.5",
+    "H_Yellow_pg": "🏠 🟨/m",
+    "H_YellowsTotal_pg": "🏠 Total 🟨/m",
+    "H_YellowsOver35": "🏠 % O3.5",
+    "H_Red_pg": "🏠 🟥/m",
+    "H_Fouls_pg": "🏠 Fautes/m",
+
+    # Stats additionnelles — Extérieur (A_*)
+    "A_Shots_pg": "✈️ Tirs/m",
+    "A_ShotsTarget_pg": "✈️ Cadrés/m",
+    "A_Corners_pg": "✈️ Corners/m",
+    "A_CornersContre_pg": "✈️ Corners reçus/m",
+    "A_CornersTotal_pg": "✈️ Total corners/m",
+    "A_CornersOver85": "✈️ % O8.5",
+    "A_CornersOver95": "✈️ % O9.5",
+    "A_CornersOver105": "✈️ % O10.5",
+    "A_Yellow_pg": "✈️ 🟨/m",
+    "A_YellowsTotal_pg": "✈️ Total 🟨/m",
+    "A_YellowsOver35": "✈️ % O3.5",
+    "A_Red_pg": "✈️ 🟥/m",
+    "A_Fouls_pg": "✈️ Fautes/m",
 }
 
 def build_column_config(colonnes):
@@ -725,224 +783,54 @@ tab_matchs, tab_matchups, tab_teams, tab_poisson, tab_sequences = st.tabs([
 ])
 
 # ============================================================
-# ONGLET STATS ÉQUIPES
+# INITIALISATION ÉTAT POUR FILTRES RAPIDES (chips)
 # ============================================================
-with tab_teams:
-    st.caption("Statistiques cumulées par équipe et par saison.")
-    fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
-    with fcol1:
-        opt_saison = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
-        saison_sel = st.selectbox("Saison", options=opt_saison, index=0, key="teams_season")
-    with fcol2:
-        opt_ligue = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
-        ligue_sel = st.selectbox("Ligue", options=opt_ligue, index=0, key="teams_league")
-    with fcol3:
-        recherche_t = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="teams_search")
-    with fcol4:
-        type_stats = st.selectbox("Type de stats",
-                                   options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
-                                   index=0, key="teams_type")
-
-    df_t = filtrer_saison(team_stats, saison_sel)
-    if ligue_sel != "Toutes les ligues":
-        df_t = df_t[df_t["League"] == ligue_sel]
-    if recherche_t:
-        df_t = df_t[df_t["Team"].str.lower().str.contains(recherche_t.lower())]
-
-    st.caption(f"{len(df_t)} équipe(s)")
-
-    # Choisir les colonnes selon le type de stats sélectionné
-    if type_stats == "Tirs & corners":
-        cols_t = [
-            "Team", "League", "Season", "Pos", "MP",
-            "Shots_pg", "ShotsContre_pg",
-            "ShotsTarget_pg", "ShotsTargetContre_pg",
-            "Corners_pg", "CornersContre_pg", "CornersTotal_pg",
-            "CornersOver85_pct", "CornersOver95_pct", "CornersOver105_pct",
-        ]
-    elif type_stats == "Cartons & fautes":
-        cols_t = [
-            "Team", "League", "Season", "Pos", "MP",
-            "Yellow_pg", "YellowContre_pg", "YellowsTotal_pg", "YellowsOver35_pct",
-            "Red_pg", "RedContre_pg",
-            "Fouls_pg", "FoulsContre_pg",
-        ]
-    else:  # Buts (défaut)
-        cols_t = [
-            "Team", "League", "Season", "Pos", "Pts", "Form5", "MP", "W", "D", "L",
-            "GF_pg", "GA_pg", "Total_pg",
-            "Over05_pct", "Over15_pct", "Over25_pct", "BTTS_pct",
-            "Count00", "Pct00", "CS_pct", "FTS_pct",
-        ]
-        # En mode mobile, on réduit aux colonnes essentielles
-    if mode_mobile:
-        if type_stats == "Tirs & corners":
-            cols_t = ["Team", "League", "Pos", "Shots_pg", "Corners_pg", "CornersOver95_pct"]
-        elif type_stats == "Cartons & fautes":
-            cols_t = ["Team", "League", "Pos", "Yellow_pg", "YellowsOver35_pct", "Red_pg"]
-        else:
-            cols_t = ["Team", "League", "Pos", "Over05_pct", "Over15_pct", "Over25_pct", "Pct00"]
-    cols_t = [c for c in cols_t if c in df_t.columns]
-    df_t_sorted = df_t.sort_values(["League", "Pos"], na_position="last")
-    st.dataframe(
-        appliquer_couleurs(df_t_sorted, cols_t),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
-        column_config=build_column_config(cols_t),
-    )
-
-# ============================================================
-# ONGLET SÉQUENCES EN COURS
-# ============================================================
-with tab_sequences:
-    st.caption("Séquences actives en cours pour chaque équipe (basées sur leurs derniers matchs consécutifs).")
-    fcol1, fcol2, fcol3 = st.columns([2, 2, 2])
-    with fcol1:
-        opt_saison_s = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
-        saison_sel_s = st.selectbox("Saison", options=opt_saison_s, index=0, key="seq_season")
-    with fcol2:
-        opt_ligue_s = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
-        ligue_sel_s = st.selectbox("Ligue", options=opt_ligue_s, index=0, key="seq_league")
-    with fcol3:
-        recherche_s = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="seq_search")
-
-    df_s = filtrer_saison(team_stats, saison_sel_s)
-    if ligue_sel_s != "Toutes les ligues":
-        df_s = df_s[df_s["League"] == ligue_sel_s]
-    if recherche_s:
-        df_s = df_s[df_s["Team"].str.lower().str.contains(recherche_s.lower())]
-
-    st.caption(f"{len(df_s)} équipe(s)")
-    cols_s = [
-        "Team", "League", "Season", "Pos", "Form5", "MP",
-        "Streak_NoScore", "Streak_NoConcede",
-        "Streak_BTTS", "Streak_NoBTTS",
-        "Streak_Over05", "Streak_Over15", "Streak_Over25", "Streak_Under25",
-        "Streak_No00",
-        "Streak_Win", "Streak_NoWin", "Streak_Loss",
-        "L10_Over25_pct", "L10_BTTS_pct",
-    ]
-    if mode_mobile:
-        cols_s = ["Team", "League", "Form5",
-                  "Streak_Over25", "Streak_BTTS", "Streak_No00", "Streak_Win"]
-    cols_s = [c for c in cols_s if c in df_s.columns]
-    st.dataframe(
-        appliquer_couleurs(df_s, cols_s),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
-        column_config=build_column_config(cols_s),
-    )
-
-# ============================================================
-# ONGLET FORCE POISSON
-# ============================================================
-with tab_poisson:
-    st.caption("Forces d'attaque/défense normalisées par la moyenne de la ligue (1.00 = moyenne).")
-    fcol1, fcol2, fcol3 = st.columns([2, 2, 2])
-    with fcol1:
-        opt_saison_p = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
-        saison_sel_p = st.selectbox("Saison", options=opt_saison_p, index=0, key="pois_season")
-    with fcol2:
-        opt_ligue_p = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
-        ligue_sel_p = st.selectbox("Ligue", options=opt_ligue_p, index=0, key="pois_league")
-    with fcol3:
-        recherche_p = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="pois_search")
-
-    df_p = filtrer_saison(team_stats, saison_sel_p)
-    if ligue_sel_p != "Toutes les ligues":
-        df_p = df_p[df_p["League"] == ligue_sel_p]
-    if recherche_p:
-        df_p = df_p[df_p["Team"].str.lower().str.contains(recherche_p.lower())]
-
-    st.caption(f"{len(df_p)} équipe(s)")
-    cols_p = [
-        "Team", "League", "Season", "Pos", "MP",
-        "HomeAttack", "HomeDefense", "AwayAttack", "AwayDefense",
-        "xG_home", "xG_away",
-    ]
-    if mode_mobile:
-        cols_p = ["Team", "League", "Pos", "HomeAttack", "AwayAttack", "xG_home"]
-    cols_p = [c for c in cols_p if c in df_p.columns]
-    st.dataframe(
-        appliquer_couleurs(df_p, cols_p),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
-        column_config=build_column_config(cols_p),
-    )
+if "dates_filtrees" not in st.session_state:
+    st.session_state.dates_filtrees = []
+if "filtre_rapide" not in st.session_state:
+    st.session_state.filtre_rapide = None
 
 # ============================================================
 # ONGLET MATCHS
 # ============================================================
 with tab_matchs:
-    # ============================================================
-    # CHIPS DE FILTRES RAPIDES
-    # ============================================================
-    from datetime import date, timedelta
-    aujourdhui = date.today()
-    demain = aujourdhui + timedelta(days=1)
-    # Trouver le prochain samedi (0=lundi, 5=samedi, 6=dimanche)
-    jours_jusquau_samedi = (5 - aujourdhui.weekday()) % 7
-    if jours_jusquau_samedi == 0:  # si on est samedi, le "week-end" commence aujourd'hui
-        jours_jusquau_samedi = 0
-    prochain_samedi = aujourdhui + timedelta(days=jours_jusquau_samedi)
-    prochain_dimanche = prochain_samedi + timedelta(days=1)
+    # Chips de filtres rapides
+    chip0, chip1, chip2, chip3, chip4, chip5, _ = st.columns([1, 1.2, 1, 1.3, 1.5, 0.8, 2.2])
+    today = pd.Timestamp.now().normalize()
 
-    # Init session state pour garder le filtre actif
-    if "filtre_rapide" not in st.session_state:
-        st.session_state.filtre_rapide = None
-    if "dates_filtrees" not in st.session_state:
-        st.session_state.dates_filtrees = None
-
-    # En mode mobile, on laisse plus d'espace aux chips
-    if mode_mobile:
-        chip0, chip1, chip2, chip3, chip4, chip5 = st.columns(6)
-    else:
-        chip0, chip1, chip2, chip3, chip4, chip5, _ = st.columns([1, 1.2, 1, 1.3, 1.5, 0.8, 2.2])
     with chip0:
-        if st.button("⬅️ Hier", use_container_width=True, key="chip_yesterday"):
-            hier = aujourdhui - timedelta(days=1)
+        if st.button("⬅️ Hier", key="chip_hier"):
+            st.session_state.dates_filtrees = [(today - pd.Timedelta(days=1)).strftime("%Y-%m-%d")]
             st.session_state.filtre_rapide = "yesterday"
-            st.session_state.dates_filtrees = [hier.strftime("%Y-%m-%d")]
     with chip1:
-        if st.button("🕐 Aujourd'hui", use_container_width=True, key="chip_today"):
+        if st.button("🕐 Aujourd'hui", key="chip_today"):
+            st.session_state.dates_filtrees = [today.strftime("%Y-%m-%d")]
             st.session_state.filtre_rapide = "today"
-            st.session_state.dates_filtrees = [aujourdhui.strftime("%Y-%m-%d")]
     with chip2:
-        if st.button("➡️ Demain", use_container_width=True, key="chip_tomorrow"):
+        if st.button("➡️ Demain", key="chip_tomorrow"):
+            st.session_state.dates_filtrees = [(today + pd.Timedelta(days=1)).strftime("%Y-%m-%d")]
             st.session_state.filtre_rapide = "tomorrow"
-            st.session_state.dates_filtrees = [demain.strftime("%Y-%m-%d")]
     with chip3:
-        if st.button("🎯 Ce week-end", use_container_width=True, key="chip_weekend"):
+        if st.button("🎯 Ce week-end", key="chip_we"):
+            jours_avant_sam = (5 - today.dayofweek) % 7
+            sam = today + pd.Timedelta(days=jours_avant_sam)
+            dim = sam + pd.Timedelta(days=1)
+            st.session_state.dates_filtrees = [sam.strftime("%Y-%m-%d"), dim.strftime("%Y-%m-%d")]
             st.session_state.filtre_rapide = "weekend"
-            st.session_state.dates_filtrees = [
-                prochain_samedi.strftime("%Y-%m-%d"),
-                prochain_dimanche.strftime("%Y-%m-%d"),
-            ]
     with chip4:
-        if st.button("📅 7 prochains jours", use_container_width=True, key="chip_week"):
+        if st.button("📅 7 prochains jours", key="chip_week"):
+            st.session_state.dates_filtrees = [(today + pd.Timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
             st.session_state.filtre_rapide = "week"
-            st.session_state.dates_filtrees = [
-                (aujourdhui + timedelta(days=i)).strftime("%Y-%m-%d")
-                for i in range(8)
-            ]
     with chip5:
-        if st.button("🔙 Tout", use_container_width=True, key="chip_reset"):
+        if st.button("🔙 Tout", key="chip_reset"):
+            st.session_state.dates_filtrees = []
             st.session_state.filtre_rapide = None
-            st.session_state.dates_filtrees = None
 
-    # Afficher le filtre actif
-    if st.session_state.filtre_rapide:
-        labels = {"yesterday": "Hier", "today": "Aujourd'hui", "tomorrow": "Demain",
-                  "weekend": "Ce week-end", "week": "7 prochains jours"}
-        st.caption(f"🔍 Filtre actif : **{labels[st.session_state.filtre_rapide]}** — cliquez sur 🔙 Tout pour retirer.")
-    # En mode mobile, empiler verticalement avec des colonnes de 1 (prend toute la largeur)
+    # Filtres principaux (avec sélecteur Type de stats)
     if mode_mobile:
-        fcol1 = fcol2 = fcol3 = fcol4 = st.container()
+        fcol1 = fcol2 = fcol3 = fcol4 = fcol5 = st.container()
     else:
-        fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
+        fcol1, fcol2, fcol3, fcol4, fcol5 = st.columns([2, 2, 2, 2, 2])
 
     with fcol1:
         dates_dispo = sorted(matchups["DateNY"].unique(), reverse=True)
@@ -959,7 +847,15 @@ with tab_matchs:
     with fcol4:
         recherche = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="m_search")
 
-    # Si un chip est actif, on filtre sur plusieurs dates possibles
+    with fcol5:
+        type_stats_match = st.selectbox(
+            "Type de stats",
+            options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
+            index=0,
+            key="m_type_stats"
+        )
+
+    # Filtrage
     if st.session_state.dates_filtrees:
         df_aff = matchups[matchups["DateNY"].isin(st.session_state.dates_filtrees)].copy()
     else:
@@ -974,13 +870,11 @@ with tab_matchs:
             df_aff["AwayTeam"].str.lower().str.contains(r_lower)
         ]
 
-    # Afficher clairement la période couverte par le tableau
+    # Bandeau résumé
     if st.session_state.dates_filtrees:
         labels = {"yesterday": "Hier", "today": "Aujourd'hui", "tomorrow": "Demain",
                   "weekend": "Ce week-end", "week": "7 prochains jours"}
         label = labels.get(st.session_state.filtre_rapide, "Période sélectionnée")
-
-        # Construire le résumé des dates couvertes
         dates_cov = sorted(st.session_state.dates_filtrees)
         if len(dates_cov) == 1:
             resume_dates = dates_cov[0]
@@ -988,7 +882,6 @@ with tab_matchs:
             resume_dates = f"{dates_cov[0]} et {dates_cov[1]}"
         else:
             resume_dates = f"du {dates_cov[0]} au {dates_cov[-1]}"
-
         st.markdown(
             f"#### 📅 {label} — {resume_dates}  \n"
             f"**{len(df_aff)}** match(s) dans cette période"
@@ -999,20 +892,36 @@ with tab_matchs:
             f"**{len(df_aff)}** match(s) ce jour-là"
         )
 
-    colonnes = [
-        "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
-        # 🎯 Indice Poisson en premier
-        "xG_H", "xG_A",
-        "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
-        # 🔗 Combiné
-        "Combined_00_Pct",
-        # 🏠 Stats Domicile
-        "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
-        # ✈️ Stats Extérieur
-        "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
-        # ⚔️ H2H en dernier
-        "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
-    ]
+    # Sélection des colonnes selon le type de stats
+    if type_stats_match == "Tirs & corners":
+        colonnes = [
+            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+            "H_Shots_pg", "H_ShotsTarget_pg",
+            "H_Corners_pg", "H_CornersContre_pg",
+            "H_CornersTotal_pg", "H_CornersOver85", "H_CornersOver95", "H_CornersOver105",
+            "A_Shots_pg", "A_ShotsTarget_pg",
+            "A_Corners_pg", "A_CornersContre_pg",
+            "A_CornersTotal_pg", "A_CornersOver85", "A_CornersOver95", "A_CornersOver105",
+        ]
+    elif type_stats_match == "Cartons & fautes":
+        colonnes = [
+            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+            "H_Yellow_pg", "H_YellowsTotal_pg", "H_YellowsOver35",
+            "H_Red_pg", "H_Fouls_pg",
+            "A_Yellow_pg", "A_YellowsTotal_pg", "A_YellowsOver35",
+            "A_Red_pg", "A_Fouls_pg",
+        ]
+    else:  # Buts (défaut)
+        colonnes = [
+            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+            "xG_H", "xG_A",
+            "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+            "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
+            "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
+            "Combined_00_Pct",
+            "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
+        ]
+
     if mode_mobile:
         colonnes = ["TimeNY", "HomeTeam", "AwayTeam", "Score",
                     "H_Over05", "A_Over05", "H_Over15", "A_Over15",
@@ -1024,6 +933,152 @@ with tab_matchs:
         hide_index=True,
         height=600,
         column_config=build_column_config(colonnes),
+    )
+
+# ============================================================
+# ONGLET STATS ÉQUIPES (revient à l'original simple)
+# ============================================================
+with tab_teams:
+    st.caption("Statistiques cumulées par équipe et par saison.")
+
+    fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
+    with fcol1:
+        options_saison = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
+        saison_t = st.selectbox("Saison", options=options_saison, index=0, key="t_season")
+    with fcol2:
+        ligues_t = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
+        ligue_t = st.selectbox("Ligue", options=ligues_t, index=0, key="t_league")
+    with fcol3:
+        recherche_t = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="t_search")
+    with fcol4:
+        type_t = st.selectbox(
+            "Type de stats",
+            options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
+            index=0,
+            key="t_type_stats"
+        )
+
+    # Filtrage saison équipes (basé sur DisplayLeague pour respecter les saisons par ligue)
+    if saison_t == "En cours (par défaut)":
+        df_t = team_stats[team_stats.apply(
+            lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)].copy()
+    elif saison_t == "Toutes les saisons":
+        df_t = team_stats.copy()
+    else:
+        df_t = team_stats[team_stats["Season"] == saison_t].copy()
+    if ligue_t != "Toutes les ligues":
+        df_t = df_t[df_t["League"] == ligue_t]
+    if recherche_t:
+        df_t = df_t[df_t["Team"].str.lower().str.contains(recherche_t.lower())]
+
+    st.caption(f"**{len(df_t)}** équipe(s)")
+
+    if type_t == "Tirs & corners":
+        cols_t = ["Team", "League", "Season", "Pos", "MP",
+                  "Shots_pg", "ShotsContre_pg", "ShotsTarget_pg", "ShotsTargetContre_pg",
+                  "Corners_pg", "CornersContre_pg", "CornersTotal_pg",
+                  "CornersOver85_pct", "CornersOver95_pct", "CornersOver105_pct"]
+    elif type_t == "Cartons & fautes":
+        cols_t = ["Team", "League", "Season", "Pos", "MP",
+                  "Yellow_pg", "YellowContre_pg", "YellowsTotal_pg", "YellowsOver35_pct",
+                  "Red_pg", "RedContre_pg", "Fouls_pg", "FoulsContre_pg"]
+    else:  # Buts
+        cols_t = ["Team", "League", "Season", "Pos", "Pts", "Form5", "MP", "W", "D", "L",
+                  "GF_pg", "GA_pg", "Total_pg",
+                  "Over05_pct", "Over15_pct", "Over25_pct", "BTTS_pct",
+                  "Count00", "Pct00", "CS_pct", "FTS_pct"]
+
+    if mode_mobile:
+        if type_t == "Tirs & corners":
+            cols_t = ["Team", "League", "Pos", "Shots_pg", "Corners_pg", "CornersOver95_pct"]
+        elif type_t == "Cartons & fautes":
+            cols_t = ["Team", "League", "Pos", "Yellow_pg", "YellowsOver35_pct", "Red_pg"]
+        else:
+            cols_t = ["Team", "League", "Pos", "Form5", "Over25_pct", "BTTS_pct", "Pct00"]
+
+    cols_t = [c for c in cols_t if c in df_t.columns]
+    st.dataframe(
+        appliquer_couleurs(df_t, cols_t),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_t),
+    )
+
+# ============================================================
+# ONGLET FORCE POISSON
+# ============================================================
+with tab_poisson:
+    st.caption("Forces d'attaque/défense relatives à la moyenne de la ligue (1.0 = moyenne).")
+    fcol1, fcol2 = st.columns([2, 2])
+    with fcol1:
+        options_saison_p = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
+        saison_p = st.selectbox("Saison", options=options_saison_p, index=0, key="p_season")
+    with fcol2:
+        ligues_p = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
+        ligue_p = st.selectbox("Ligue", options=ligues_p, index=0, key="p_league")
+
+    if saison_p == "En cours (par défaut)":
+        df_p = team_stats[team_stats.apply(
+            lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)].copy()
+    elif saison_p == "Toutes les saisons":
+        df_p = team_stats.copy()
+    else:
+        df_p = team_stats[team_stats["Season"] == saison_p].copy()
+    if ligue_p != "Toutes les ligues":
+        df_p = df_p[df_p["League"] == ligue_p]
+
+    cols_p = ["Team", "League", "Season", "Pos",
+              "HomeAttack", "HomeDefense", "AwayAttack", "AwayDefense",
+              "xG_home", "xG_away"]
+    if mode_mobile:
+        cols_p = ["Team", "League", "Pos", "HomeAttack", "AwayAttack", "xG_home"]
+    cols_p = [c for c in cols_p if c in df_p.columns]
+    st.dataframe(
+        appliquer_couleurs(df_p, cols_p),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_p),
+    )
+
+# ============================================================
+# ONGLET SÉQUENCES EN COURS
+# ============================================================
+with tab_sequences:
+    st.caption("Séquences actuelles : nombre de matchs consécutifs avec une caractéristique.")
+    fcol1, fcol2 = st.columns([2, 2])
+    with fcol1:
+        options_saison_s = ["En cours (par défaut)", "Toutes les saisons"] + sorted(team_stats["Season"].unique().tolist())
+        saison_s = st.selectbox("Saison", options=options_saison_s, index=0, key="s_season")
+    with fcol2:
+        ligues_s = ["Toutes les ligues"] + sorted(team_stats["League"].unique().tolist())
+        ligue_s = st.selectbox("Ligue", options=ligues_s, index=0, key="s_league")
+
+    if saison_s == "En cours (par défaut)":
+        df_s = team_stats[team_stats.apply(
+            lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)].copy()
+    elif saison_s == "Toutes les saisons":
+        df_s = team_stats.copy()
+    else:
+        df_s = team_stats[team_stats["Season"] == saison_s].copy()
+    if ligue_s != "Toutes les ligues":
+        df_s = df_s[df_s["League"] == ligue_s]
+
+    cols_s = ["Team", "League", "Season", "Form5",
+              "Streak_NoScore", "Streak_NoConcede", "Streak_BTTS", "Streak_NoBTTS",
+              "Streak_Over05", "Streak_Over15", "Streak_Over25", "Streak_Under25",
+              "Streak_No00", "Streak_Win", "Streak_NoWin", "Streak_Loss"]
+    if mode_mobile:
+        cols_s = ["Team", "League", "Form5",
+                  "Streak_Over25", "Streak_BTTS", "Streak_No00", "Streak_Win"]
+    cols_s = [c for c in cols_s if c in df_s.columns]
+    st.dataframe(
+        appliquer_couleurs(df_s, cols_s),
+        use_container_width=True,
+        hide_index=True,
+        height=600,
+        column_config=build_column_config(cols_s),
     )
     
 # ============================================================

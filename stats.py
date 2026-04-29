@@ -336,7 +336,37 @@ def construire_matchups(df, team_stats):
         lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
         probs = probs_match(lam_h, lam_a)
         h2h = h2h_stats(index_h2h, row["HomeTeam"], row["AwayTeam"], row["Date"])
-
+# Stats additionnelles si dispo (peuvent être None pour ligues extra)
+        h_extra = {
+            "H_Shots_pg": h.get("Shots_pg"),
+            "H_ShotsTarget_pg": h.get("ShotsTarget_pg"),
+            "H_Corners_pg": h.get("Corners_pg"),
+            "H_CornersContre_pg": h.get("CornersContre_pg"),
+            "H_CornersTotal_pg": h.get("CornersTotal_pg"),
+            "H_CornersOver85": h.get("CornersOver85_pct"),
+            "H_CornersOver95": h.get("CornersOver95_pct"),
+            "H_CornersOver105": h.get("CornersOver105_pct"),
+            "H_Yellow_pg": h.get("Yellow_pg"),
+            "H_YellowsTotal_pg": h.get("YellowsTotal_pg"),
+            "H_YellowsOver35": h.get("YellowsOver35_pct"),
+            "H_Red_pg": h.get("Red_pg"),
+            "H_Fouls_pg": h.get("Fouls_pg"),
+        }
+        a_extra = {
+            "A_Shots_pg": a.get("Shots_pg"),
+            "A_ShotsTarget_pg": a.get("ShotsTarget_pg"),
+            "A_Corners_pg": a.get("Corners_pg"),
+            "A_CornersContre_pg": a.get("CornersContre_pg"),
+            "A_CornersTotal_pg": a.get("CornersTotal_pg"),
+            "A_CornersOver85": a.get("CornersOver85_pct"),
+            "A_CornersOver95": a.get("CornersOver95_pct"),
+            "A_CornersOver105": a.get("CornersOver105_pct"),
+            "A_Yellow_pg": a.get("Yellow_pg"),
+            "A_YellowsTotal_pg": a.get("YellowsTotal_pg"),
+            "A_YellowsOver35": a.get("YellowsOver35_pct"),
+            "A_Red_pg": a.get("Red_pg"),
+            "A_Fouls_pg": a.get("Fouls_pg"),
+        }
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -362,6 +392,8 @@ def construire_matchups(df, team_stats):
             "P_Over25": round(100 * probs["over25"], 1),
             "P_BTTS": round(100 * probs["btts"], 1),
             "P_00": round(100 * probs["p00"], 1),
+            **h_extra,
+            **a_extra,
             **h2h,
         })
     return pd.DataFrame(matchups)
@@ -387,7 +419,37 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
         lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
         probs = probs_match(lam_h, lam_a)
         h2h = h2h_stats(index_h2h, row["HomeTeam"], row["AwayTeam"], row["Date"])
-
+# Stats additionnelles si dispo (peuvent être None pour ligues extra)
+        h_extra = {
+            "H_Shots_pg": h.get("Shots_pg"),
+            "H_ShotsTarget_pg": h.get("ShotsTarget_pg"),
+            "H_Corners_pg": h.get("Corners_pg"),
+            "H_CornersContre_pg": h.get("CornersContre_pg"),
+            "H_CornersTotal_pg": h.get("CornersTotal_pg"),
+            "H_CornersOver85": h.get("CornersOver85_pct"),
+            "H_CornersOver95": h.get("CornersOver95_pct"),
+            "H_CornersOver105": h.get("CornersOver105_pct"),
+            "H_Yellow_pg": h.get("Yellow_pg"),
+            "H_YellowsTotal_pg": h.get("YellowsTotal_pg"),
+            "H_YellowsOver35": h.get("YellowsOver35_pct"),
+            "H_Red_pg": h.get("Red_pg"),
+            "H_Fouls_pg": h.get("Fouls_pg"),
+        }
+        a_extra = {
+            "A_Shots_pg": a.get("Shots_pg"),
+            "A_ShotsTarget_pg": a.get("ShotsTarget_pg"),
+            "A_Corners_pg": a.get("Corners_pg"),
+            "A_CornersContre_pg": a.get("CornersContre_pg"),
+            "A_CornersTotal_pg": a.get("CornersTotal_pg"),
+            "A_CornersOver85": a.get("CornersOver85_pct"),
+            "A_CornersOver95": a.get("CornersOver95_pct"),
+            "A_CornersOver105": a.get("CornersOver105_pct"),
+            "A_Yellow_pg": a.get("Yellow_pg"),
+            "A_YellowsTotal_pg": a.get("YellowsTotal_pg"),
+            "A_YellowsOver35": a.get("YellowsOver35_pct"),
+            "A_Red_pg": a.get("Red_pg"),
+            "A_Fouls_pg": a.get("Fouls_pg"),
+        }
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -413,6 +475,8 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
             "P_Over25": round(100 * probs["over25"], 1),
             "P_BTTS": round(100 * probs["btts"], 1),
             "P_00": round(100 * probs["p00"], 1),
+            **h_extra,
+            **a_extra,
             **h2h,
         })
     return pd.DataFrame(matchups)
@@ -468,63 +532,6 @@ def charger_fixtures_a_venir(chemin_fixtures, df_historique, stats_ref):
         matchups_fx["Score"] = "À VENIR"
         matchups_fx["IsUpcoming"] = True
     return matchups_fx
-
-
-def charger_fixtures_a_venir(chemin_fixtures, df_historique, stats_ref):
-    """
-    Charge les fixtures à venir et les transforme en matchups,
-    en réutilisant les stats d'équipes (calculées sur les matchs joués).
-    """
-    from pathlib import Path
-    if not Path(chemin_fixtures).exists():
-        return pd.DataFrame()
-
-    fx = pd.read_csv(chemin_fixtures)
-    if len(fx) == 0:
-        return pd.DataFrame()
-
-    # Harmoniser pour pouvoir passer dans construire_matchups
-    fx["Date"] = pd.to_datetime(fx["Date"], errors="coerce")
-    fx = fx.dropna(subset=["Date"])
-
-    # Appliquer la désambiguïsation des noms de ligues
-    compte_noms = df_historique.groupby("LeagueName")["Country"].nunique()
-    ambigus = compte_noms[compte_noms > 1].index.tolist()
-    def designer(row):
-        if row["LeagueName"] in ambigus:
-            return f"{row['LeagueName']} ({PAYS_COURT.get(row['Country'], row['Country'][:3].upper())})"
-        return row["LeagueName"]
-    fx["DisplayLeague"] = fx.apply(designer, axis=1)
-
-    # Inférer la saison
-    fx["Season"] = fx.apply(lambda r: inferer_saison(r["League"], r["Date"]), axis=1)
-
-    # Heures NY
-    uk_tz = ZoneInfo("Europe/London")
-    ny_tz = ZoneInfo("America/New_York")
-    def vers_ny(date, heure, fmt):
-        if pd.isna(heure) or not heure or pd.isna(date):
-            return date.strftime("%Y-%m-%d") if fmt == "%Y-%m-%d" else ""
-        try:
-            # football-data.org renvoie en UTC, pas UK
-            dt = datetime.strptime(f"{date.strftime('%Y-%m-%d')} {heure}", "%Y-%m-%d %H:%M").replace(tzinfo=ZoneInfo("UTC"))
-            return dt.astimezone(ny_tz).strftime(fmt)
-        except Exception:
-            return heure if fmt != "%Y-%m-%d" else date.strftime("%Y-%m-%d")
-    fx["TimeNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%H:%M"), axis=1)
-    fx["DateNY"] = fx.apply(lambda r: vers_ny(r["Date"], r["Time"], "%Y-%m-%d"), axis=1)
-    fx["IsUpcoming"] = True
-
-    # Faire passer ces fixtures dans la même machinerie que les matchs joués
-    # On met des valeurs bidon pour FTHG/FTAG (ne seront pas affichées)
-    fx["FTHG"] = 0
-    fx["FTAG"] = 0
-    matchups_fx = construire_matchups(fx, stats_ref)
-    if len(matchups_fx) > 0:
-        matchups_fx["Score"] = "À VENIR"
-        matchups_fx["IsUpcoming"] = True
-    return matchups_fx
-
 
 def calculer_tout(chemin_csv, chemin_fixtures=None):
     df = charger_et_preparer(chemin_csv)
