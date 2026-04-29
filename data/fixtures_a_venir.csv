@@ -1,110 +1,112 @@
 League,LeagueName,Country,Date,Time,HomeTeam,AwayTeam,FTHG,FTAG,FTR,Status,IsUpcoming
-E0,Premier League,England,2026-04-21,19:00,Brighton,Chelsea,,,,TIMED,True
-E0,Premier League,England,2026-04-22,19:00,Bournemouth,Leeds,,,,TIMED,True
-E0,Premier League,England,2026-04-22,19:00,Burnley,Man City,,,,TIMED,True
-E0,Premier League,England,2026-04-24,19:00,Sunderland,Nott'm Forest,,,,TIMED,True
-E0,Premier League,England,2026-04-25,11:30,Fulham,Aston Villa,,,,TIMED,True
-E0,Premier League,England,2026-04-25,14:00,Liverpool,Crystal Palace,,,,TIMED,True
-E0,Premier League,England,2026-04-25,14:00,West Ham,Everton,,,,TIMED,True
-E0,Premier League,England,2026-04-25,14:00,Wolves,Tottenham,,,,TIMED,True
-E0,Premier League,England,2026-04-25,16:30,Arsenal,Newcastle,,,,TIMED,True
-E0,Premier League,England,2026-04-27,19:00,Man United,Brentford,,,,TIMED,True
 E0,Premier League,England,2026-05-01,19:00,Leeds,Burnley,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-24,18:30,RB Leipzig,Union Berlin,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,13:30,Mainz,Bayern Munich,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,13:30,FC Koln,Leverkusen,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,13:30,Augsburg,Ein Frankfurt,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,13:30,Wolfsburg,M'gladbach,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,13:30,Heidenheim,St Pauli,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-25,16:30,Hamburg,Hoffenheim,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-26,13:30,Stuttgart,Werder Bremen,,,,TIMED,True
-D1,Bundesliga,Germany,2026-04-26,15:30,Dortmund,Freiburg,,,,TIMED,True
-I1,Serie A,Italy,2026-04-24,18:45,Napoli,Cremonese,,,,TIMED,True
-I1,Serie A,Italy,2026-04-25,13:00,Parma,Pisa,,,,TIMED,True
-I1,Serie A,Italy,2026-04-25,16:00,Bologna,Roma,,,,TIMED,True
-I1,Serie A,Italy,2026-04-25,18:45,Verona,Lecce,,,,TIMED,True
-I1,Serie A,Italy,2026-04-26,10:30,Fiorentina,Sassuolo,,,,TIMED,True
-I1,Serie A,Italy,2026-04-26,13:00,Genoa,Como,,,,TIMED,True
-I1,Serie A,Italy,2026-04-26,16:00,Torino,Inter,,,,TIMED,True
-I1,Serie A,Italy,2026-04-26,18:45,Milan,Juventus,,,,TIMED,True
-I1,Serie A,Italy,2026-04-27,16:30,Cagliari,Atalanta,,,,TIMED,True
-I1,Serie A,Italy,2026-04-27,18:45,Lazio,Udinese,,,,TIMED,True
-I1,Serie A,Italy,2026-05-01,18:45,Pisa,Lecce,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-21,17:00,Ath Bilbao,Osasuna,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-21,17:00,Mallorca,Valencia,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-21,19:30,Real Madrid,Alaves,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-21,19:30,Girona,Betis,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-22,17:00,Elche,Ath Madrid,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-22,18:00,Sociedad,Getafe,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-22,19:30,Barcelona,Celta,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-23,17:00,Levante,Sevilla,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-23,18:00,Vallecano,Espanol,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-23,19:30,Oviedo,Villarreal,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-24,19:00,Betis,Real Madrid,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-25,12:00,Alaves,Mallorca,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-25,14:15,Getafe,Barcelona,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-25,16:30,Valencia,Girona,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-25,19:00,Ath Madrid,Ath Bilbao,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-26,12:00,Vallecano,Sociedad,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-26,14:15,Oviedo,Elche,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-26,16:30,Osasuna,Sevilla,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-26,19:00,Villarreal,Celta,,,,TIMED,True
-SP1,La Liga,Spain,2026-04-27,19:00,Espanol,Levante,,,,TIMED,True
-F1,Ligue 1,France,2026-04-22,17:00,Paris SG,Nantes,,,,TIMED,True
-F1,Ligue 1,France,2026-04-24,18:45,Brest,Lens,,,,TIMED,True
-F1,Ligue 1,France,2026-04-25,13:00,Lyon,Auxerre,,,,TIMED,True
-F1,Ligue 1,France,2026-04-25,17:00,Angers,Paris SG,,,,TIMED,True
-F1,Ligue 1,France,2026-04-25,19:05,Toulouse,Monaco,,,,TIMED,True
-F1,Ligue 1,France,2026-04-26,13:00,Lorient,Strasbourg,,,,TIMED,True
-F1,Ligue 1,France,2026-04-26,15:15,Le Havre,Metz,,,,TIMED,True
-F1,Ligue 1,France,2026-04-26,15:15,Paris FC,Lille,,,,TIMED,True
-F1,Ligue 1,France,2026-04-26,15:15,Rennes,Nantes,,,,TIMED,True
-F1,Ligue 1,France,2026-04-26,18:45,Marseille,Nice,,,,TIMED,True
-N1,Eredivisie,Netherlands,2026-04-22,18:00,Telstar,Sparta Rotterdam,,,,TIMED,True
-N1,Eredivisie,Netherlands,2026-04-23,16:45,Go Ahead Eagles,AZ Alkmaar,,,,TIMED,True
-N1,Eredivisie,Netherlands,2026-04-23,19:00,PSV Eindhoven,Zwolle,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-23,18:00,Casa Pia,Sp Braga,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-24,19:15,Alverca,Arouca,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-25,14:30,Tondela,Nacional,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-25,17:00,Benfica,Moreirense,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-25,19:30,Vitoria,Rio Ave,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-26,14:30,Estoril,Famalicao,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-26,17:00,Santa Clara,Sp Braga,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-26,17:00,Estrela,Porto,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-26,19:30,AVS,Sp Lisbon,,,,TIMED,True
-P1,Primeira Liga,Portugal,2026-04-27,19:15,Gil Vicente,Casa Pia,,,,TIMED,True
+E0,Premier League,England,2026-05-02,14:00,Brentford,West Ham,,,,TIMED,True
+E0,Premier League,England,2026-05-02,14:00,Newcastle,Brighton,,,,TIMED,True
+E0,Premier League,England,2026-05-02,14:00,Wolves,Sunderland,,,,TIMED,True
+E0,Premier League,England,2026-05-02,16:30,Arsenal,Fulham,,,,TIMED,True
+E0,Premier League,England,2026-05-03,13:00,Bournemouth,Crystal Palace,,,,TIMED,True
+E0,Premier League,England,2026-05-03,14:30,Man United,Liverpool,,,,TIMED,True
+E0,Premier League,England,2026-05-03,18:00,Aston Villa,Tottenham,,,,TIMED,True
+E0,Premier League,England,2026-05-04,14:00,Chelsea,Nott'm Forest,,,,TIMED,True
+E0,Premier League,England,2026-05-04,19:00,Everton,Man City,,,,TIMED,True
+E0,Premier League,England,2026-05-09,11:30,Liverpool,Chelsea,,,,TIMED,True
+E0,Premier League,England,2026-05-09,14:00,Sunderland,Man United,,,,TIMED,True
+E0,Premier League,England,2026-05-09,14:00,Brighton,Wolves,,,,TIMED,True
+E0,Premier League,England,2026-05-09,14:00,Fulham,Bournemouth,,,,TIMED,True
+E0,Premier League,England,2026-05-09,16:30,Man City,Brentford,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,13:30,Hoffenheim,Stuttgart,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,13:30,Werder Bremen,Augsburg,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,13:30,Bayern Munich,Heidenheim,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,13:30,Union Berlin,FC Koln,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,13:30,Ein Frankfurt,Hamburg,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-02,16:30,Leverkusen,RB Leipzig,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-03,13:30,St Pauli,Mainz,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-03,15:30,M'gladbach,Dortmund,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-03,17:30,Freiburg,Wolfsburg,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-08,18:30,Dortmund,Ein Frankfurt,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-09,13:30,Stuttgart,Leverkusen,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-09,13:30,Hoffenheim,Werder Bremen,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-09,13:30,Augsburg,M'gladbach,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-09,13:30,RB Leipzig,St Pauli,,,,TIMED,True
+D1,Bundesliga,Germany,2026-05-09,16:30,Wolfsburg,Bayern Munich,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-01,19:00,Girona,Mallorca,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-02,12:00,Villarreal,Levante,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-02,14:15,Valencia,Ath Madrid,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-02,16:30,Alaves,Ath Bilbao,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-02,19:00,Osasuna,Barcelona,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-03,12:00,Celta,Elche,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-03,14:15,Getafe,Vallecano,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-03,16:30,Betis,Oviedo,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-03,19:00,Espanol,Real Madrid,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-04,19:00,Sevilla,Sociedad,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-08,19:00,Levante,Osasuna,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-09,12:00,Elche,Alaves,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-09,14:15,Sevilla,Espanol,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-09,16:30,Ath Madrid,Celta,,,,TIMED,True
+SP1,La Liga,Spain,2026-05-09,19:00,Sociedad,Betis,,,,TIMED,True
+F1,Ligue 1,France,2026-05-02,13:00,Nantes,Marseille,,,,TIMED,True
+F1,Ligue 1,France,2026-05-02,15:00,Paris SG,Lorient,,,,TIMED,True
+F1,Ligue 1,France,2026-05-02,17:00,Metz,Monaco,,,,TIMED,True
+F1,Ligue 1,France,2026-05-02,19:05,Nice,Lens,,,,TIMED,True
+F1,Ligue 1,France,2026-05-03,13:00,Lille,Le Havre,,,,TIMED,True
+F1,Ligue 1,France,2026-05-03,15:15,Auxerre,Angers,,,,TIMED,True
+F1,Ligue 1,France,2026-05-03,15:15,Paris FC,Brest,,,,TIMED,True
+F1,Ligue 1,France,2026-05-03,15:15,Strasbourg,Toulouse,,,,TIMED,True
+F1,Ligue 1,France,2026-05-03,18:45,Lyon,Rennes,,,,TIMED,True
+F1,Ligue 1,France,2026-05-08,18:45,Lens,Nantes,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-02,14:30,FC Utrecht,NAC Breda,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-02,16:45,FC Groningen,SBV Excelsior,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-02,18:00,AFC Ajax,PSV Eindhoven,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-02,19:00,NEC,Telstar,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-03,10:15,FC Volendam,SC Heerenveen,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-03,12:30,Fortuna Sittard,Feyenoord Rotterdam,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-03,12:30,Zwolle,Heracles Almelo,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-03,14:45,AZ Alkmaar,FC Twente '65,,,,TIMED,True
+N1,Eredivisie,Netherlands,2026-05-03,14:45,Sparta Rotterdam,Go Ahead Eagles,,,,TIMED,True
 P1,Primeira Liga,Portugal,2026-04-29,19:15,Sp Lisbon,Tondela,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-25,21:30,Bahia,Santos,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-25,21:30,Botafogo RJ,Internacional,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-25,21:30,Remo,Cruzeiro,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,00:00,Sao Paulo,Mirassol,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,19:00,Corinthians,Vasco,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,19:00,Gremio,Coritiba,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,21:30,Athletico-PR,Vitoria,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,21:30,Bragantino,Palmeiras,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,23:30,Atletico-MG,Flamengo RJ,,,,TIMED,True
-BRA,Serie A,Brazil,2026-04-26,23:30,Fluminense,Chapecoense-SC,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Coventry,Portsmouth,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Norwich,Derby,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Oxford,Wrexham,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,QPR,Swansea,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Southampton,Bristol City,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Stoke,Millwall,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,West Brom,Watford,,,,TIMED,True
-ELC,Championship,England,2026-04-21,18:45,Leicester,Hull,,,,TIMED,True
-ELC,Championship,England,2026-04-22,18:45,Middlesbrough,Sheffield Weds,,,,TIMED,True
-ELC,Championship,England,2026-04-22,18:45,Birmingham,Preston,,,,TIMED,True
-ELC,Championship,England,2026-04-22,18:45,Charlton,Ipswich,,,,TIMED,True
-ELC,Championship,England,2026-04-22,18:45,Sheffield United,Blackburn,,,,TIMED,True
-ELC,Championship,England,2026-04-24,19:00,Leicester,Millwall,,,,TIMED,True
-ELC,Championship,England,2026-04-25,11:30,Charlton,Hull,,,,TIMED,True
-ELC,Championship,England,2026-04-25,11:30,Middlesbrough,Watford,,,,TIMED,True
-ELC,Championship,England,2026-04-25,11:30,West Brom,Ipswich,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,Birmingham,Bristol City,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,Norwich,Swansea,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,Oxford,Sheffield Weds,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,QPR,Derby,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,Sheffield United,Preston,,,,TIMED,True
-ELC,Championship,England,2026-04-25,14:00,Stoke,Portsmouth,,,,TIMED,True
-ELC,Championship,England,2026-04-26,11:00,Coventry,Wrexham,,,,TIMED,True
-ELC,Championship,England,2026-04-28,18:45,Southampton,Ipswich,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-02,14:30,Nacional,AVS,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-02,14:30,Moreirense,Estrela,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-02,14:30,Arouca,Santa Clara,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-02,17:00,Famalicao,Benfica,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-02,19:30,Porto,Alverca,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-03,14:30,Casa Pia,Tondela,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-03,17:00,Sp Braga,Estoril,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-03,19:30,Rio Ave,Gil Vicente,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-04,19:15,Sp Lisbon,Vitoria,,,,TIMED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Vitoria,Casa Pia,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Gil Vicente,Arouca,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Tondela,Moreirense,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,AVS,Porto,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Estrela,Famalicao,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Alverca,Estoril,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Rio Ave,Sp Lisbon,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Santa Clara,Nacional,,,,SCHEDULED,True
+P1,Primeira Liga,Portugal,2026-05-10,00:00,Benfica,Sp Braga,,,,SCHEDULED,True
+BRA,Serie A,Brazil,2026-05-02,19:00,Botafogo RJ,Remo,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-02,21:30,Palmeiras,Santos,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-02,21:30,Vitoria,Coritiba,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-02,23:30,Athletico-PR,Gremio,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,00:00,Cruzeiro,Atletico-MG,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,19:00,Flamengo RJ,Vasco,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,19:00,Sao Paulo,Bahia,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,21:30,Chapecoense-SC,Bragantino,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,21:30,Internacional,Fluminense,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-03,23:30,Mirassol,Corinthians,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-09,19:00,Coritiba,Internacional,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-09,21:00,Fluminense,Vitoria,,,,TIMED,True
+BRA,Serie A,Brazil,2026-05-10,00:00,Bahia,Cruzeiro,,,,TIMED,True
+CL,Champions League,UEFA,2026-04-29,19:00,Ath Madrid,Arsenal,,,,TIMED,True
+CL,Champions League,UEFA,2026-05-05,19:00,Arsenal,Ath Madrid,,,,TIMED,True
+CL,Champions League,UEFA,2026-05-06,19:00,Bayern Munich,Paris SG,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Blackburn,Leicester,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Bristol City,Stoke,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Derby,Sheffield United,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Hull,Norwich,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Ipswich,QPR,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Millwall,Oxford,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Portsmouth,Birmingham,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Preston,Southampton,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Sheffield Weds,West Brom,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Swansea,Charlton,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Watford,Coventry,,,,TIMED,True
+ELC,Championship,England,2026-05-02,11:30,Wrexham,Middlesbrough,,,,TIMED,True
