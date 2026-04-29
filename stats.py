@@ -194,7 +194,18 @@ def calculer_team_stats(df):
         away_defense = (a["GA"].mean() / lg_h) if len(a) > 0 and lg_h > 0 else 1.0
         pos, pts, gd = classements.get((lg, saison), {}).get(team, (None, None, None))
         last10 = grp.tail(10)
+        last5 = grp.tail(5)
 
+        # Stats récentes vs saison (pour détection d'anomalies)
+        gf_pg_5 = last5["GF"].mean() if len(last5) > 0 else None
+        ga_pg_5 = last5["GA"].mean() if len(last5) > 0 else None
+        over25_5 = 100 * last5["Over25"].mean() if len(last5) > 0 else None
+        btts_5 = 100 * last5["BTTS"].mean() if len(last5) > 0 else None
+
+        gf_pg_10 = last10["GF"].mean() if len(last10) > 0 else None
+        ga_pg_10 = last10["GA"].mean() if len(last10) > 0 else None
+        over25_10 = 100 * last10["Over25"].mean() if len(last10) > 0 else None
+        btts_10 = 100 * last10["BTTS"].mean() if len(last10) > 0 else None
         stats[(team, lg, saison)] = {
             "Team": team, "League": lg, "Season": saison, "MP": len(grp),
             "Pos": pos, "Pts": pts, "W": int(grp["Win"].sum()),
@@ -224,6 +235,13 @@ def calculer_team_stats(df):
             "Streak_Loss": streak_courante(grp["Loss"]),
             "L10_Over25_pct": round(100 * last10["Over25"].mean(), 1),
             "L10_BTTS_pct": round(100 * last10["BTTS"].mean(), 1),
+            # Stats sur 5 derniers et 10 derniers (pour anomalies)
+            "L5_GF_pg": round(gf_pg_5, 2) if gf_pg_5 is not None else None,
+            "L5_GA_pg": round(ga_pg_5, 2) if ga_pg_5 is not None else None,
+            "L5_Over25_pct": round(over25_5, 1) if over25_5 is not None else None,
+            "L5_BTTS_pct": round(btts_5, 1) if btts_5 is not None else None,
+            "L10_GF_pg": round(gf_pg_10, 2) if gf_pg_10 is not None else None,
+            "L10_GA_pg": round(ga_pg_10, 2) if ga_pg_10 is not None else None,
             "HomeAttack": round(home_attack, 2), "HomeDefense": round(home_defense, 2),
             "AwayAttack": round(away_attack, 2), "AwayDefense": round(away_defense, 2),
             "xG_home": round(home_attack * lg_h, 2),
@@ -321,7 +339,87 @@ def h2h_stats(index_h2h, home_team, away_team, jusqu_a_date):
         "H2H_O25_pct": round(100 * (total > 2.5).mean(), 1),
         "H2H_00_pct": round(100 * ((past["FTHG"] == 0) & (past["FTAG"] == 0)).mean(), 1),
     }
+def detecter_anomalies(stats):
+    """
+    Compare les stats récentes (5 et 10 derniers) avec la saison entière.
+    Retourne (emojis, détails_texte) pour utilisation en tooltip.
+    """
+    if not stats:
+        return "", ""
 
+    SEUIL = 20  # points de pourcentage
+    SEUIL_BUTS = 0.6  # buts/match
+
+    signaux = []
+    details = []
+
+    # Stats saison
+    gf_saison = stats.get("GF_pg")
+    ga_saison = stats.get("GA_pg")
+    over25_saison = stats.get("Over25_pct")
+    btts_saison = stats.get("BTTS_pct")
+
+    # Stats récentes (5 derniers - prioritaires) avec fallback 10 derniers
+    gf_recent = stats.get("L5_GF_pg") or stats.get("L10_GF_pg")
+    ga_recent = stats.get("L5_GA_pg") or stats.get("L10_GA_pg")
+    over25_recent = stats.get("L5_Over25_pct") or stats.get("L10_Over25_pct")
+    btts_recent = stats.get("L5_BTTS_pct") or stats.get("L10_BTTS_pct")
+    fenetre = "5 derniers" if stats.get("L5_GF_pg") is not None else "10 derniers"
+
+    # 1. Surforme attaque
+    if gf_saison is not None and gf_recent is not None:
+        if gf_recent - gf_saison >= SEUIL_BUTS:
+            signaux.append("📈")
+            details.append(f"📈 Surforme attaque : {gf_recent:.1f} buts/m sur {fenetre} vs {gf_saison:.1f} en saison")
+        elif gf_saison - gf_recent >= SEUIL_BUTS:
+            signaux.append("📉")
+            details.append(f"📉 Sousforme attaque : {gf_recent:.1f} buts/m sur {fenetre} vs {gf_saison:.1f} en saison")
+
+    # 2. Surforme/sousforme défense
+    if ga_saison is not None and ga_recent is not None:
+        if ga_saison - ga_recent >= SEUIL_BUTS:
+            signaux.append("🛡️")
+            details.append(f"🛡️ Surforme défense : {ga_recent:.1f} encaissés/m sur {fenetre} vs {ga_saison:.1f} en saison")
+        elif ga_recent - ga_saison >= SEUIL_BUTS:
+            signaux.append("⚠️")
+            details.append(f"⚠️ Sousforme défense : {ga_recent:.1f} encaissés/m sur {fenetre} vs {ga_saison:.1f} en saison")
+
+    # 3. Tendance Over/Under
+    if over25_saison is not None and over25_recent is not None:
+        if over25_recent - over25_saison >= SEUIL:
+            signaux.append("🔥")
+            details.append(f"🔥 Tendance Over : {over25_recent:.0f}% O2.5 sur {fenetre} vs {over25_saison:.0f}% en saison")
+        elif over25_saison - over25_recent >= SEUIL:
+            signaux.append("🧊")
+            details.append(f"🧊 Tendance Under : {over25_recent:.0f}% O2.5 sur {fenetre} vs {over25_saison:.0f}% en saison")
+
+    # 4. Tendance BTTS
+    if btts_saison is not None and btts_recent is not None:
+        if btts_recent - btts_saison >= SEUIL:
+            signaux.append("💥")
+            details.append(f"💥 Tendance BTTS : {btts_recent:.0f}% BTTS sur {fenetre} vs {btts_saison:.0f}% en saison")
+        elif btts_saison - btts_recent >= SEUIL:
+            signaux.append("🚫")
+            details.append(f"🚫 Anti-BTTS : {btts_recent:.0f}% BTTS sur {fenetre} vs {btts_saison:.0f}% en saison")
+
+    # Construire un mini-résumé chiffré pour l'affichage compact
+    resume_chiffre = []
+    if gf_saison is not None and gf_recent is not None:
+        diff_gf = gf_recent - gf_saison
+        if abs(diff_gf) >= SEUIL_BUTS:
+            signe = "+" if diff_gf > 0 else ""
+            resume_chiffre.append(f"{signe}{diff_gf:.1f} BM")
+    if ga_saison is not None and ga_recent is not None:
+        diff_ga = ga_recent - ga_saison
+        if abs(diff_ga) >= SEUIL_BUTS:
+            signe = "+" if diff_ga > 0 else ""
+            resume_chiffre.append(f"{signe}{diff_ga:.1f} BE")
+
+    affichage_court = "".join(signaux)
+    if resume_chiffre:
+        affichage_court += " " + " ".join(resume_chiffre)
+
+    return affichage_court, " | ".join(details)
 def construire_matchups(df, team_stats):
     index_h2h = construire_index_h2h(df)  # ← AJOUTER CETTE LIGNE
     matchups = []
@@ -367,6 +465,9 @@ def construire_matchups(df, team_stats):
             "A_Red_pg": a.get("Red_pg"),
             "A_Fouls_pg": a.get("Fouls_pg"),
         }
+        # Anomalies (forme récente vs saison)
+        h_emojis, h_details = detecter_anomalies(h)
+        a_emojis, a_details = detecter_anomalies(a)
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -394,6 +495,10 @@ def construire_matchups(df, team_stats):
             "P_00": round(100 * probs["p00"], 1),
             **h_extra,
             **a_extra,
+            "H_Signaux": h_emojis,
+            "H_Signaux_detail": h_details if h_details else "Aucune anomalie détectée",
+            "A_Signaux": a_emojis,
+            "A_Signaux_detail": a_details if a_details else "Aucune anomalie détectée",
             **h2h,
         })
     return pd.DataFrame(matchups)
@@ -450,6 +555,9 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
             "A_Red_pg": a.get("Red_pg"),
             "A_Fouls_pg": a.get("Fouls_pg"),
         }
+        # Anomalies (forme récente vs saison)
+        h_emojis, h_details = detecter_anomalies(h)
+        a_emojis, a_details = detecter_anomalies(a)
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -477,6 +585,10 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
             "P_00": round(100 * probs["p00"], 1),
             **h_extra,
             **a_extra,
+            "H_Signaux": h_emojis,
+            "H_Signaux_detail": h_details if h_details else "Aucune anomalie détectée",
+            "A_Signaux": a_emojis,
+            "A_Signaux_detail": a_details if a_details else "Aucune anomalie détectée",
             **h2h,
         })
     return pd.DataFrame(matchups)

@@ -337,7 +337,50 @@ hr {
     border-left: 3px solid var(--accent) !important;
     border-radius: 8px !important;
 }
-
+/* ======================================================
+   EXPANDERS (st.expander)
+   ====================================================== */
+[data-testid="stExpander"] {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 8px !important;
+    margin-bottom: 12px !important;
+}
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] details > summary {
+    color: var(--text-default) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    padding: 10px 14px !important;
+    cursor: pointer !important;
+    list-style: none !important;
+}
+[data-testid="stExpander"] summary:hover {
+    color: var(--text-strong) !important;
+    background: var(--bg-elevated) !important;
+}
+/* Icône flèche : on cache le texte parasite et on garde l'SVG */
+[data-testid="stExpander"] summary span:not([data-testid]) {
+    font-size: 0 !important;
+}
+[data-testid="stExpander"] summary svg {
+    fill: var(--text-muted) !important;
+    transition: transform 0.2s ease !important;
+}
+[data-testid="stExpander"] details[open] summary svg {
+    transform: rotate(90deg);
+}
+/* Pseudo-éléments éventuels */
+[data-testid="stExpander"] summary::before,
+[data-testid="stExpander"] summary::-webkit-details-marker {
+    display: none !important;
+}
+/* Le contenu interne */
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    padding: 0 14px 14px 14px !important;
+    color: var(--text-default) !important;
+}
 /* ======================================================
    SCROLLBARS personnalisées
    ====================================================== */
@@ -502,6 +545,8 @@ DESCRIPTIONS_COLONNES = {
     "A_YellowsOver35": "% matchs avec plus de 3.5 jaunes (équipe à l'extérieur)",
     "A_Red_pg": "Cartons rouges par match (équipe à l'extérieur)",
     "A_Fouls_pg": "Fautes par match (équipe à l'extérieur)",
+    "H_Signaux": "Anomalies détectées chez l'équipe à domicile (forme récente vs saison)",
+    "A_Signaux": "Anomalies détectées chez l'équipe à l'extérieur (forme récente vs saison)",
 }
 # ============================================================
 # LABELS COURTS ET LISIBLES POUR LES COLONNES
@@ -650,6 +695,8 @@ LABELS_COLONNES = {
     "A_YellowsOver35": "✈️ % O3.5",
     "A_Red_pg": "✈️ 🟥/m",
     "A_Fouls_pg": "✈️ Fautes/m",
+    "H_Signaux": "🏠 🚨",
+    "A_Signaux": "✈️ 🚨",
 }
 
 def build_column_config(colonnes):
@@ -891,7 +938,31 @@ with tab_matchs:
             f"#### 📅 {date_selectionnee}  \n"
             f"**{len(df_aff)}** match(s) ce jour-là"
         )
+# Légende des signaux d'anomalies (uniquement en vue Buts)
+    if type_stats_match == "Buts (défaut)":
+        if "afficher_legende_matchs" not in st.session_state:
+            st.session_state.afficher_legende_matchs = False
 
+        col_legende, _ = st.columns([2, 8])
+        with col_legende:
+            label = "🚨 Masquer la légende des signaux" if st.session_state.afficher_legende_matchs else "🚨 Afficher la légende des signaux"
+            if st.button(label, key="btn_legende_matchs"):
+                st.session_state.afficher_legende_matchs = not st.session_state.afficher_legende_matchs
+                st.rerun()
+
+        if st.session_state.afficher_legende_matchs:
+            st.markdown("""
+            Comparaison **forme récente** (5-10 derniers) vs **saison**.
+
+            | Emoji | Signification |
+            |---|---|
+            | 📈 / 📉 | Attaque en surforme / sousforme |
+            | 🛡️ / ⚠️ | Défense en surforme / sousforme |
+            | 🔥 / 🧊 | Tendance Over / Under 2.5 |
+            | 💥 / 🚫 | Tendance BTTS / Anti-BTTS |
+
+            **+X.X BM** = buts marqués/match en plus que la saison · **+X.X BE** = buts encaissés/match en plus
+            """)
     # Sélection des colonnes selon le type de stats
     if type_stats_match == "Tirs & corners":
         colonnes = [
@@ -914,6 +985,7 @@ with tab_matchs:
     else:  # Buts (défaut)
         colonnes = [
             "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+            "H_Signaux", "A_Signaux",
             "xG_H", "xG_A",
             "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
             "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
@@ -1215,17 +1287,21 @@ with tab_matchups:
                 a = stats_complet[ak]
 
                 # Calcul Poisson (même logique que construire_matchups)
-                from stats import probs_match, h2h_stats
+                from stats import probs_match, h2h_stats, detecter_anomalies
                 lam_h = h["HomeAttack"] * a["AwayDefense"] * h["_lg_h"]
                 lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
                 probs = probs_match(lam_h, lam_a)
                 h2h = h2h_stats(idx_h2h, m_match["HomeTeam"], m_match["AwayTeam"], today)
+                h_emojis, h_details = detecter_anomalies(h)
+                a_emojis, a_details = detecter_anomalies(a)
 
                 matchups_rows.append({
                     "HomeTeam": m_match["HomeTeam"],
                     "H_Ligue": m_match["HomeLeague"],
                     "AwayTeam": m_match["AwayTeam"],
                     "A_Ligue": m_match["AwayLeague"],
+                    "H_Signaux": h_emojis,
+                    "A_Signaux": a_emojis,
                     "H_Pos": h["Pos"], "H_Form": h["Form5"],
                     "H_Over05": h["Over05_pct"], "H_Over15": h["Over15_pct"],
                     "H_Over25": h["Over25_pct"], "H_BTTS": h["BTTS_pct"],
@@ -1252,24 +1328,42 @@ with tab_matchups:
                 df_display = pd.DataFrame(matchups_rows)
                 colonnes_custom = [
                     "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
-                    # 🎯 Indice Poisson en premier
+                    "H_Signaux", "A_Signaux",
                     "xG_H", "xG_A",
                     "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
-                    # 🔗 Combiné
                     "Combined_00_Pct",
-                    # 🏠 Stats Domicile
                     "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
                     "H_00_Count", "H_00_Pct",
-                    # ✈️ Stats Extérieur
                     "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
                     "A_00_Count", "A_00_Pct",
-                    # ⚔️ H2H en dernier
                     "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
                 ]
                 if mode_mobile:
                     colonnes_custom = ["HomeTeam", "AwayTeam",
                                        "H_Over05", "A_Over05", "H_Over15", "A_Over15",
                                        "P_Over05", "P_Over15", "P_00"]
+                # Légende des signaux
+                if "afficher_legende_matchups" not in st.session_state:
+                    st.session_state.afficher_legende_matchups = False
+
+                col_leg, _ = st.columns([2, 8])
+                with col_leg:
+                    label = "🚨 Masquer légende" if st.session_state.afficher_legende_matchups else "🚨 Afficher légende"
+                    if st.button(label, key="btn_legende_matchups"):
+                        st.session_state.afficher_legende_matchups = not st.session_state.afficher_legende_matchups
+                        st.rerun()
+
+                if st.session_state.afficher_legende_matchups:
+                    st.markdown("""
+                    | Emoji | Signification |
+                    |---|---|
+                    | 📈 / 📉 | Attaque en surforme / sousforme |
+                    | 🛡️ / ⚠️ | Défense en surforme / sousforme |
+                    | 🔥 / 🧊 | Tendance Over / Under 2.5 |
+                    | 💥 / 🚫 | Tendance BTTS / Anti-BTTS |
+
+                    Format : **+X.X BM/BE** = différence buts marqués/encaissés vs saison.
+                    """)
                 colonnes_custom = [c for c in colonnes_custom if c in df_display.columns]
                 st.dataframe(
                     appliquer_couleurs(df_display, colonnes_custom),
