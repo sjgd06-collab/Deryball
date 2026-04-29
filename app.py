@@ -716,18 +716,18 @@ with col_mode:
 # ============================================================
 # ONGLETS
 # ============================================================
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📊 Stats équipes",
-    "🔥 Séquences en cours",
-    "🎯 Force Poisson",
+tab_matchs, tab_matchups, tab_teams, tab_poisson, tab_sequences = st.tabs([
     "📅 Matchs",
     "🧪 Matchups personnalisés",
+    "📊 Stats équipes",
+    "🎯 Force Poisson",
+    "🔥 Séquences en cours",
 ])
 
 # ============================================================
 # ONGLET STATS ÉQUIPES
 # ============================================================
-with tab1:
+with tab_teams:
     st.caption("Statistiques cumulées par équipe et par saison.")
     fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
     with fcol1:
@@ -795,7 +795,7 @@ with tab1:
 # ============================================================
 # ONGLET SÉQUENCES EN COURS
 # ============================================================
-with tab2:
+with tab_sequences:
     st.caption("Séquences actives en cours pour chaque équipe (basées sur leurs derniers matchs consécutifs).")
     fcol1, fcol2, fcol3 = st.columns([2, 2, 2])
     with fcol1:
@@ -838,7 +838,7 @@ with tab2:
 # ============================================================
 # ONGLET FORCE POISSON
 # ============================================================
-with tab3:
+with tab_poisson:
     st.caption("Forces d'attaque/défense normalisées par la moyenne de la ligue (1.00 = moyenne).")
     fcol1, fcol2, fcol3 = st.columns([2, 2, 2])
     with fcol1:
@@ -876,7 +876,7 @@ with tab3:
 # ============================================================
 # ONGLET MATCHS
 # ============================================================
-with tab4:
+with tab_matchs:
     # ============================================================
     # CHIPS DE FILTRES RAPIDES
     # ============================================================
@@ -1001,10 +1001,16 @@ with tab4:
 
     colonnes = [
         "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
-        "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
-        "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
-        "Combined_00_Pct", "xG_H", "xG_A",
+        # 🎯 Indice Poisson en premier
+        "xG_H", "xG_A",
         "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+        # 🔗 Combiné
+        "Combined_00_Pct",
+        # 🏠 Stats Domicile
+        "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
+        # ✈️ Stats Extérieur
+        "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
+        # ⚔️ H2H en dernier
         "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
     ]
     if mode_mobile:
@@ -1023,7 +1029,7 @@ with tab4:
 # ============================================================
 # ONGLET 5 — MATCHUPS PERSONNALISÉS
 # ============================================================
-with tab5:
+with tab_matchups:
     st.markdown("### 🧪 Créer vos propres matchups")
     st.caption(
         "Sélectionnez 2 équipes de n'importe quelles ligues pour voir les stats "
@@ -1191,12 +1197,18 @@ with tab5:
                 df_display = pd.DataFrame(matchups_rows)
                 colonnes_custom = [
                     "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
+                    # 🎯 Indice Poisson en premier
+                    "xG_H", "xG_A",
+                    "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+                    # 🔗 Combiné
+                    "Combined_00_Pct",
+                    # 🏠 Stats Domicile
                     "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
                     "H_00_Count", "H_00_Pct",
+                    # ✈️ Stats Extérieur
                     "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
                     "A_00_Count", "A_00_Pct",
-                    "Combined_00_Pct", "xG_H", "xG_A",
-                    "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+                    # ⚔️ H2H en dernier
                     "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
                 ]
                 if mode_mobile:
