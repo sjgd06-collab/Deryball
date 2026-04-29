@@ -360,6 +360,46 @@ hr {
     color: var(--text-strong) !important;
     background: var(--bg-elevated) !important;
 }
+
+/* Cacher TOUTES les variantes d'icônes Material qui peuvent fuiter en texte */
+[data-testid="stExpander"] summary [class*="material-symbols"],
+[data-testid="stExpander"] summary [class*="material-icons"],
+[data-testid="stExpander"] summary [class*="MaterialIcon"],
+[data-testid="stExpander"] summary [data-testid="stIconMaterial"],
+[data-testid="stExpander"] summary [data-testid*="Icon"],
+[data-testid="stExpander"] summary [aria-hidden="true"]:not(svg) {
+    font-size: 0 !important;
+    line-height: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    color: transparent !important;
+}
+
+/* Pseudo-éléments natifs du <details> */
+[data-testid="stExpander"] summary::before,
+[data-testid="stExpander"] summary::-webkit-details-marker {
+    display: none !important;
+}
+
+/* Garder le SVG s'il est présent */
+[data-testid="stExpander"] summary svg {
+    fill: var(--text-muted) !important;
+    transition: transform 0.2s ease !important;
+}
+[data-testid="stExpander"] details[open] summary svg {
+    transform: rotate(90deg);
+}
+
+/* Le contenu interne */
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    padding: 0 14px 14px 14px !important;
+    color: var(--text-default) !important;
+}
+[data-testid="stExpander"] summary:hover {
+    color: var(--text-strong) !important;
+    background: var(--bg-elevated) !important;
+}
 /* Icône flèche : on cache le texte parasite et on garde l'SVG */
 [data-testid="stExpander"] summary span:not([data-testid]) {
     font-size: 0 !important;
@@ -821,12 +861,13 @@ with col_mode:
 # ============================================================
 # ONGLETS
 # ============================================================
-tab_matchs, tab_matchups, tab_teams, tab_poisson, tab_sequences = st.tabs([
+tab_matchs, tab_matchups, tab_teams, tab_poisson, tab_sequences, tab_validation = st.tabs([
     "📅 Matchs",
     "🧪 Matchups personnalisés",
     "📊 Stats équipes",
     "🎯 Force Poisson",
     "🔥 Séquences en cours",
+    "✅ Validation Poisson",
 ])
 
 # ============================================================
@@ -1374,3 +1415,115 @@ with tab_matchups:
                 )
             else:
                 st.warning("Aucun matchup valide. Vérifie que les équipes ont des stats disponibles.")
+                # ============================================================
+# ONGLET VALIDATION POISSON
+# ============================================================
+with tab_validation:
+    from stats import (
+        calculer_validation_poisson, metriques_calibration,
+        calibration_par_buckets, plus_grandes_surprises,
+    )
+
+    st.markdown("### ✅ Validation du modèle Poisson")
+    st.caption(
+        "Compare les probabilités Poisson prédites aux résultats réels des matchs joués. "
+        "Permet de voir où le modèle se trompe et de quel côté."
+    )
+
+    with st.expander("ℹ️ À lire avant d'interpréter ces chiffres"):
+        st.markdown("""
+        **Biais important :** les stats utilisées par Poisson (HomeAttack, AwayDefense…)
+        sont calculées sur **toute la saison**, incluant les matchs qu'on cherche à prédire.
+        Les métriques ci-dessous sont donc **optimistes** par rapport à une vraie performance
+        prédictive.
+
+        **Ce que ces chiffres permettent quand même de voir :**
+        - 📊 **Calibration** : est-ce que les tranches "60-70% prédit" donnent ~65% de réussite ?
+        - ⚖️ **Biais systématiques** : le modèle sur-prédit-il les Over 2.5 ?
+        - 🏆 **Comparaison entre marchés** : Poisson est-il meilleur sur BTTS ou sur 0-0 ?
+
+        Une vraie validation **walk-forward** (recalculer les stats à chaque date du calendrier)
+        est prévue dans une prochaine itération.
+        """)
+
+    # Filtres
+    fcol1, fcol2 = st.columns([2, 2])
+    with fcol1:
+        options_saison_v = ["En cours (par défaut)", "Toutes les saisons"] + sorted(matchups["Season"].unique().tolist())
+        saison_v = st.selectbox("Saison", options=options_saison_v, index=0, key="v_season")
+    with fcol2:
+        ligues_v = ["Toutes les ligues"] + sorted(matchups["League"].unique().tolist())
+        ligue_v = st.selectbox("Ligue", options=ligues_v, index=0, key="v_league")
+
+    # Filtrage
+    df_v = matchups.copy()
+    if "IsUpcoming" in df_v.columns:
+        df_v = df_v[df_v["IsUpcoming"] != True]
+    if saison_v == "En cours (par défaut)":
+        df_v = df_v[df_v.apply(lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)]
+    elif saison_v != "Toutes les saisons":
+        df_v = df_v[df_v["Season"] == saison_v]
+    if ligue_v != "Toutes les ligues":
+        df_v = df_v[df_v["League"] == ligue_v]
+
+    df_validation = calculer_validation_poisson(df_v)
+
+    if len(df_validation) == 0:
+        st.warning("Aucun match joué dans cette sélection.")
+    else:
+        st.markdown(f"#### 📊 {len(df_validation)} matchs analysés")
+
+        # Métriques par marché avec couleurs
+        metriques = metriques_calibration(df_validation)
+        styled_metriques = (
+            metriques.style
+            .background_gradient(subset=["Brier"], cmap="RdYlGn_r", vmin=0, vmax=0.30)
+            .background_gradient(subset=["Accuracy"], cmap="Greens", vmin=50, vmax=85)
+            .background_gradient(subset=["Écart (pp)"], cmap="RdBu", vmin=-15, vmax=15)
+            .format({"Brier": "{:.4f}", "Accuracy": "{:.1f}",
+                     "% prédit moy": "{:.1f}", "% réel": "{:.1f}", "Écart (pp)": "{:+.1f}"})
+        )
+        st.dataframe(styled_metriques, use_container_width=True, hide_index=True)
+        st.caption(
+            "💡 **Brier score** : plus c'est bas, mieux c'est (0 = parfait, 0.25 = pile/face). "
+            "**Écart** : positif = modèle sur-prédit, négatif = sous-prédit."
+        )
+
+        # Calibration par tranche
+        st.markdown("---")
+        st.markdown("#### 🎯 Calibration par tranche de probabilité")
+
+        marches_dict = {
+            "Over 2.5": ("P_Over25", "Real_Over25"),
+            "BTTS":     ("P_BTTS",   "Real_BTTS"),
+            "Over 1.5": ("P_Over15", "Real_Over15"),
+            "Over 0.5": ("P_Over05", "Real_Over05"),
+            "0-0":      ("P_00",     "Real_00"),
+        }
+        marche_sel = st.selectbox("Marché à analyser", options=list(marches_dict.keys()), key="v_marche")
+        col_pred, col_real = marches_dict[marche_sel]
+
+        buckets = calibration_par_buckets(df_validation, col_pred, col_real)
+        if len(buckets) > 0:
+            styled_buckets = (
+                buckets.style
+                .background_gradient(subset=["Écart (pp)"], cmap="RdBu", vmin=-25, vmax=25)
+                .format({"% prédit moy": "{:.1f}", "% réel": "{:.1f}", "Écart (pp)": "{:+.1f}"})
+            )
+            st.dataframe(styled_buckets, use_container_width=True, hide_index=True)
+            st.caption(
+                "💡 Si le modèle est bien calibré, **% prédit moy** ≈ **% réel** dans chaque tranche. "
+                "L'écart est en points de pourcentage (pp)."
+            )
+        else:
+            st.info("Pas assez de données pour bucketer ce marché.")
+
+        # Top surprises
+        st.markdown("---")
+        st.markdown(f"#### 😱 Top 10 — où le modèle s'est le plus trompé ({marche_sel})")
+        surprises = plus_grandes_surprises(df_validation, col_pred, col_real, n=10)
+        st.dataframe(surprises, use_container_width=True, hide_index=True)
+        st.caption(
+            "Écart positif = modèle prédisait haut mais c'est arrivé en bas (ou inversement). "
+            "0/1 dans la colonne Réel = est-ce que l'évènement s'est produit."
+        )

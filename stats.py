@@ -283,11 +283,37 @@ def poisson_pmf(k, lam):
         return 1.0 if k == 0 else 0.0
     return (lam ** k * math.exp(-lam)) / math.factorial(k)
 
-def probs_match(lam_h, lam_a, max_g=10):
+
+def tau_correction(x, y, lam_h, lam_a, rho):
+    """
+    Facteur de correction Dixon-Coles pour les 4 scores faibles.
+    Modélise la corrélation observée entre buts H et A (Poisson assume indépendance).
+
+    rho < 0 (typique en foot) : ↑ P(0-0) et P(1-1), ↓ P(1-0) et P(0-1).
+    rho = 0 : retombe sur Poisson indépendant classique.
+    """
+    if x == 0 and y == 0:
+        return 1 - lam_h * lam_a * rho
+    elif x == 0 and y == 1:
+        return 1 + lam_h * rho
+    elif x == 1 and y == 0:
+        return 1 + lam_a * rho
+    elif x == 1 and y == 1:
+        return 1 - rho
+    return 1.0
+
+
+def probs_match(lam_h, lam_a, max_g=10, rho=-0.10):
+    """
+    Probabilités d'événements (Poisson + correction Dixon-Coles).
+    rho=-0.10 par défaut (valeur empirique standard en littérature foot).
+    rho=0 → Poisson pur sans correction.
+    """
     p = {"p00": 0, "over05": 0, "over15": 0, "over25": 0, "btts": 0}
     for i in range(max_g):
         for j in range(max_g):
-            pr = poisson_pmf(i, lam_h) * poisson_pmf(j, lam_a)
+            tau = tau_correction(i, j, lam_h, lam_a, rho) if rho != 0 else 1.0
+            pr = tau * poisson_pmf(i, lam_h) * poisson_pmf(j, lam_a)
             t = i + j
             if i == 0 and j == 0:
                 p["p00"] += pr
@@ -301,6 +327,33 @@ def probs_match(lam_h, lam_a, max_g=10):
                 p["btts"] += pr
     return p
 
+
+def recalculer_probs_avec_rho(matchups_df, rho):
+    """
+    Recalcule P_* pour un rho donné en partant des xG_H/xG_A déjà calculés.
+    Utile pour comparer DC vs Poisson pur dans la validation.
+    """
+    df = matchups_df.copy()
+    new_rows = []
+    for _, row in df.iterrows():
+        lam_h = row.get("xG_H")
+        lam_a = row.get("xG_A")
+        if pd.isna(lam_h) or pd.isna(lam_a):
+            new_rows.append({"P_Over05": None, "P_Over15": None,
+                             "P_Over25": None, "P_BTTS": None, "P_00": None})
+            continue
+        probs = probs_match(lam_h, lam_a, rho=rho)
+        new_rows.append({
+            "P_Over05": round(100 * probs["over05"], 1),
+            "P_Over15": round(100 * probs["over15"], 1),
+            "P_Over25": round(100 * probs["over25"], 1),
+            "P_BTTS":   round(100 * probs["btts"], 1),
+            "P_00":     round(100 * probs["p00"], 1),
+        })
+    np_df = pd.DataFrame(new_rows)
+    for col in ["P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00"]:
+        df[col] = np_df[col].values
+    return df
 def construire_index_h2h(df):
     """
     Pré-calcule un index des confrontations par paire d'équipes.
@@ -669,3 +722,104 @@ def calculer_tout(chemin_csv, chemin_fixtures=None):
         "matchups": matchups_df,
         "saison_courante": courante,
     }
+    # ============================================================
+# 5. VALIDATION POISSON (compare prédictions vs résultats réels)
+# ============================================================
+
+def calculer_validation_poisson(matchups_df):
+    """
+    Filtre aux matchs joués et ajoute des colonnes Real_* (0/1) pour chaque marché.
+    """
+    df = matchups_df.copy()
+    if "IsUpcoming" in df.columns:
+        df = df[df["IsUpcoming"] != True]
+
+    def parse_score(s):
+        try:
+            h, a = str(s).split("-")
+            return int(h), int(a)
+        except Exception:
+            return None, None
+
+    parsed = df["Score"].apply(parse_score)
+    df["Actual_H"] = [p[0] for p in parsed]
+    df["Actual_A"] = [p[1] for p in parsed]
+    df = df.dropna(subset=["Actual_H", "Actual_A"]).copy()
+    df["Actual_H"] = df["Actual_H"].astype(int)
+    df["Actual_A"] = df["Actual_A"].astype(int)
+    df["Actual_Total"] = df["Actual_H"] + df["Actual_A"]
+
+    df["Real_Over05"] = (df["Actual_Total"] >= 1).astype(int)
+    df["Real_Over15"] = (df["Actual_Total"] >= 2).astype(int)
+    df["Real_Over25"] = (df["Actual_Total"] >= 3).astype(int)
+    df["Real_BTTS"] = ((df["Actual_H"] > 0) & (df["Actual_A"] > 0)).astype(int)
+    df["Real_00"] = ((df["Actual_H"] == 0) & (df["Actual_A"] == 0)).astype(int)
+    return df
+
+
+def metriques_calibration(df_validation):
+    """
+    Pour chaque marché, calcule : taux prédit moyen, taux réel, écart, Brier, accuracy.
+    """
+    marches = [
+        ("Over 0.5", "P_Over05", "Real_Over05"),
+        ("Over 1.5", "P_Over15", "Real_Over15"),
+        ("Over 2.5", "P_Over25", "Real_Over25"),
+        ("BTTS",     "P_BTTS",   "Real_BTTS"),
+        ("0-0",      "P_00",     "Real_00"),
+    ]
+    rows = []
+    for nom, col_pred, col_real in marches:
+        if col_pred not in df_validation.columns or col_real not in df_validation.columns:
+            continue
+        sub = df_validation[[col_pred, col_real]].dropna()
+        if len(sub) == 0:
+            continue
+        pred = sub[col_pred] / 100.0   # convertir % en proba [0,1]
+        real = sub[col_real]
+        brier = ((pred - real) ** 2).mean()
+        accuracy = ((pred > 0.5).astype(int) == real).mean()
+        rows.append({
+            "Marché": nom,
+            "N matchs": int(len(sub)),
+            "% prédit moy": round(100 * pred.mean(), 1),
+            "% réel": round(100 * real.mean(), 1),
+            "Écart (pp)": round(100 * (pred.mean() - real.mean()), 1),
+            "Brier": round(brier, 4),
+            "Accuracy": round(100 * accuracy, 1),
+        })
+    return pd.DataFrame(rows)
+
+
+def calibration_par_buckets(df_validation, col_pred, col_real):
+    """
+    Découpe les prédictions en tranches fixes de 10 points et compare au réel.
+    """
+    sub = df_validation[[col_pred, col_real]].dropna().copy()
+    if len(sub) == 0:
+        return pd.DataFrame()
+    bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.01]
+    labels = ["0-10%", "10-20%", "20-30%", "30-40%", "40-50%",
+              "50-60%", "60-70%", "70-80%", "80-90%", "90-100%"]
+    sub["Tranche"] = pd.cut(sub[col_pred], bins=bins, labels=labels, include_lowest=True)
+    agg = sub.groupby("Tranche", observed=True).agg(
+        N=(col_pred, "size"),
+        Pred_moyen=(col_pred, "mean"),
+        Real_pct=(col_real, "mean"),
+    ).reset_index()
+    agg["Pred_moyen"] = agg["Pred_moyen"].round(1)
+    agg["Real_pct"] = (agg["Real_pct"] * 100).round(1)
+    agg["Écart (pp)"] = (agg["Pred_moyen"] - agg["Real_pct"]).round(1)
+    return agg.rename(columns={"Pred_moyen": "% prédit moy", "Real_pct": "% réel"})
+
+
+def plus_grandes_surprises(df_validation, col_pred, col_real, n=10):
+    """
+    Renvoie les n matchs où la prédiction était la plus loin du résultat (en pp).
+    """
+    df = df_validation.copy()
+    df["Écart (pp)"] = (df[col_pred] - df[col_real] * 100).round(1)
+    df = df.reindex(df["Écart (pp)"].abs().sort_values(ascending=False).index).head(n)
+    cols = ["Date", "League", "HomeTeam", "AwayTeam", "Score", col_pred, col_real, "Écart (pp)"]
+    cols = [c for c in cols if c in df.columns]
+    return df[cols].rename(columns={col_pred: "% prédit", col_real: "Réel (0/1)"})
