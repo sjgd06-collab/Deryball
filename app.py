@@ -459,7 +459,9 @@ DESCRIPTIONS_COLONNES = {
     "GF_pg": "Buts marqués par match (moyenne)",
     "GA_pg": "Buts encaissés par match (moyenne)",
     "Total_pg": "Total de buts par match (moyenne)",
-
+    "Spark_GF": "Buts marqués sur les 10 derniers matchs (ancien à gauche, récent à droite)",
+    "Spark_GA": "Buts encaissés sur les 10 derniers matchs (ancien à gauche, récent à droite)",
+    "Spark_Total": "Total de buts par match sur les 10 derniers — utile pour la tendance Over/Under",
     # Pourcentages généraux
     "Over05_pct": "% des matchs avec au moins 1 but",
     "Over15_pct": "% des matchs avec au moins 2 buts",
@@ -611,6 +613,9 @@ LABELS_COLONNES = {
     "GF_pg": "⚽ BM/m",
     "GA_pg": "🛡️ BE/m",
     "Total_pg": "Total/m",
+    "Spark_GF": "📈 BM 10d",
+    "Spark_GA": "📉 BE 10d",
+    "Spark_Total": "📊 Total 10d",
     "Over05_pct": "O0.5",
     "Over15_pct": "O1.5",
     "Over25_pct": "O2.5",
@@ -744,12 +749,19 @@ def build_column_config(colonnes):
     import streamlit as st
     config = {}
     for col in colonnes:
-        label = LABELS_COLONNES.get(col, col)  # nom court si disponible, sinon nom technique
-        help_text = DESCRIPTIONS_COLONNES.get(col)  # description pour tooltip
-        config[col] = st.column_config.Column(
-            label,
-            help=help_text,
-        )
+        label = LABELS_COLONNES.get(col, col)
+        help_text = DESCRIPTIONS_COLONNES.get(col)
+        # Sparklines : barres horizontales (chaque barre = 1 match)
+        if col in ("Spark_GF", "Spark_GA"):
+            config[col] = st.column_config.BarChartColumn(
+                label, help=help_text, y_min=0, y_max=5,
+            )
+        elif col == "Spark_Total":
+            config[col] = st.column_config.BarChartColumn(
+                label, help=help_text, y_min=0, y_max=8,
+            )
+        else:
+            config[col] = st.column_config.Column(label, help=help_text)
     return config
 # ============================================================
 # CHARGEMENT DES DONNÉES (avec cache)
@@ -1097,7 +1109,7 @@ with tab_teams:
                   "Red_pg", "RedContre_pg", "Fouls_pg", "FoulsContre_pg"]
     else:  # Buts
         cols_t = ["Team", "League", "Season", "Pos", "Pts", "Form5", "MP", "W", "D", "L",
-                  "GF_pg", "GA_pg", "Total_pg",
+                  "GF_pg", "Spark_GF", "GA_pg", "Spark_GA", "Total_pg", "Spark_Total",
                   "Over05_pct", "Over15_pct", "Over25_pct", "BTTS_pct",
                   "Count00", "Pct00", "CS_pct", "FTS_pct"]
 
@@ -1107,7 +1119,7 @@ with tab_teams:
         elif type_t == "Cartons & fautes":
             cols_t = ["Team", "League", "Pos", "Yellow_pg", "YellowsOver35_pct", "Red_pg"]
         else:
-            cols_t = ["Team", "League", "Pos", "Form5", "Over25_pct", "BTTS_pct", "Pct00"]
+            cols_t = ["Team", "League", "Pos", "Form5", "Spark_Total", "Over25_pct", "BTTS_pct"]
 
     cols_t = [c for c in cols_t if c in df_t.columns]
     st.dataframe(
@@ -1444,6 +1456,33 @@ with tab_validation:
 
         Une vraie validation **walk-forward** (recalculer les stats à chaque date du calendrier)
         est prévue dans une prochaine itération.
+
+        ---
+
+        ### 🎯 Le Brier score, c'est quoi ?
+
+        C'est une mesure de qualité d'une prédiction probabiliste. Pour chaque match,
+        on calcule l'écart au carré entre la proba prédite (ex. 0.65) et le résultat
+        réel (1 si l'évènement est arrivé, 0 sinon). Puis on moyenne sur tous les matchs.
+
+        - **0.000** = parfait (impossible en pratique)
+        - **0.250** = équivalent à pile-ou-face
+        - Plus c'est **bas**, mieux c'est.
+        - Bon pour comparer **deux modèles** sur le même jeu de matchs (ex. DC vs Poisson pur).
+
+        ### 🔬 Dixon-Coles (DC), c'est quoi ?
+
+        Le Poisson "pur" suppose que les buts à domicile et à l'extérieur sont
+        **indépendants**. En réalité, en foot, on observe que les scores faibles
+        (**0-0**, **1-1**) arrivent un peu plus souvent que prédit, et **1-0 / 0-1**
+        un peu moins. La correction Dixon-Coles ajoute un paramètre **ρ (rho)** qui
+        ajuste les probas des 4 cases basses (0-0, 0-1, 1-0, 1-1) pour coller à cette
+        réalité empirique. Ici on utilise **ρ = -0.10**, valeur standard en littérature foot.
+
+        ⚠️ **Conséquence importante** : DC ne touche que les 4 cases basses, donc
+        **Over 2.5 est identique** entre DC et Poisson pur (les cases concernées
+        ont toutes un total < 3). Seuls **BTTS, 0-0, Over 0.5 et Over 1.5** changent
+        — et de quelques points seulement.
         """)
 
     # Filtres
@@ -1490,6 +1529,53 @@ with tab_validation:
         )
 
         # Calibration par tranche
+        # ============================================================
+        # COMPARAISON DIXON-COLES vs POISSON PUR
+        # ============================================================
+        st.markdown("---")
+        st.markdown("#### 🔬 Comparaison Dixon-Coles vs Poisson pur")
+        comparer_dc = st.toggle(
+            "Afficher la comparaison côte à côte",
+            value=False,
+            key="v_compare_dc",
+            help="Recalcule les probas en mode Poisson pur (ρ=0) pour comparer avec DC (ρ=-0.10).",
+        )
+
+        if comparer_dc:
+            from stats import recalculer_probs_avec_rho
+
+            with st.spinner("Recalcul en mode Poisson pur (ρ=0)..."):
+                df_v_pur = recalculer_probs_avec_rho(df_v, rho=0.0)
+                df_validation_pur = calculer_validation_poisson(df_v_pur)
+                metriques_pur = metriques_calibration(df_validation_pur)
+
+            col_dc, col_pur = st.columns(2)
+            with col_dc:
+                st.markdown("##### ✅ Dixon-Coles (ρ=-0.10)")
+                styled_dc = (
+                    metriques.style
+                    .background_gradient(subset=["Brier"], cmap="RdYlGn_r", vmin=0, vmax=0.30)
+                    .background_gradient(subset=["Écart (pp)"], cmap="RdBu", vmin=-15, vmax=15)
+                    .format({"Brier": "{:.4f}", "Accuracy": "{:.1f}",
+                             "% prédit moy": "{:.1f}", "% réel": "{:.1f}",
+                             "Écart (pp)": "{:+.1f}"})
+                )
+                st.dataframe(styled_dc, use_container_width=True, hide_index=True)
+            with col_pur:
+                st.markdown("##### ➖ Poisson pur (ρ=0)")
+                styled_pur = (
+                    metriques_pur.style
+                    .background_gradient(subset=["Brier"], cmap="RdYlGn_r", vmin=0, vmax=0.30)
+                    .background_gradient(subset=["Écart (pp)"], cmap="RdBu", vmin=-15, vmax=15)
+                    .format({"Brier": "{:.4f}", "Accuracy": "{:.1f}",
+                             "% prédit moy": "{:.1f}", "% réel": "{:.1f}",
+                             "Écart (pp)": "{:+.1f}"})
+                )
+                st.dataframe(styled_pur, use_container_width=True, hide_index=True)
+            st.caption(
+                "💡 Compare les Brier scores et les écarts. Brier plus bas = meilleur. "
+                "DC devrait améliorer BTTS et 1-1, mais peut légèrement empirer 0-0."
+            )
         st.markdown("---")
         st.markdown("#### 🎯 Calibration par tranche de probabilité")
 

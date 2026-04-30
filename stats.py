@@ -248,7 +248,13 @@ def calculer_team_stats(df):
             "xG_away": round(away_attack * lg_a, 2),
             "_lg_h": lg_h, "_lg_a": lg_a,
         }
-
+# Sparklines : 10 derniers matchs (chronologique : ancien → récent)
+        recent_10 = grp.tail(10)
+        stats[(team, lg, saison)]["Spark_GF"] = recent_10["GF"].astype(int).tolist()
+        stats[(team, lg, saison)]["Spark_GA"] = recent_10["GA"].astype(int).tolist()
+        stats[(team, lg, saison)]["Spark_Total"] = (
+            recent_10["GF"] + recent_10["GA"]
+        ).astype(int).tolist()
         # Stats additionnelles (si colonnes disponibles)
         for prefix, libelle in [("S", "Shots"), ("ST", "ShotsTarget"), ("C", "Corners"),
                                  ("Y", "Yellow"), ("R", "Red"), ("F", "Fouls")]:
