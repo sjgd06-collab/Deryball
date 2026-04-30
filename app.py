@@ -4,11 +4,9 @@ Deryball — Application Streamlit principale.
 import streamlit as st
 import pandas as pd
 from stats import calculer_tout
+from cards import CARDS_CSS, rendre_cartes_matchs
 
 st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
-# ============================================================
-# THÈME PERSONNALISÉ — Style Linear / FM24 (gris-mauve)
-# ============================================================
 # ============================================================
 # THÈME PERSONNALISÉ — Style Linear / FM24 (gris-mauve)
 # ============================================================
@@ -93,8 +91,6 @@ h4 { font-size: 16px !important; }
 /* ======================================================
    ENCADRER LES BLOCS HORIZONTAUX (filtres, chips)
    ====================================================== */
-
-/* Le truc malin : on encadre les st.columns horizontaux contenant des selects/inputs/buttons */
 [data-testid="stHorizontalBlock"]:has(> div [data-testid="stSelectbox"]),
 [data-testid="stHorizontalBlock"]:has(> div [data-testid="stTextInput"]) {
     background:
@@ -161,29 +157,19 @@ h4 { font-size: 16px !important; }
     font-weight: 500 !important;
     transition: all 0.15s ease !important;
 }
-
-/* Hauteur et padding cohérents pour les selectbox */
 .stSelectbox > div > div {
     min-height: 42px !important;
     padding: 4px 12px !important;
     display: flex !important;
     align-items: center !important;
 }
-
-/* Le conteneur du texte affiché (BaseWeb) */
-.stSelectbox div[data-baseweb="select"] > div {
-    min-height: 36px !important;
-}
-
-/* Le texte de la valeur sélectionnée */
+.stSelectbox div[data-baseweb="select"] > div { min-height: 36px !important; }
 .stSelectbox div[data-baseweb="select"] > div > div {
     line-height: 1.5 !important;
     overflow: visible !important;
     white-space: nowrap !important;
     padding: 4px 0 !important;
 }
-
-/* Padding spécifique des inputs texte */
 .stTextInput > div > div > input {
     padding: 10px 14px !important;
     min-height: 42px !important;
@@ -193,8 +179,6 @@ h4 { font-size: 16px !important; }
     border-color: var(--accent-soft) !important;
     background-color: var(--bg-hover) !important;
 }
-
-/* Popover des selects */
 [data-baseweb="popover"] [role="listbox"] {
     background: var(--bg-elevated) !important;
     border: 1px solid var(--border-default) !important;
@@ -241,8 +225,6 @@ h4 { font-size: 16px !important; }
 /* ======================================================
    TOGGLE / SWITCH (st.toggle) — couleur mauve assumée
    ====================================================== */
-
-/* Le rail (track) du toggle — état OFF */
 .stCheckbox [role="switch"],
 [data-baseweb="checkbox"] [role="checkbox"],
 [data-baseweb="switch"] > div {
@@ -250,8 +232,6 @@ h4 { font-size: 16px !important; }
     border: 1px solid var(--border-default) !important;
     transition: all 0.2s ease !important;
 }
-
-/* Le rail — état ON (mauve plein) */
 .stCheckbox [role="switch"][aria-checked="true"],
 [data-baseweb="checkbox"][aria-checked="true"] [role="checkbox"],
 [data-baseweb="switch"][aria-checked="true"] > div {
@@ -259,23 +239,42 @@ h4 { font-size: 16px !important; }
     border-color: var(--accent-soft) !important;
     box-shadow: 0 0 0 4px rgba(130,102,255,0.20) !important;
 }
-
-/* Le knob (petit bouton rond qui glisse) — état OFF */
 .stCheckbox [role="switch"] > div,
 [data-baseweb="checkbox"] [role="checkbox"] > div {
     background-color: var(--text-muted) !important;
     transition: all 0.2s ease !important;
 }
-
-/* Le knob — état ON (blanc) */
 .stCheckbox [role="switch"][aria-checked="true"] > div,
 [data-baseweb="checkbox"][aria-checked="true"] [role="checkbox"] > div {
     background-color: white !important;
 }
-
-/* Override la couleur primaire bleue par défaut de Streamlit */
 .stCheckbox div[data-testid="stCheckbox"] label > div:first-child[style*="background"] {
     background-color: var(--accent) !important;
+}
+
+/* ======================================================
+   RADIO (utilisé pour le toggle Vue Tableau/Détaillée)
+   ====================================================== */
+.stRadio > div[role="radiogroup"] {
+    gap: 6px !important;
+}
+.stRadio label {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: 8px !important;
+    padding: 8px 14px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+}
+.stRadio label:hover {
+    border-color: var(--accent-soft) !important;
+    background: var(--accent-glow) !important;
+}
+.stRadio label[data-checked="true"],
+.stRadio label:has(input:checked) {
+    background: rgba(130,102,255,0.30) !important;
+    border-color: var(--accent) !important;
+    color: var(--text-strong) !important;
 }
 
 /* ======================================================
@@ -292,7 +291,7 @@ hr {
 }
 
 /* ======================================================
-   TABLEAUX (DATAFRAME) — la grosse partie
+   TABLEAUX (DATAFRAME)
    ====================================================== */
 .stDataFrame, [data-testid="stDataFrame"] {
     border-radius: 12px !important;
@@ -360,8 +359,6 @@ hr {
     color: var(--text-strong) !important;
     background: var(--bg-elevated) !important;
 }
-
-/* Cacher TOUTES les variantes d'icônes Material qui peuvent fuiter en texte */
 [data-testid="stExpander"] summary [class*="material-symbols"],
 [data-testid="stExpander"] summary [class*="material-icons"],
 [data-testid="stExpander"] summary [class*="MaterialIcon"],
@@ -375,14 +372,10 @@ hr {
     overflow: hidden !important;
     color: transparent !important;
 }
-
-/* Pseudo-éléments natifs du <details> */
 [data-testid="stExpander"] summary::before,
 [data-testid="stExpander"] summary::-webkit-details-marker {
     display: none !important;
 }
-
-/* Garder le SVG s'il est présent */
 [data-testid="stExpander"] summary svg {
     fill: var(--text-muted) !important;
     transition: transform 0.2s ease !important;
@@ -390,37 +383,14 @@ hr {
 [data-testid="stExpander"] details[open] summary svg {
     transform: rotate(90deg);
 }
-
-/* Le contenu interne */
 [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
     padding: 0 14px 14px 14px !important;
     color: var(--text-default) !important;
 }
-[data-testid="stExpander"] summary:hover {
-    color: var(--text-strong) !important;
-    background: var(--bg-elevated) !important;
-}
-/* Icône flèche : on cache le texte parasite et on garde l'SVG */
 [data-testid="stExpander"] summary span:not([data-testid]) {
     font-size: 0 !important;
 }
-[data-testid="stExpander"] summary svg {
-    fill: var(--text-muted) !important;
-    transition: transform 0.2s ease !important;
-}
-[data-testid="stExpander"] details[open] summary svg {
-    transform: rotate(90deg);
-}
-/* Pseudo-éléments éventuels */
-[data-testid="stExpander"] summary::before,
-[data-testid="stExpander"] summary::-webkit-details-marker {
-    display: none !important;
-}
-/* Le contenu interne */
-[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
-    padding: 0 14px 14px 14px !important;
-    color: var(--text-default) !important;
-}
+
 /* ======================================================
    SCROLLBARS personnalisées
    ====================================================== */
@@ -433,11 +403,14 @@ hr {
 ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 </style>
 """, unsafe_allow_html=True)
+
+# CSS spécifique aux cartes (vue détaillée)
+st.markdown(CARDS_CSS, unsafe_allow_html=True)
+
 # ============================================================
 # DESCRIPTIONS DES COLONNES (tooltips au survol de l'entête)
 # ============================================================
 DESCRIPTIONS_COLONNES = {
-    # Colonnes de base
     "Team": "Nom de l'équipe",
     "League": "Ligue / championnat",
     "Season": "Saison concernée",
@@ -447,22 +420,17 @@ DESCRIPTIONS_COLONNES = {
     "HomeTeam": "Équipe à domicile",
     "AwayTeam": "Équipe à l'extérieur",
     "Score": "Score final du match (ou 'À VENIR' si pas encore joué)",
-
-    # Classement et forme
     "Pos": "Position actuelle au classement",
     "Pts": "Points accumulés cette saison",
     "Form5": "Forme sur les 5 derniers matchs (V=victoire, N=nul, D=défaite)",
     "MP": "Nombre de matchs joués",
-    "W": "Victoires",
-    "D": "Matchs nuls",
-    "L": "Défaites",
+    "W": "Victoires", "D": "Matchs nuls", "L": "Défaites",
     "GF_pg": "Buts marqués par match (moyenne)",
     "GA_pg": "Buts encaissés par match (moyenne)",
     "Total_pg": "Total de buts par match (moyenne)",
     "Spark_GF": "Buts marqués sur les 10 derniers matchs (ancien à gauche, récent à droite)",
     "Spark_GA": "Buts encaissés sur les 10 derniers matchs (ancien à gauche, récent à droite)",
     "Spark_Total": "Total de buts par match sur les 10 derniers — utile pour la tendance Over/Under",
-    # Pourcentages généraux
     "Over05_pct": "% des matchs avec au moins 1 but",
     "Over15_pct": "% des matchs avec au moins 2 buts",
     "Over25_pct": "% des matchs avec au moins 3 buts (plus de 2.5)",
@@ -471,8 +439,6 @@ DESCRIPTIONS_COLONNES = {
     "Pct00": "% des matchs terminés 0-0",
     "CS_pct": "% de matchs où l'équipe n'a pas encaissé (clean sheet)",
     "FTS_pct": "% de matchs où l'équipe n'a pas marqué",
-
-    # Séquences en cours
     "Streak_NoScore": "Nombre de matchs consécutifs sans marquer",
     "Streak_NoConcede": "Matchs consécutifs sans encaisser",
     "Streak_BTTS": "Matchs consécutifs où les 2 équipes ont marqué",
@@ -487,16 +453,12 @@ DESCRIPTIONS_COLONNES = {
     "Streak_Loss": "Défaites consécutives",
     "L10_Over25_pct": "% Over 2.5 sur les 10 derniers matchs",
     "L10_BTTS_pct": "% BTTS sur les 10 derniers matchs",
-
-    # Force Poisson
     "HomeAttack": "Force offensive à domicile (1.00 = moyenne de la ligue)",
     "HomeDefense": "Force défensive à domicile (1.00 = moyenne, <1 = bon)",
     "AwayAttack": "Force offensive à l'extérieur (1.00 = moyenne)",
     "AwayDefense": "Force défensive à l'extérieur (1.00 = moyenne, <1 = bon)",
     "xG_home": "Buts attendus à domicile (Poisson)",
     "xG_away": "Buts attendus à l'extérieur (Poisson)",
-
-    # Colonnes matchup — Domicile (H_)
     "H_Pos": "Classement actuel de l'équipe à domicile",
     "H_Form": "Forme sur les 5 derniers matchs (domicile)",
     "H_Over05": "% Over 0.5 de l'équipe à domicile",
@@ -505,8 +467,6 @@ DESCRIPTIONS_COLONNES = {
     "H_BTTS": "% BTTS de l'équipe à domicile",
     "H_00_Count": "Nombre de 0-0 de l'équipe à domicile",
     "H_00_Pct": "% de 0-0 de l'équipe à domicile",
-
-    # Colonnes matchup — Extérieur (A_)
     "A_Pos": "Classement actuel de l'équipe à l'extérieur",
     "A_Form": "Forme sur les 5 derniers matchs (extérieur)",
     "A_Over05": "% Over 0.5 de l'équipe à l'extérieur",
@@ -515,15 +475,9 @@ DESCRIPTIONS_COLONNES = {
     "A_BTTS": "% BTTS de l'équipe à l'extérieur",
     "A_00_Count": "Nombre de 0-0 de l'équipe à l'extérieur",
     "A_00_Pct": "% de 0-0 de l'équipe à l'extérieur",
-
-    # Ligues (pour matchups personnalisés)
     "H_Ligue": "Ligue de l'équipe à domicile",
     "A_Ligue": "Ligue de l'équipe à l'extérieur",
-
-    # Combiné
     "Combined_00_Pct": "Moyenne des % de 0-0 des 2 équipes",
-
-    # Poisson (P_)
     "xG_H": "Buts attendus de l'équipe domicile (modèle Poisson)",
     "xG_A": "Buts attendus de l'équipe extérieur (modèle Poisson)",
     "P_Over05": "Probabilité Poisson qu'il y ait au moins 1 but",
@@ -531,15 +485,11 @@ DESCRIPTIONS_COLONNES = {
     "P_Over25": "Probabilité Poisson qu'il y ait plus de 2.5 buts",
     "P_BTTS": "Probabilité Poisson que les 2 équipes marquent",
     "P_00": "Probabilité Poisson que le match finisse 0-0",
-
-    # Head to Head (H2H_)
     "H2H_N": "Nombre de confrontations passées entre ces 2 équipes",
     "H2H_AvgGoals": "Moyenne de buts par match dans les confrontations passées",
     "H2H_BTTS_pct": "% BTTS dans les confrontations passées",
     "H2H_O25_pct": "% Over 2.5 dans les confrontations passées",
     "H2H_00_pct": "% de 0-0 dans les confrontations passées",
-
-    # Stats additionnelles (tirs, corners, cartons, fautes)
     "Shots_pg": "Tirs par match (moyenne)",
     "ShotsContre_pg": "Tirs concédés par match (moyenne)",
     "ShotsTarget_pg": "Tirs cadrés par match (moyenne)",
@@ -558,7 +508,6 @@ DESCRIPTIONS_COLONNES = {
     "RedContre_pg": "Cartons rouges concédés par match",
     "Fouls_pg": "Fautes commises par match",
     "FoulsContre_pg": "Fautes subies par match",
-    # Stats additionnelles dans Matchs/Matchups — Domicile
     "H_Shots_pg": "Tirs par match (équipe à domicile)",
     "H_ShotsTarget_pg": "Tirs cadrés par match (équipe à domicile)",
     "H_Corners_pg": "Corners par match (équipe à domicile)",
@@ -572,8 +521,6 @@ DESCRIPTIONS_COLONNES = {
     "H_YellowsOver35": "% matchs avec plus de 3.5 jaunes (équipe à domicile)",
     "H_Red_pg": "Cartons rouges par match (équipe à domicile)",
     "H_Fouls_pg": "Fautes par match (équipe à domicile)",
-
-    # Stats additionnelles dans Matchs/Matchups — Extérieur
     "A_Shots_pg": "Tirs par match (équipe à l'extérieur)",
     "A_ShotsTarget_pg": "Tirs cadrés par match (équipe à l'extérieur)",
     "A_Corners_pg": "Corners par match (équipe à l'extérieur)",
@@ -594,7 +541,6 @@ DESCRIPTIONS_COLONNES = {
 # LABELS COURTS ET LISIBLES POUR LES COLONNES
 # ============================================================
 LABELS_COLONNES = {
-    # Base
     "HomeTeam": "🏠 Domicile",
     "AwayTeam": "✈️ Extérieur",
     "TimeNY": "⏰ Heure (NY)",
@@ -603,8 +549,6 @@ LABELS_COLONNES = {
     "Season": "🗓️ Saison",
     "Team": "⚽ Équipe",
     "Score": "⚡ Score",
-
-    # Classement & forme globale
     "Pos": "#",
     "Pts": "Pts",
     "MP": "J",
@@ -616,142 +560,76 @@ LABELS_COLONNES = {
     "Spark_GF": "📈 BM 10d",
     "Spark_GA": "📉 BE 10d",
     "Spark_Total": "📊 Total 10d",
-    "Over05_pct": "O0.5",
-    "Over15_pct": "O1.5",
-    "Over25_pct": "O2.5",
-    "BTTS_pct": "BTTS",
-    "Count00": "# 0-0",
-    "Pct00": "% 0-0",
-    "CS_pct": "% CS",
-    "FTS_pct": "% FTS",
-
-    # Séquences
+    "Over05_pct": "O0.5", "Over15_pct": "O1.5", "Over25_pct": "O2.5",
+    "BTTS_pct": "BTTS", "Count00": "# 0-0", "Pct00": "% 0-0",
+    "CS_pct": "% CS", "FTS_pct": "% FTS",
     "Streak_NoScore": "❌🥅 sans marquer",
     "Streak_NoConcede": "🛡️ sans encaisser",
-    "Streak_BTTS": "✅ BTTS",
-    "Streak_NoBTTS": "❌ BTTS",
-    "Streak_Over05": "✅ O0.5",
-    "Streak_Over15": "✅ O1.5",
-    "Streak_Over25": "✅ O2.5",
-    "Streak_Under25": "✅ U2.5",
+    "Streak_BTTS": "✅ BTTS", "Streak_NoBTTS": "❌ BTTS",
+    "Streak_Over05": "✅ O0.5", "Streak_Over15": "✅ O1.5",
+    "Streak_Over25": "✅ O2.5", "Streak_Under25": "✅ U2.5",
     "Streak_No00": "❌ 0-0",
-    "Streak_Win": "🏆 V",
-    "Streak_NoWin": "❌ V",
-    "Streak_Loss": "💀 D",
-    "L10_Over25_pct": "L10 O2.5",
-    "L10_BTTS_pct": "L10 BTTS",
-
-    # Force Poisson
-    "HomeAttack": "🏠⚔️ Attaque",
-    "HomeDefense": "🏠🛡️ Défense",
-    "AwayAttack": "✈️⚔️ Attaque",
-    "AwayDefense": "✈️🛡️ Défense",
-    "xG_home": "xG 🏠",
-    "xG_away": "xG ✈️",
-
-    # Zone DOMICILE (vert)
-    "H_Pos": "🏠 #",
-    "H_Form": "🏠 Forme",
-    "H_Over05": "🏠 O0.5",
-    "H_Over15": "🏠 O1.5",
-    "H_Over25": "🏠 O2.5",
-    "H_BTTS": "🏠 BTTS",
-    "H_00_Count": "🏠 # 0-0",
-    "H_00_Pct": "🏠 % 0-0",
-
-    # Zone EXTÉRIEUR (bleu)
-    "A_Pos": "✈️ #",
-    "A_Form": "✈️ Forme",
-    "A_Over05": "✈️ O0.5",
-    "A_Over15": "✈️ O1.5",
-    "A_Over25": "✈️ O2.5",
-    "A_BTTS": "✈️ BTTS",
-    "A_00_Count": "✈️ # 0-0",
-    "A_00_Pct": "✈️ % 0-0",
-
-    # Ligues pour matchup perso
-    "H_Ligue": "🏠 Ligue",
-    "A_Ligue": "✈️ Ligue",
-
-    # Combiné
+    "Streak_Win": "🏆 V", "Streak_NoWin": "❌ V", "Streak_Loss": "💀 D",
+    "L10_Over25_pct": "L10 O2.5", "L10_BTTS_pct": "L10 BTTS",
+    "HomeAttack": "🏠⚔️ Attaque", "HomeDefense": "🏠🛡️ Défense",
+    "AwayAttack": "✈️⚔️ Attaque", "AwayDefense": "✈️🛡️ Défense",
+    "xG_home": "xG 🏠", "xG_away": "xG ✈️",
+    "H_Pos": "🏠 #", "H_Form": "🏠 Forme",
+    "H_Over05": "🏠 O0.5", "H_Over15": "🏠 O1.5",
+    "H_Over25": "🏠 O2.5", "H_BTTS": "🏠 BTTS",
+    "H_00_Count": "🏠 # 0-0", "H_00_Pct": "🏠 % 0-0",
+    "A_Pos": "✈️ #", "A_Form": "✈️ Forme",
+    "A_Over05": "✈️ O0.5", "A_Over15": "✈️ O1.5",
+    "A_Over25": "✈️ O2.5", "A_BTTS": "✈️ BTTS",
+    "A_00_Count": "✈️ # 0-0", "A_00_Pct": "✈️ % 0-0",
+    "H_Ligue": "🏠 Ligue", "A_Ligue": "✈️ Ligue",
     "Combined_00_Pct": "🔗 % 0-0",
-
-    # Zone POISSON (jaune)
-    "xG_H": "🎯 xG 🏠",
-    "xG_A": "🎯 xG ✈️",
-    "P_Over05": "🎯 O0.5",
-    "P_Over15": "🎯 O1.5",
-    "P_Over25": "🎯 O2.5",
-    "P_BTTS": "🎯 BTTS",
-    "P_00": "🎯 0-0",
-
-    # Zone H2H (violet)
-    "H2H_N": "⚔️ N",
-    "H2H_AvgGoals": "⚔️ Buts/m",
-    "H2H_BTTS_pct": "⚔️ BTTS",
-    "H2H_O25_pct": "⚔️ O2.5",
+    "xG_H": "🎯 xG 🏠", "xG_A": "🎯 xG ✈️",
+    "P_Over05": "🎯 O0.5", "P_Over15": "🎯 O1.5",
+    "P_Over25": "🎯 O2.5", "P_BTTS": "🎯 BTTS", "P_00": "🎯 0-0",
+    "H2H_N": "⚔️ N", "H2H_AvgGoals": "⚔️ Buts/m",
+    "H2H_BTTS_pct": "⚔️ BTTS", "H2H_O25_pct": "⚔️ O2.5",
     "H2H_00_pct": "⚔️ 0-0",
-
-    # Stats additionnelles
-    "Shots_pg": "⚽ Tirs/m",
-    "ShotsContre_pg": "🛡️ Tirs reçus/m",
+    "Shots_pg": "⚽ Tirs/m", "ShotsContre_pg": "🛡️ Tirs reçus/m",
     "ShotsTarget_pg": "🎯 T. cadrés/m",
     "ShotsTargetContre_pg": "🛡️ T. cadrés reçus/m",
-    "Corners_pg": "🚩 Corners/m",
-    "CornersContre_pg": "🛡️ Corners reçus/m",
+    "Corners_pg": "🚩 Corners/m", "CornersContre_pg": "🛡️ Corners reçus/m",
     "CornersTotal_pg": "🚩 Total corners/m",
     "CornersOver95_pct": "🚩 Over 9.5",
     "CornersOver85_pct": "🚩 Over 8.5",
     "CornersOver105_pct": "🚩 Over 10.5",
-    "Yellow_pg": "🟨 Jaunes/m",
-    "YellowContre_pg": "🟨 Jaunes adv/m",
+    "Yellow_pg": "🟨 Jaunes/m", "YellowContre_pg": "🟨 Jaunes adv/m",
     "YellowsTotal_pg": "🟨 Total jaunes/m",
     "YellowsOver35_pct": "🟨 Over 3.5",
-    "Red_pg": "🟥 Rouges/m",
-    "RedContre_pg": "🟥 Rouges adv/m",
-    "Fouls_pg": "⚠️ Fautes/m",
-    "FoulsContre_pg": "⚠️ Fautes subies/m",
-    # Stats additionnelles — Domicile (H_*)
-    "H_Shots_pg": "🏠 Tirs/m",
-    "H_ShotsTarget_pg": "🏠 Cadrés/m",
+    "Red_pg": "🟥 Rouges/m", "RedContre_pg": "🟥 Rouges adv/m",
+    "Fouls_pg": "⚠️ Fautes/m", "FoulsContre_pg": "⚠️ Fautes subies/m",
+    "H_Shots_pg": "🏠 Tirs/m", "H_ShotsTarget_pg": "🏠 Cadrés/m",
     "H_Corners_pg": "🏠 Corners/m",
     "H_CornersContre_pg": "🏠 Corners reçus/m",
     "H_CornersTotal_pg": "🏠 Total corners/m",
-    "H_CornersOver85": "🏠 % O8.5",
-    "H_CornersOver95": "🏠 % O9.5",
+    "H_CornersOver85": "🏠 % O8.5", "H_CornersOver95": "🏠 % O9.5",
     "H_CornersOver105": "🏠 % O10.5",
-    "H_Yellow_pg": "🏠 🟨/m",
-    "H_YellowsTotal_pg": "🏠 Total 🟨/m",
+    "H_Yellow_pg": "🏠 🟨/m", "H_YellowsTotal_pg": "🏠 Total 🟨/m",
     "H_YellowsOver35": "🏠 % O3.5",
-    "H_Red_pg": "🏠 🟥/m",
-    "H_Fouls_pg": "🏠 Fautes/m",
-
-    # Stats additionnelles — Extérieur (A_*)
-    "A_Shots_pg": "✈️ Tirs/m",
-    "A_ShotsTarget_pg": "✈️ Cadrés/m",
+    "H_Red_pg": "🏠 🟥/m", "H_Fouls_pg": "🏠 Fautes/m",
+    "A_Shots_pg": "✈️ Tirs/m", "A_ShotsTarget_pg": "✈️ Cadrés/m",
     "A_Corners_pg": "✈️ Corners/m",
     "A_CornersContre_pg": "✈️ Corners reçus/m",
     "A_CornersTotal_pg": "✈️ Total corners/m",
-    "A_CornersOver85": "✈️ % O8.5",
-    "A_CornersOver95": "✈️ % O9.5",
+    "A_CornersOver85": "✈️ % O8.5", "A_CornersOver95": "✈️ % O9.5",
     "A_CornersOver105": "✈️ % O10.5",
-    "A_Yellow_pg": "✈️ 🟨/m",
-    "A_YellowsTotal_pg": "✈️ Total 🟨/m",
+    "A_Yellow_pg": "✈️ 🟨/m", "A_YellowsTotal_pg": "✈️ Total 🟨/m",
     "A_YellowsOver35": "✈️ % O3.5",
-    "A_Red_pg": "✈️ 🟥/m",
-    "A_Fouls_pg": "✈️ Fautes/m",
-    "H_Signaux": "🏠 🚨",
-    "A_Signaux": "✈️ 🚨",
+    "A_Red_pg": "✈️ 🟥/m", "A_Fouls_pg": "✈️ Fautes/m",
+    "H_Signaux": "🏠 🚨", "A_Signaux": "✈️ 🚨",
 }
 
 def build_column_config(colonnes):
     """Construit la column_config de Streamlit avec les tooltips et des labels lisibles."""
-    import streamlit as st
     config = {}
     for col in colonnes:
         label = LABELS_COLONNES.get(col, col)
         help_text = DESCRIPTIONS_COLONNES.get(col)
-        # Sparklines : barres horizontales (chaque barre = 1 match)
         if col in ("Spark_GF", "Spark_GA"):
             config[col] = st.column_config.BarChartColumn(
                 label, help=help_text, y_min=0, y_max=5,
@@ -763,6 +641,7 @@ def build_column_config(colonnes):
         else:
             config[col] = st.column_config.Column(label, help=help_text)
     return config
+
 # ============================================================
 # CHARGEMENT DES DONNÉES (avec cache)
 # ============================================================
@@ -779,16 +658,13 @@ team_stats = donnees["team_stats"]
 matchups = donnees["matchups"]
 saison_courante = donnees["saison_courante"]
 
-# Fonctions de pré-calcul mises en cache pour l'onglet Matchups personnalisés
 @st.cache_data(show_spinner="Préparation des stats détaillées...")
 def precalculer_stats_complet():
-    """Re-calcule le dict stats complet (avec _lg_h, _lg_a) une seule fois."""
     from stats import calculer_team_stats
     return calculer_team_stats(df_brut)
 
 @st.cache_data(show_spinner="Préparation de l'index H2H...")
 def precalculer_index_h2h():
-    """Construit l'index H2H une seule fois."""
     from stats import construire_index_h2h
     return construire_index_h2h(df_brut)
 
@@ -799,12 +675,11 @@ idx_h2h = precalculer_index_h2h()
 # FONCTIONS UTILITAIRES
 # ============================================================
 def styler_score_a_venir(val):
-    """Applique un fond bleu au texte 'À VENIR' dans la colonne Score."""
     if val == "À VENIR":
         return "background-color: #1e3a5f; color: #60a5fa; font-weight: bold; border-radius: 4px;"
     return ""
+
 def appliquer_couleurs(df, cols):
-    """Applique les dégradés de couleurs aux colonnes d'un tableau."""
     cols_pct_haut = [c for c in cols if c in [
         "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
         "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
@@ -838,18 +713,14 @@ def appliquer_couleurs(df, cols):
     if cols_rating_bas:
         styled = styled.background_gradient(subset=cols_rating_bas, cmap="Greens_r", vmin=0.5, vmax=1.8)
 
-    # Badge "À VENIR" sur la colonne Score
     if "Score" in cols:
         styled = styled.map(styler_score_a_venir, subset=["Score"])
-    # Formater tous les floats avec 1 décimale maximum
     cols_floats = [c for c in cols if df[c].dtype == "float64"]
     if cols_floats:
         styled = styled.format(formatter="{:.1f}", subset=cols_floats, na_rep="—")
-        
     return styled
 
 def filtrer_saison(df, saison_selection):
-    """Applique le filtre de saison (en cours / toutes / spécifique)."""
     if saison_selection == "En cours (par défaut)":
         return df[df.apply(lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)]
     elif saison_selection == "Toutes les saisons":
@@ -862,6 +733,7 @@ def filtrer_saison(df, saison_selection):
 # ============================================================
 st.title("⚽ Deryball")
 st.caption("Plateforme de stats et de prédictions Poisson pour le football")
+
 # Toggle mode mobile / compact
 col_mode, _ = st.columns([1, 4])
 with col_mode:
@@ -882,9 +754,7 @@ tab_matchs, tab_matchups, tab_teams, tab_poisson, tab_sequences, tab_validation 
     "✅ Validation Poisson",
 ])
 
-# ============================================================
-# INITIALISATION ÉTAT POUR FILTRES RAPIDES (chips)
-# ============================================================
+# Init état pour filtres rapides
 if "dates_filtrees" not in st.session_state:
     st.session_state.dates_filtrees = []
 if "filtre_rapide" not in st.session_state:
@@ -926,7 +796,7 @@ with tab_matchs:
             st.session_state.dates_filtrees = []
             st.session_state.filtre_rapide = None
 
-    # Filtres principaux (avec sélecteur Type de stats)
+    # Filtres principaux
     if mode_mobile:
         fcol1 = fcol2 = fcol3 = fcol4 = fcol5 = st.container()
     else:
@@ -935,18 +805,14 @@ with tab_matchs:
     with fcol1:
         dates_dispo = sorted(matchups["DateNY"].unique(), reverse=True)
         date_selectionnee = st.selectbox("Date (NY)", options=dates_dispo, index=0, key="m_date")
-
     with fcol2:
         options_saison = ["En cours (par défaut)", "Toutes les saisons"] + sorted(matchups["Season"].unique().tolist())
         saison_selectionnee = st.selectbox("Saison", options=options_saison, index=0, key="m_season")
-
     with fcol3:
         ligues = ["Toutes les ligues"] + sorted(matchups["League"].unique().tolist())
         ligue_selectionnee = st.selectbox("Ligue", options=ligues, index=0, key="m_league")
-
     with fcol4:
         recherche = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="m_search")
-
     with fcol5:
         type_stats_match = st.selectbox(
             "Type de stats",
@@ -991,7 +857,22 @@ with tab_matchs:
             f"#### 📅 {date_selectionnee}  \n"
             f"**{len(df_aff)}** match(s) ce jour-là"
         )
-# Légende des signaux d'anomalies (uniquement en vue Buts)
+
+    # ============================================================
+    # 🆕 TOGGLE VUE : TABLEAU vs DÉTAILLÉE
+    # ============================================================
+    col_vue, _ = st.columns([2, 6])
+    with col_vue:
+        vue_match = st.radio(
+            "Mode d'affichage",
+            options=["📊 Tableau", "🎴 Détaillée"],
+            index=0,
+            key="vue_match",
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+
+    # Légende des signaux d'anomalies (uniquement en vue Buts)
     if type_stats_match == "Buts (défaut)":
         if "afficher_legende_matchs" not in st.session_state:
             st.session_state.afficher_legende_matchs = False
@@ -1016,55 +897,98 @@ with tab_matchs:
 
             **+X.X BM** = buts marqués/match en plus que la saison · **+X.X BE** = buts encaissés/match en plus
             """)
-    # Sélection des colonnes selon le type de stats
-    if type_stats_match == "Tirs & corners":
-        colonnes = [
-            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
-            "H_Shots_pg", "H_ShotsTarget_pg",
-            "H_Corners_pg", "H_CornersContre_pg",
-            "H_CornersTotal_pg", "H_CornersOver85", "H_CornersOver95", "H_CornersOver105",
-            "A_Shots_pg", "A_ShotsTarget_pg",
-            "A_Corners_pg", "A_CornersContre_pg",
-            "A_CornersTotal_pg", "A_CornersOver85", "A_CornersOver95", "A_CornersOver105",
-        ]
-    elif type_stats_match == "Cartons & fautes":
-        colonnes = [
-            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
-            "H_Yellow_pg", "H_YellowsTotal_pg", "H_YellowsOver35",
-            "H_Red_pg", "H_Fouls_pg",
-            "A_Yellow_pg", "A_YellowsTotal_pg", "A_YellowsOver35",
-            "A_Red_pg", "A_Fouls_pg",
-        ]
-    else:  # Buts (défaut)
-        colonnes = [
-            "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
-            "H_Signaux", "A_Signaux",
-            "xG_H", "xG_A",
-            "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
-            "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
-            "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
-            "Combined_00_Pct",
-            "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
-        ]
 
-    if mode_mobile:
-        colonnes = ["TimeNY", "HomeTeam", "AwayTeam", "Score",
-                    "H_Over05", "A_Over05", "H_Over15", "A_Over15",
-                    "P_Over05", "P_Over15", "P_00"]
-    colonnes = [c for c in colonnes if c in df_aff.columns]
-    st.dataframe(
-        appliquer_couleurs(df_aff, colonnes),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
-        column_config=build_column_config(colonnes),
-    )
     # ============================================================
-    # HEATMAP POISSON DES SCORES
+    # 🆕 AFFICHAGE CONDITIONNEL : TABLEAU OU CARTES
+    # ============================================================
+    if vue_match == "🎴 Détaillée":
+        # ----- VUE DÉTAILLÉE (cartes) -----
+        # Note : la vue détaillée est conçue pour l'analyse des buts (Poisson, BTTS, H2H).
+        # Pour les autres types de stats, on garde le tableau (les cartes ne les affichent pas).
+        if type_stats_match != "Buts (défaut)":
+            st.info(
+                "💡 La vue détaillée affiche les stats Poisson et buts. "
+                "Pour les stats Tirs/Corners ou Cartons/Fautes, utilise la vue Tableau."
+            )
+            # On bascule vers le tableau quand même pour ne pas laisser l'écran vide
+            colonnes = (
+                [
+                    "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+                    "H_Shots_pg", "H_ShotsTarget_pg",
+                    "H_Corners_pg", "H_CornersContre_pg",
+                    "H_CornersTotal_pg", "H_CornersOver85", "H_CornersOver95", "H_CornersOver105",
+                    "A_Shots_pg", "A_ShotsTarget_pg",
+                    "A_Corners_pg", "A_CornersContre_pg",
+                    "A_CornersTotal_pg", "A_CornersOver85", "A_CornersOver95", "A_CornersOver105",
+                ] if type_stats_match == "Tirs & corners"
+                else [
+                    "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+                    "H_Yellow_pg", "H_YellowsTotal_pg", "H_YellowsOver35",
+                    "H_Red_pg", "H_Fouls_pg",
+                    "A_Yellow_pg", "A_YellowsTotal_pg", "A_YellowsOver35",
+                    "A_Red_pg", "A_Fouls_pg",
+                ]
+            )
+            colonnes = [c for c in colonnes if c in df_aff.columns]
+            st.dataframe(
+                appliquer_couleurs(df_aff, colonnes),
+                use_container_width=True, hide_index=True, height=600,
+                column_config=build_column_config(colonnes),
+            )
+        else:
+            # Tri par heure pour avoir un ordre logique dans les cartes
+            df_cartes = df_aff.copy()
+            if "TimeNY" in df_cartes.columns:
+                df_cartes = df_cartes.sort_values(["DateNY", "TimeNY"])
+            rendre_cartes_matchs(df_cartes, st)
+    else:
+        # ----- VUE TABLEAU (originale) -----
+        if type_stats_match == "Tirs & corners":
+            colonnes = [
+                "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+                "H_Shots_pg", "H_ShotsTarget_pg",
+                "H_Corners_pg", "H_CornersContre_pg",
+                "H_CornersTotal_pg", "H_CornersOver85", "H_CornersOver95", "H_CornersOver105",
+                "A_Shots_pg", "A_ShotsTarget_pg",
+                "A_Corners_pg", "A_CornersContre_pg",
+                "A_CornersTotal_pg", "A_CornersOver85", "A_CornersOver95", "A_CornersOver105",
+            ]
+        elif type_stats_match == "Cartons & fautes":
+            colonnes = [
+                "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+                "H_Yellow_pg", "H_YellowsTotal_pg", "H_YellowsOver35",
+                "H_Red_pg", "H_Fouls_pg",
+                "A_Yellow_pg", "A_YellowsTotal_pg", "A_YellowsOver35",
+                "A_Red_pg", "A_Fouls_pg",
+            ]
+        else:  # Buts (défaut)
+            colonnes = [
+                "TimeNY", "League", "HomeTeam", "AwayTeam", "Score",
+                "H_Signaux", "A_Signaux",
+                "xG_H", "xG_A",
+                "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+                "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS", "H_00_Count", "H_00_Pct",
+                "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS", "A_00_Count", "A_00_Pct",
+                "Combined_00_Pct",
+                "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
+            ]
+
+        if mode_mobile:
+            colonnes = ["TimeNY", "HomeTeam", "AwayTeam", "Score",
+                        "H_Over05", "A_Over05", "H_Over15", "A_Over15",
+                        "P_Over05", "P_Over15", "P_00"]
+        colonnes = [c for c in colonnes if c in df_aff.columns]
+        st.dataframe(
+            appliquer_couleurs(df_aff, colonnes),
+            use_container_width=True, hide_index=True, height=600,
+            column_config=build_column_config(colonnes),
+        )
+
+    # ============================================================
+    # HEATMAP POISSON DES SCORES (visible dans les 2 vues)
     # ============================================================
     if len(df_aff) > 0 and type_stats_match == "Buts (défaut)":
         with st.expander("🎯 Détail Poisson d'un match (heatmap des scores)", expanded=False):
-            # Sélecteur de match
             df_aff_lbl = df_aff.copy()
             df_aff_lbl["__label"] = (
                 df_aff_lbl["DateNY"].astype(str) + " · " +
@@ -1085,7 +1009,6 @@ with tab_matchs:
                 from stats import matrice_scores
                 res = matrice_scores(lam_h, lam_a)
 
-                # En-tête résumé
                 top3_txt = " · ".join([f"**{i}-{j}** ({100*p:.1f}%)" for i, j, p in res["top3"]])
 
                 col1, col2 = st.columns([3, 2])
@@ -1122,8 +1045,9 @@ with tab_matchs:
                 )
             else:
                 st.warning("Pas de xG disponible pour ce match — stats incomplètes.")
+
 # ============================================================
-# ONGLET STATS ÉQUIPES (revient à l'original simple)
+# ONGLET STATS ÉQUIPES
 # ============================================================
 with tab_teams:
     st.caption("Statistiques cumulées par équipe et par saison.")
@@ -1145,7 +1069,6 @@ with tab_teams:
             key="t_type_stats"
         )
 
-    # Filtrage saison équipes (basé sur DisplayLeague pour respecter les saisons par ligue)
     if saison_t == "En cours (par défaut)":
         df_t = team_stats[team_stats.apply(
             lambda r: r["Season"] == saison_courante.get(r["League"]), axis=1)].copy()
@@ -1169,7 +1092,7 @@ with tab_teams:
         cols_t = ["Team", "League", "Season", "Pos", "MP",
                   "Yellow_pg", "YellowContre_pg", "YellowsTotal_pg", "YellowsOver35_pct",
                   "Red_pg", "RedContre_pg", "Fouls_pg", "FoulsContre_pg"]
-    else:  # Buts
+    else:
         cols_t = ["Team", "League", "Season", "Pos", "Pts", "Form5", "MP", "W", "D", "L",
                   "GF_pg", "Spark_GF", "GA_pg", "Spark_GA", "Total_pg", "Spark_Total",
                   "Over05_pct", "Over15_pct", "Over25_pct", "BTTS_pct",
@@ -1186,9 +1109,7 @@ with tab_teams:
     cols_t = [c for c in cols_t if c in df_t.columns]
     st.dataframe(
         appliquer_couleurs(df_t, cols_t),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
+        use_container_width=True, hide_index=True, height=600,
         column_config=build_column_config(cols_t),
     )
 
@@ -1223,9 +1144,7 @@ with tab_poisson:
     cols_p = [c for c in cols_p if c in df_p.columns]
     st.dataframe(
         appliquer_couleurs(df_p, cols_p),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
+        use_container_width=True, hide_index=True, height=600,
         column_config=build_column_config(cols_p),
     )
 
@@ -1262,14 +1181,12 @@ with tab_sequences:
     cols_s = [c for c in cols_s if c in df_s.columns]
     st.dataframe(
         appliquer_couleurs(df_s, cols_s),
-        use_container_width=True,
-        hide_index=True,
-        height=600,
+        use_container_width=True, hide_index=True, height=600,
         column_config=build_column_config(cols_s),
     )
-    
+
 # ============================================================
-# ONGLET 5 — MATCHUPS PERSONNALISÉS
+# ONGLET MATCHUPS PERSONNALISÉS
 # ============================================================
 with tab_matchups:
     st.markdown("### 🧪 Créer vos propres matchups")
@@ -1280,12 +1197,9 @@ with tab_matchups:
         "en ligue de chaque équipe, sans contexte de confrontation réelle."
     )
 
-    # Initialiser la liste de matchups en session state (garde entre les interactions)
     if "matchups_custom" not in st.session_state:
         st.session_state.matchups_custom = []
 
-    # Préparer la structure ligue → équipes
-    team_stats = team_stats
     ligues_dispo = sorted(team_stats["League"].dropna().unique().tolist())
 
     def get_teams_pour_ligue(ligue):
@@ -1300,7 +1214,6 @@ with tab_matchups:
     with col_h2:
         teams_h = get_teams_pour_ligue(ligue_h)
         team_h = st.selectbox("Équipe domicile", teams_h, key="team_h_custom")
-
     with col_a1:
         ligue_a = st.selectbox("Ligue extérieur", ligues_dispo, key="ligue_a_custom",
                                 index=min(1, len(ligues_dispo)-1))
@@ -1328,13 +1241,11 @@ with tab_matchups:
             st.session_state.matchups_custom = []
             st.rerun()
 
-    # Afficher la liste actuelle
     st.markdown(f"#### 📋 Ma liste ({len(st.session_state.matchups_custom)} matchups)")
 
     if not st.session_state.matchups_custom:
         st.info("Aucun matchup pour l'instant. Ajoute ton premier ci-dessus !")
     else:
-        # Liste compacte avec bouton supprimer par ligne
         for i, m in enumerate(st.session_state.matchups_custom):
             col_txt, col_sup = st.columns([5, 1])
             with col_txt:
@@ -1347,45 +1258,33 @@ with tab_matchups:
                     st.session_state.matchups_custom.pop(i)
                     st.rerun()
 
-        # Construire le tableau de stats pour tous les matchups de la liste
         st.markdown("#### 📊 Stats & Probabilités")
 
-        import pandas as pd
-
-        # Construire un mini-DataFrame avec les matchups demandés
+        # Construire le DataFrame de matchups
         rows = []
         today = pd.Timestamp.now().normalize()
         for m in st.session_state.matchups_custom:
-            # Trouver la saison courante pour chaque équipe
             cles_h = [k for k in stats_complet.keys() if k[0] == m["HomeTeam"] and k[1] == m["HomeLeague"]]
             cles_a = [k for k in stats_complet.keys() if k[0] == m["AwayTeam"] and k[1] == m["AwayLeague"]]
             if not cles_h or not cles_a:
                 continue
-            # Prendre la saison la plus récente
             saison_h = sorted(cles_h, key=lambda k: k[2])[-1][2]
-            saison_a = sorted(cles_a, key=lambda k: k[2])[-1][2]
             rows.append({
                 "League": "CUSTOM",
-                "DisplayLeague": m["HomeLeague"],  # On utilise celle du domicile
+                "DisplayLeague": m["HomeLeague"],
                 "HomeTeam": m["HomeTeam"],
                 "AwayTeam": m["AwayTeam"],
                 "Date": today,
                 "DateNY": today.strftime("%Y-%m-%d"),
-                "Time": "",
-                "TimeNY": "",
+                "Time": "", "TimeNY": "",
                 "Season": saison_h,
                 "FTHG": 0, "FTAG": 0,
             })
 
         if rows:
             fx_custom = pd.DataFrame(rows)
-            # Pour les matchups inter-ligues, il faut bidouiller un peu :
-            # on force la ligue de chaque équipe individuellement dans les stats
-            # Le plus simple : on construit le matchup à la main
             matchups_rows = []
             for _, row in fx_custom.iterrows():
-                cles_h = [k for k in stats_complet.keys() if k[0] == row["HomeTeam"] and k[1] == m.get("HomeLeague", row["DisplayLeague"])]
-                # On récupère les stats de chaque équipe dans SA ligue respective
                 m_match = next((mm for mm in st.session_state.matchups_custom
                                 if mm["HomeTeam"] == row["HomeTeam"] and mm["AwayTeam"] == row["AwayTeam"]), None)
                 if not m_match:
@@ -1401,7 +1300,6 @@ with tab_matchups:
                 h = stats_complet[hk]
                 a = stats_complet[ak]
 
-                # Calcul Poisson (même logique que construire_matchups)
                 from stats import probs_match, h2h_stats, detecter_anomalies
                 lam_h = h["HomeAttack"] * a["AwayDefense"] * h["_lg_h"]
                 lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
@@ -1415,6 +1313,10 @@ with tab_matchups:
                     "H_Ligue": m_match["HomeLeague"],
                     "AwayTeam": m_match["AwayTeam"],
                     "A_Ligue": m_match["AwayLeague"],
+                    "League": f"{m_match['HomeLeague']} vs {m_match['AwayLeague']}",
+                    "TimeNY": "—",
+                    "Score": "",  # Hypothétique
+                    "IsUpcoming": True,
                     "H_Signaux": h_emojis,
                     "A_Signaux": a_emojis,
                     "H_Pos": h["Pos"], "H_Form": h["Form5"],
@@ -1441,22 +1343,19 @@ with tab_matchups:
 
             if matchups_rows:
                 df_display = pd.DataFrame(matchups_rows)
-                colonnes_custom = [
-                    "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
-                    "H_Signaux", "A_Signaux",
-                    "xG_H", "xG_A",
-                    "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
-                    "Combined_00_Pct",
-                    "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
-                    "H_00_Count", "H_00_Pct",
-                    "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
-                    "A_00_Count", "A_00_Pct",
-                    "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
-                ]
-                if mode_mobile:
-                    colonnes_custom = ["HomeTeam", "AwayTeam",
-                                       "H_Over05", "A_Over05", "H_Over15", "A_Over15",
-                                       "P_Over05", "P_Over15", "P_00"]
+
+                # 🆕 Toggle Vue Tableau / Détaillée pour les matchups custom
+                col_vue_c, _ = st.columns([2, 6])
+                with col_vue_c:
+                    vue_custom = st.radio(
+                        "Mode d'affichage",
+                        options=["📊 Tableau", "🎴 Détaillée"],
+                        index=0,
+                        key="vue_custom",
+                        horizontal=True,
+                        label_visibility="collapsed",
+                    )
+
                 # Légende des signaux
                 if "afficher_legende_matchups" not in st.session_state:
                     st.session_state.afficher_legende_matchups = False
@@ -1479,17 +1378,36 @@ with tab_matchups:
 
                     Format : **+X.X BM/BE** = différence buts marqués/encaissés vs saison.
                     """)
-                colonnes_custom = [c for c in colonnes_custom if c in df_display.columns]
-                st.dataframe(
-                    appliquer_couleurs(df_display, colonnes_custom),
-                    use_container_width=True,
-                    hide_index=True,
-                    height=400,
-                    column_config=build_column_config(colonnes_custom),
-                )
+
+                if vue_custom == "🎴 Détaillée":
+                    rendre_cartes_matchs(df_display, st)
+                else:
+                    colonnes_custom = [
+                        "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
+                        "H_Signaux", "A_Signaux",
+                        "xG_H", "xG_A",
+                        "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+                        "Combined_00_Pct",
+                        "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
+                        "H_00_Count", "H_00_Pct",
+                        "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
+                        "A_00_Count", "A_00_Pct",
+                        "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
+                    ]
+                    if mode_mobile:
+                        colonnes_custom = ["HomeTeam", "AwayTeam",
+                                           "H_Over05", "A_Over05", "H_Over15", "A_Over15",
+                                           "P_Over05", "P_Over15", "P_00"]
+                    colonnes_custom = [c for c in colonnes_custom if c in df_display.columns]
+                    st.dataframe(
+                        appliquer_couleurs(df_display, colonnes_custom),
+                        use_container_width=True, hide_index=True, height=400,
+                        column_config=build_column_config(colonnes_custom),
+                    )
             else:
                 st.warning("Aucun matchup valide. Vérifie que les équipes ont des stats disponibles.")
-                # ============================================================
+
+# ============================================================
 # ONGLET VALIDATION POISSON
 # ============================================================
 with tab_validation:
@@ -1547,7 +1465,6 @@ with tab_validation:
         — et de quelques points seulement.
         """)
 
-    # Filtres
     fcol1, fcol2 = st.columns([2, 2])
     with fcol1:
         options_saison_v = ["En cours (par défaut)", "Toutes les saisons"] + sorted(matchups["Season"].unique().tolist())
@@ -1556,7 +1473,6 @@ with tab_validation:
         ligues_v = ["Toutes les ligues"] + sorted(matchups["League"].unique().tolist())
         ligue_v = st.selectbox("Ligue", options=ligues_v, index=0, key="v_league")
 
-    # Filtrage
     df_v = matchups.copy()
     if "IsUpcoming" in df_v.columns:
         df_v = df_v[df_v["IsUpcoming"] != True]
@@ -1574,7 +1490,6 @@ with tab_validation:
     else:
         st.markdown(f"#### 📊 {len(df_validation)} matchs analysés")
 
-        # Métriques par marché avec couleurs
         metriques = metriques_calibration(df_validation)
         styled_metriques = (
             metriques.style
@@ -1590,10 +1505,6 @@ with tab_validation:
             "**Écart** : positif = modèle sur-prédit, négatif = sous-prédit."
         )
 
-        # Calibration par tranche
-        # ============================================================
-        # COMPARAISON DIXON-COLES vs POISSON PUR
-        # ============================================================
         st.markdown("---")
         st.markdown("#### 🔬 Comparaison Dixon-Coles vs Poisson pur")
         comparer_dc = st.toggle(
@@ -1638,6 +1549,7 @@ with tab_validation:
                 "💡 Compare les Brier scores et les écarts. Brier plus bas = meilleur. "
                 "DC devrait améliorer BTTS et 1-1, mais peut légèrement empirer 0-0."
             )
+
         st.markdown("---")
         st.markdown("#### 🎯 Calibration par tranche de probabilité")
 
@@ -1666,7 +1578,6 @@ with tab_validation:
         else:
             st.info("Pas assez de données pour bucketer ce marché.")
 
-        # Top surprises
         st.markdown("---")
         st.markdown(f"#### 😱 Top 10 — où le modèle s'est le plus trompé ({marche_sel})")
         surprises = plus_grandes_surprises(df_validation, col_pred, col_real, n=10)
