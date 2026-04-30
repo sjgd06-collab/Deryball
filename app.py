@@ -1059,7 +1059,69 @@ with tab_matchs:
         height=600,
         column_config=build_column_config(colonnes),
     )
+    # ============================================================
+    # HEATMAP POISSON DES SCORES
+    # ============================================================
+    if len(df_aff) > 0 and type_stats_match == "Buts (défaut)":
+        with st.expander("🎯 Détail Poisson d'un match (heatmap des scores)", expanded=False):
+            # Sélecteur de match
+            df_aff_lbl = df_aff.copy()
+            df_aff_lbl["__label"] = (
+                df_aff_lbl["DateNY"].astype(str) + " · " +
+                df_aff_lbl["HomeTeam"].astype(str) + " vs " +
+                df_aff_lbl["AwayTeam"].astype(str) + " (" +
+                df_aff_lbl["League"].astype(str) + ")"
+            )
+            match_choisi = st.selectbox(
+                "Match à analyser",
+                options=df_aff_lbl["__label"].tolist(),
+                key="heatmap_match_select",
+            )
+            ligne = df_aff_lbl[df_aff_lbl["__label"] == match_choisi].iloc[0]
+            lam_h = ligne.get("xG_H")
+            lam_a = ligne.get("xG_A")
 
+            if pd.notna(lam_h) and pd.notna(lam_a):
+                from stats import matrice_scores
+                res = matrice_scores(lam_h, lam_a)
+
+                # En-tête résumé
+                top3_txt = " · ".join([f"**{i}-{j}** ({100*p:.1f}%)" for i, j, p in res["top3"]])
+
+                col1, col2 = st.columns([3, 2])
+                with col1:
+                    st.markdown(f"**🏆 Top 3 scores :** {top3_txt}")
+                    st.markdown(
+                        f"**⚖️ Issue 1X2 :** "
+                        f"🏠 {ligne['HomeTeam']} **{100*res['p_home']:.0f}%** · "
+                        f"⚖️ Nul **{100*res['p_draw']:.0f}%** · "
+                        f"✈️ {ligne['AwayTeam']} **{100*res['p_away']:.0f}%**"
+                    )
+                with col2:
+                    st.metric("xG (🏠 / ✈️)", f"{lam_h:.2f} / {lam_a:.2f}")
+
+                st.markdown("**Probabilité de chaque score exact (%)**")
+                st.caption("🏠 buts en lignes · ✈️ buts en colonnes")
+
+                matrice = res["matrice"]
+                df_heat = pd.DataFrame(
+                    [[round(100 * matrice[i][j], 2) for j in range(6)] for i in range(6)],
+                    index=[f"🏠 {i}" for i in range(6)],
+                    columns=[f"✈️ {j}" for j in range(6)],
+                )
+                styled_heat = (
+                    df_heat.style
+                    .background_gradient(cmap="YlOrRd", vmin=0, vmax=15)
+                    .format("{:.2f}")
+                )
+                st.dataframe(styled_heat, use_container_width=False)
+
+                st.caption(
+                    f"💡 Cette matrice couvre **{100*res['couverture']:.1f}%** des scores possibles "
+                    f"(le reste = scores avec ≥6 buts pour une équipe)."
+                )
+            else:
+                st.warning("Pas de xG disponible pour ce match — stats incomplètes.")
 # ============================================================
 # ONGLET STATS ÉQUIPES (revient à l'original simple)
 # ============================================================

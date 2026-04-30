@@ -332,7 +332,43 @@ def probs_match(lam_h, lam_a, max_g=10, rho=-0.10):
             if i > 0 and j > 0:
                 p["btts"] += pr
     return p
+def matrice_scores(lam_h, lam_a, max_g=6, rho=-0.10):
+    """
+    Calcule la matrice max_g x max_g des probabilités de chaque score exact
+    (avec correction Dixon-Coles). Retourne aussi top 3 scores et marges 1X2.
 
+    Note : la matrice est tronquée à max_g buts/équipe, donc la somme des
+    probas est < 1. Les marges 1X2 sont re-normalisées pour sommer à 100%.
+    """
+    matrice = [[0.0] * max_g for _ in range(max_g)]
+    total = 0.0
+    for i in range(max_g):
+        for j in range(max_g):
+            tau = tau_correction(i, j, lam_h, lam_a, rho) if rho != 0 else 1.0
+            p = tau * poisson_pmf(i, lam_h) * poisson_pmf(j, lam_a)
+            matrice[i][j] = p
+            total += p
+
+    # Top 3 scores les plus probables
+    scores_plats = [(i, j, matrice[i][j]) for i in range(max_g) for j in range(max_g)]
+    scores_plats.sort(key=lambda x: x[2], reverse=True)
+    top3 = scores_plats[:3]
+
+    # Marges 1X2 (re-normalisées sur la matrice tronquée)
+    p_home = sum(matrice[i][j] for i in range(max_g) for j in range(max_g) if i > j)
+    p_draw = sum(matrice[i][i] for i in range(max_g))
+    p_away = sum(matrice[i][j] for i in range(max_g) for j in range(max_g) if i < j)
+    if total > 0:
+        p_home, p_draw, p_away = p_home / total, p_draw / total, p_away / total
+
+    return {
+        "matrice": matrice,
+        "top3": top3,
+        "p_home": p_home,
+        "p_draw": p_draw,
+        "p_away": p_away,
+        "couverture": total,  # somme avant normalisation, indique si on couvre ≥95%
+    }
 
 def recalculer_probs_avec_rho(matchups_df, rho):
     """
