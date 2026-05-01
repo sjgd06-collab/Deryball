@@ -18,21 +18,19 @@ from datetime import datetime
 # saison_url est le code 4 chiffres pour l'URL : "2526" = saison 2025-26
 LIGUES = [
     # Ligues européennes (saison 2025-26)
-    ("E0",  "Premier League",  "England",     "2526"),
-    ("E1",  "Championship",    "England",     "2526"),
-    ("D1",  "Bundesliga",      "Germany",     "2526"),
-    ("D2",  "2. Bundesliga",   "Germany",     "2526"),
-    ("I1",  "Serie A",         "Italy",       "2526"),
-    ("SP1", "La Liga",         "Spain",       "2526"),
-    ("F1",  "Ligue 1",         "France",      "2526"),
-    ("N1",  "Eredivisie",      "Netherlands", "2526"),
-    ("B1",  "Jupiler League",  "Belgium",     "2526"),
-    ("P1",  "Primeira Liga",   "Portugal",    "2526"),
-    ("T1",  "Super Lig",       "Turkey",      "2526"),
-    ("G1",  "Super League",    "Greece",      "2526"),
-    ("SC0", "Premiership",     "Scotland",    "2526"),
-    ("G1",  "Super League",    "Greece",      "2526"),
-    ("SC0", "Premiership",     "Scotland",    "2526"),
+    ("E0",  "Premier League",     "England",     "2526"),
+    ("E1",  "Championship",       "England",     "2526"),
+    ("D1",  "Bundesliga",         "Germany",     "2526"),
+    ("D2",  "2. Bundesliga",      "Germany",     "2526"),
+    ("I1",  "Serie A",            "Italy",       "2526"),
+    ("SP1", "La Liga",            "Spain",       "2526"),
+    ("F1",  "Ligue 1",            "France",      "2526"),
+    ("N1",  "Eredivisie",         "Netherlands", "2526"),
+    ("B1",  "Jupiler League",     "Belgium",     "2526"),
+    ("P1",  "Primeira Liga",      "Portugal",    "2526"),
+    ("T1",  "Super Lig",          "Turkey",      "2526"),
+    ("G1",  "Super League",       "Greece",      "2526"),
+    ("SC0", "Premiership",        "Scotland",    "2526"),
 ]
 
 # Ligues en "format extra" (calendrier civil, autre URL)

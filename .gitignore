@@ -5,3 +5,6 @@ __pycache__/
 Thumbs.db
 data/cache/
 .env
+data/scraped/_cache/
+experiments/*/dump*.html
+experiments/*/*_dump.html
