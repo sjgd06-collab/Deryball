@@ -1334,6 +1334,33 @@ with tab_matchups:
                     "P_Over25": round(100 * probs["over25"], 1),
                     "P_BTTS": round(100 * probs["btts"], 1),
                     "P_00": round(100 * probs["p00"], 1),
+                    # Stats additionnelles (peuvent être None pour les ligues sans ces données)
+                    "H_Shots_pg": h.get("Shots_pg"),
+                    "H_ShotsTarget_pg": h.get("ShotsTarget_pg"),
+                    "H_Corners_pg": h.get("Corners_pg"),
+                    "H_CornersContre_pg": h.get("CornersContre_pg"),
+                    "H_CornersTotal_pg": h.get("CornersTotal_pg"),
+                    "H_CornersOver85": h.get("CornersOver85_pct"),
+                    "H_CornersOver95": h.get("CornersOver95_pct"),
+                    "H_CornersOver105": h.get("CornersOver105_pct"),
+                    "H_Yellow_pg": h.get("Yellow_pg"),
+                    "H_YellowsTotal_pg": h.get("YellowsTotal_pg"),
+                    "H_YellowsOver35": h.get("YellowsOver35_pct"),
+                    "H_Red_pg": h.get("Red_pg"),
+                    "H_Fouls_pg": h.get("Fouls_pg"),
+                    "A_Shots_pg": a.get("Shots_pg"),
+                    "A_ShotsTarget_pg": a.get("ShotsTarget_pg"),
+                    "A_Corners_pg": a.get("Corners_pg"),
+                    "A_CornersContre_pg": a.get("CornersContre_pg"),
+                    "A_CornersTotal_pg": a.get("CornersTotal_pg"),
+                    "A_CornersOver85": a.get("CornersOver85_pct"),
+                    "A_CornersOver95": a.get("CornersOver95_pct"),
+                    "A_CornersOver105": a.get("CornersOver105_pct"),
+                    "A_Yellow_pg": a.get("Yellow_pg"),
+                    "A_YellowsTotal_pg": a.get("YellowsTotal_pg"),
+                    "A_YellowsOver35": a.get("YellowsOver35_pct"),
+                    "A_Red_pg": a.get("Red_pg"),
+                    "A_Fouls_pg": a.get("Fouls_pg"),
                     "H2H_N": h2h["H2H_N"],
                     "H2H_AvgGoals": h2h["H2H_AvgGoals"],
                     "H2H_BTTS_pct": h2h["H2H_BTTS_pct"],
@@ -1344,8 +1371,8 @@ with tab_matchups:
             if matchups_rows:
                 df_display = pd.DataFrame(matchups_rows)
 
-                # 🆕 Toggle Vue Tableau / Détaillée pour les matchups custom
-                col_vue_c, _ = st.columns([2, 6])
+                # 🆕 Toggle Vue Tableau / Détaillée + Type de stats
+                col_vue_c, col_type_c = st.columns([2, 2])
                 with col_vue_c:
                     vue_custom = st.radio(
                         "Mode d'affichage",
@@ -1353,6 +1380,14 @@ with tab_matchups:
                         index=0,
                         key="vue_custom",
                         horizontal=True,
+                        label_visibility="collapsed",
+                    )
+                with col_type_c:
+                    type_stats_custom = st.selectbox(
+                        "Type de stats",
+                        options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
+                        index=0,
+                        key="mc_type_stats",
                         label_visibility="collapsed",
                     )
 
@@ -1382,18 +1417,39 @@ with tab_matchups:
                 if vue_custom == "🎴 Détaillée":
                     rendre_cartes_matchs(df_display, st)
                 else:
-                    colonnes_custom = [
-                        "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
-                        "H_Signaux", "A_Signaux",
-                        "xG_H", "xG_A",
-                        "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
-                        "Combined_00_Pct",
-                        "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
-                        "H_00_Count", "H_00_Pct",
-                        "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
-                        "A_00_Count", "A_00_Pct",
-                        "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
-                    ]
+                    # Liste de colonnes selon le type de stats
+                    if type_stats_custom == "Tirs & corners":
+                        colonnes_custom = [
+                            "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
+                            "H_Shots_pg", "H_ShotsTarget_pg",
+                            "H_Corners_pg", "H_CornersContre_pg",
+                            "H_CornersTotal_pg", "H_CornersOver85", "H_CornersOver95", "H_CornersOver105",
+                            "A_Shots_pg", "A_ShotsTarget_pg",
+                            "A_Corners_pg", "A_CornersContre_pg",
+                            "A_CornersTotal_pg", "A_CornersOver85", "A_CornersOver95", "A_CornersOver105",
+                        ]
+                    elif type_stats_custom == "Cartons & fautes":
+                        colonnes_custom = [
+                            "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
+                            "H_Yellow_pg", "H_YellowsTotal_pg", "H_YellowsOver35",
+                            "H_Red_pg", "H_Fouls_pg",
+                            "A_Yellow_pg", "A_YellowsTotal_pg", "A_YellowsOver35",
+                            "A_Red_pg", "A_Fouls_pg",
+                        ]
+                    else:  # Buts (défaut)
+                        colonnes_custom = [
+                            "HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue",
+                            "H_Signaux", "A_Signaux",
+                            "xG_H", "xG_A",
+                            "P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00",
+                            "Combined_00_Pct",
+                            "H_Pos", "H_Form", "H_Over05", "H_Over15", "H_Over25", "H_BTTS",
+                            "H_00_Count", "H_00_Pct",
+                            "A_Pos", "A_Form", "A_Over05", "A_Over15", "A_Over25", "A_BTTS",
+                            "A_00_Count", "A_00_Pct",
+                            "H2H_N", "H2H_AvgGoals", "H2H_BTTS_pct", "H2H_O25_pct",
+                        ]
+
                     if mode_mobile:
                         colonnes_custom = ["HomeTeam", "AwayTeam",
                                            "H_Over05", "A_Over05", "H_Over15", "A_Over15",
@@ -1404,6 +1460,66 @@ with tab_matchups:
                         use_container_width=True, hide_index=True, height=400,
                         column_config=build_column_config(colonnes_custom),
                     )
+                    # ============================================================
+                # HEATMAP POISSON DES SCORES (visible dans les 2 vues)
+                # ============================================================
+                with st.expander("🎯 Détail Poisson d'un matchup (heatmap des scores)", expanded=False):
+                    df_display_lbl = df_display.copy()
+                    df_display_lbl["__label"] = (
+                        df_display_lbl["HomeTeam"].astype(str) + " (" +
+                        df_display_lbl["H_Ligue"].astype(str) + ") vs " +
+                        df_display_lbl["AwayTeam"].astype(str) + " (" +
+                        df_display_lbl["A_Ligue"].astype(str) + ")"
+                    )
+                    matchup_choisi = st.selectbox(
+                        "Matchup à analyser",
+                        options=df_display_lbl["__label"].tolist(),
+                        key="heatmap_matchup_select",
+                    )
+                    ligne = df_display_lbl[df_display_lbl["__label"] == matchup_choisi].iloc[0]
+                    lam_h = ligne.get("xG_H")
+                    lam_a = ligne.get("xG_A")
+
+                    if pd.notna(lam_h) and pd.notna(lam_a):
+                        from stats import matrice_scores
+                        res = matrice_scores(lam_h, lam_a)
+
+                        top3_txt = " · ".join([f"**{i}-{j}** ({100*p:.1f}%)" for i, j, p in res["top3"]])
+
+                        col1, col2 = st.columns([3, 2])
+                        with col1:
+                            st.markdown(f"**🏆 Top 3 scores :** {top3_txt}")
+                            st.markdown(
+                                f"**⚖️ Issue 1X2 :** "
+                                f"🏠 {ligne['HomeTeam']} **{100*res['p_home']:.0f}%** · "
+                                f"⚖️ Nul **{100*res['p_draw']:.0f}%** · "
+                                f"✈️ {ligne['AwayTeam']} **{100*res['p_away']:.0f}%**"
+                            )
+                        with col2:
+                            st.metric("xG (🏠 / ✈️)", f"{lam_h:.2f} / {lam_a:.2f}")
+
+                        st.markdown("**Probabilité de chaque score exact (%)**")
+                        st.caption("🏠 buts en lignes · ✈️ buts en colonnes")
+
+                        matrice = res["matrice"]
+                        df_heat = pd.DataFrame(
+                            [[round(100 * matrice[i][j], 2) for j in range(6)] for i in range(6)],
+                            index=[f"🏠 {i}" for i in range(6)],
+                            columns=[f"✈️ {j}" for j in range(6)],
+                        )
+                        styled_heat = (
+                            df_heat.style
+                            .background_gradient(cmap="YlOrRd", vmin=0, vmax=15)
+                            .format("{:.2f}")
+                        )
+                        st.dataframe(styled_heat, use_container_width=False)
+
+                        st.caption(
+                            f"💡 Cette matrice couvre **{100*res['couverture']:.1f}%** des scores possibles "
+                            f"(le reste = scores avec ≥6 buts pour une équipe)."
+                        )
+                    else:
+                        st.warning("Pas de xG disponible pour ce matchup — stats incomplètes.")
             else:
                 st.warning("Aucun matchup valide. Vérifie que les équipes ont des stats disponibles.")
 

@@ -4,6 +4,7 @@ Génère du HTML pour afficher chaque match comme une carte pliable.
 """
 import html
 import pandas as pd
+from stats import matrice_scores
 
 
 # ============================================================
@@ -291,7 +292,148 @@ CARDS_CSS = """
 .db-metric-bar-fill.success { background: var(--success); }
 .db-metric-bar-fill.warning { background: var(--warning); }
 .db-metric-bar-fill.danger { background: var(--danger); }
-
+/* Stats détaillées (mini-section) */
+.db-extras-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.db-extras-block {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px;
+}
+.db-extras-title {
+    font-size: 11px;
+    color: var(--text-muted) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.db-extras-teams {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed var(--border-default);
+}
+.db-extras-team {
+    display: flex; flex-direction: column; gap: 1px;
+}
+.db-extras-team-label {
+    font-size: 10px;
+    color: var(--text-faint) !important;
+    font-weight: 500;
+}
+.db-extras-team-val {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-strong) !important;
+    font-variant-numeric: tabular-nums;
+}
+.db-extras-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+}
+.db-extras-summary-line {
+    display: flex; justify-content: space-between;
+}
+.db-extras-summary-name {
+    color: var(--text-muted) !important;
+}
+.db-extras-summary-val {
+    font-family: 'JetBrains Mono', monospace !important;
+    color: var(--text-strong) !important;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+.db-extras-empty {
+    color: var(--text-faint) !important;
+    font-size: 11.5px;
+    font-style: italic;
+    text-align: center;
+    padding: 8px;
+}
+/* Heatmap Poisson */
+.db-heat-row {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+.db-heat-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12.5px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-default);
+}
+.db-heat-summary-line {
+    color: var(--text-muted) !important;
+}
+.db-heat-summary-line strong {
+    color: var(--text-strong) !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+.db-heat-summary-line .accent {
+    color: var(--accent) !important;
+    font-weight: 600;
+}
+.db-heat-table-wrap {
+    overflow-x: auto;
+}
+.db-heat-table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-variant-numeric: tabular-nums;
+}
+.db-heat-table th,
+.db-heat-table td {
+    padding: 6px 9px;
+    text-align: center;
+    font-size: 11.5px;
+    border: 1px solid var(--border-subtle);
+}
+.db-heat-table th {
+    background: var(--bg-elevated);
+    color: var(--text-muted) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 10px;
+}
+.db-heat-table td {
+    color: var(--text-default) !important;
+    font-weight: 500;
+    min-width: 48px;
+}
+.db-heat-table td.heat-best {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    font-weight: 700;
+    color: var(--text-strong) !important;
+}
+.db-heat-caption {
+    text-align: center;
+    color: var(--text-muted) !important;
+    font-size: 10.5px;
+    margin-top: 6px;
+    font-style: italic;
+}
 /* H2H */
 .db-h2h-row {
     display: grid;
@@ -491,7 +633,212 @@ def _metric_line(label, value, is_low_good=False):
         <span class="db-metric-val">{v:.1f}%</span>
     </div>"""
 
+def _section_extras(row):
+    """
+    Mini-section avec les stats détaillées (corners, cartons) si disponibles.
+    Retourne du HTML vide si aucune stat n'est dispo.
+    """
+    h_corners = _safe_num(row.get("H_Corners_pg"))
+    a_corners = _safe_num(row.get("A_Corners_pg"))
+    h_corners_total = _safe_num(row.get("H_CornersTotal_pg"))
+    a_corners_total = _safe_num(row.get("A_CornersTotal_pg"))
+    h_corners_o95 = _safe_pct(row.get("H_CornersOver95"))
+    a_corners_o95 = _safe_pct(row.get("A_CornersOver95"))
 
+    h_yellow = _safe_num(row.get("H_Yellow_pg"))
+    a_yellow = _safe_num(row.get("A_Yellow_pg"))
+    h_yellow_total = _safe_num(row.get("H_YellowsTotal_pg"))
+    a_yellow_total = _safe_num(row.get("A_YellowsTotal_pg"))
+    h_yellow_o35 = _safe_pct(row.get("H_YellowsOver35"))
+    a_yellow_o35 = _safe_pct(row.get("A_YellowsOver35"))
+
+    has_corners = any(v is not None for v in [h_corners, a_corners, h_corners_total, a_corners_total])
+    has_cartons = any(v is not None for v in [h_yellow, a_yellow, h_yellow_total, a_yellow_total])
+
+    if not has_corners and not has_cartons:
+        return ""  # rien à afficher
+
+    # Helpers pour valeurs vides
+    def fnum(v, suffix=""):
+        return f"{v:.1f}{suffix}" if v is not None else "—"
+
+    def fpct(v):
+        return f"{v:.0f}%" if v is not None else "—"
+
+    # Moyenne des totaux des 2 équipes (estimation Over)
+    corners_total_moy = None
+    if h_corners_total is not None and a_corners_total is not None:
+        corners_total_moy = (h_corners_total + a_corners_total) / 2
+    elif h_corners_total is not None:
+        corners_total_moy = h_corners_total
+    elif a_corners_total is not None:
+        corners_total_moy = a_corners_total
+
+    yellows_total_moy = None
+    if h_yellow_total is not None and a_yellow_total is not None:
+        yellows_total_moy = (h_yellow_total + a_yellow_total) / 2
+    elif h_yellow_total is not None:
+        yellows_total_moy = h_yellow_total
+    elif a_yellow_total is not None:
+        yellows_total_moy = a_yellow_total
+
+    # Moyenne des % Over (estimation pour le match)
+    corners_o95_moy = None
+    if h_corners_o95 is not None and a_corners_o95 is not None:
+        corners_o95_moy = (h_corners_o95 + a_corners_o95) / 2
+    elif h_corners_o95 is not None:
+        corners_o95_moy = h_corners_o95
+    elif a_corners_o95 is not None:
+        corners_o95_moy = a_corners_o95
+
+    yellows_o35_moy = None
+    if h_yellow_o35 is not None and a_yellow_o35 is not None:
+        yellows_o35_moy = (h_yellow_o35 + a_yellow_o35) / 2
+    elif h_yellow_o35 is not None:
+        yellows_o35_moy = h_yellow_o35
+    elif a_yellow_o35 is not None:
+        yellows_o35_moy = a_yellow_o35
+
+    # Bloc Corners
+    if has_corners:
+        corners_block = f"""
+        <div class="db-extras-block">
+            <div class="db-extras-title">🚩 Corners par match</div>
+            <div class="db-extras-teams">
+                <div class="db-extras-team">
+                    <span class="db-extras-team-label">🏠 Domicile</span>
+                    <span class="db-extras-team-val">{fnum(h_corners)}</span>
+                </div>
+                <div class="db-extras-team">
+                    <span class="db-extras-team-label">✈️ Extérieur</span>
+                    <span class="db-extras-team-val">{fnum(a_corners)}</span>
+                </div>
+            </div>
+            <div class="db-extras-summary">
+                <div class="db-extras-summary-line">
+                    <span class="db-extras-summary-name">Total moyen/match</span>
+                    <span class="db-extras-summary-val">{fnum(corners_total_moy)}</span>
+                </div>
+                <div class="db-extras-summary-line">
+                    <span class="db-extras-summary-name">Over 9.5 (moyenne)</span>
+                    <span class="db-extras-summary-val">{fpct(corners_o95_moy)}</span>
+                </div>
+            </div>
+        </div>"""
+    else:
+        corners_block = '<div class="db-extras-block"><div class="db-extras-title">🚩 Corners</div><div class="db-extras-empty">Données non disponibles</div></div>'
+
+    # Bloc Cartons
+    if has_cartons:
+        cartons_block = f"""
+        <div class="db-extras-block">
+            <div class="db-extras-title">🟨 Cartons jaunes par match</div>
+            <div class="db-extras-teams">
+                <div class="db-extras-team">
+                    <span class="db-extras-team-label">🏠 Domicile</span>
+                    <span class="db-extras-team-val">{fnum(h_yellow)}</span>
+                </div>
+                <div class="db-extras-team">
+                    <span class="db-extras-team-label">✈️ Extérieur</span>
+                    <span class="db-extras-team-val">{fnum(a_yellow)}</span>
+                </div>
+            </div>
+            <div class="db-extras-summary">
+                <div class="db-extras-summary-line">
+                    <span class="db-extras-summary-name">Total moyen/match</span>
+                    <span class="db-extras-summary-val">{fnum(yellows_total_moy)}</span>
+                </div>
+                <div class="db-extras-summary-line">
+                    <span class="db-extras-summary-name">Over 3.5 (moyenne)</span>
+                    <span class="db-extras-summary-val">{fpct(yellows_o35_moy)}</span>
+                </div>
+            </div>
+        </div>"""
+    else:
+        cartons_block = '<div class="db-extras-block"><div class="db-extras-title">🟨 Cartons</div><div class="db-extras-empty">Données non disponibles</div></div>'
+
+    return f"""
+    <div class="db-section-title">🏟️ Stats détaillées</div>
+    <div class="db-extras-row">
+        {corners_block}
+        {cartons_block}
+    </div>"""
+def _heat_color(p_pct):
+    """Retourne une couleur de fond selon la probabilité (en %).
+    Gradient jaune → orange → rouge."""
+    if p_pct < 0.5:
+        return "rgba(255,255,255,0.02)"
+    elif p_pct < 2:
+        return "rgba(254,224,144,0.25)"
+    elif p_pct < 5:
+        return "rgba(253,174,97,0.35)"
+    elif p_pct < 8:
+        return "rgba(244,109,67,0.5)"
+    elif p_pct < 12:
+        return "rgba(215,48,39,0.6)"
+    else:
+        return "rgba(165,0,38,0.75)"
+
+
+def _section_heatmap(row):
+    """Génère la heatmap Poisson 6x6 + résumé top 3 / 1X2 / xG en HTML pur."""
+    xg_h = _safe_num(row.get("xG_H"))
+    xg_a = _safe_num(row.get("xG_A"))
+    if xg_h is None or xg_a is None:
+        return ""
+
+    try:
+        res = matrice_scores(xg_h, xg_a)
+    except Exception:
+        return ""
+
+    matrice = res["matrice"]
+    top3 = res["top3"]
+    p_home = res["p_home"]
+    p_draw = res["p_draw"]
+    p_away = res["p_away"]
+
+    home_team = _esc(row.get("HomeTeam", "🏠"))
+    away_team = _esc(row.get("AwayTeam", "✈️"))
+
+    # Top 3 scores
+    top3_html = " · ".join(
+        f'<span class="accent">{i}-{j}</span> <strong>({100*p:.1f}%)</strong>'
+        for i, j, p in top3
+    )
+
+    # Trouver la case la plus probable (pour la surligner)
+    max_p = max(matrice[i][j] for i in range(6) for j in range(6))
+
+    # Construire la table HTML 6x6
+    head = '<th></th>' + "".join(f'<th>✈️ {j}</th>' for j in range(6))
+    rows_html = ""
+    for i in range(6):
+        row_cells = f'<th>🏠 {i}</th>'
+        for j in range(6):
+            p = matrice[i][j]
+            p_pct = 100 * p
+            bg = _heat_color(p_pct)
+            is_best = "heat-best" if p == max_p else ""
+            row_cells += f'<td class="{is_best}" style="background:{bg};">{p_pct:.1f}</td>'
+        rows_html += f'<tr>{row_cells}</tr>'
+
+    return f"""
+    <div class="db-section-title">🎯 Heatmap Poisson des scores</div>
+    <div class="db-heat-row">
+        <div class="db-heat-summary">
+            <div class="db-heat-summary-line">🏆 <strong>Top 3 :</strong> {top3_html}</div>
+            <div class="db-heat-summary-line">⚖️ <strong>1X2 :</strong> 🏠 {home_team} <strong>{100*p_home:.0f}%</strong> · ⚖️ Nul <strong>{100*p_draw:.0f}%</strong> · ✈️ {away_team} <strong>{100*p_away:.0f}%</strong></div>
+            <div class="db-heat-summary-line">🎯 <strong>xG :</strong> 🏠 <strong>{xg_h:.2f}</strong> · ✈️ <strong>{xg_a:.2f}</strong></div>
+        </div>
+        <div class="db-heat-table-wrap">
+            <table class="db-heat-table">
+                <thead><tr>{head}</tr></thead>
+                <tbody>{rows_html}</tbody>
+            </table>
+        </div>
+        <div class="db-heat-caption">Probabilités en % · cellule la plus probable surlignée · couvre {100*res['couverture']:.0f}% des scores</div>
+    </div>"""
 # ============================================================
 # RENDU D'UNE CARTE
 # ============================================================
@@ -652,6 +999,8 @@ def rendre_carte_match_html(row, mode_compact=False):
         {poisson_html}
         {xg_html}
         {compare_html}
+        {_section_extras(row)}
+        {_section_heatmap(row)}
         {h2h_html}
     </div>
 </details>""")
