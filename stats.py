@@ -182,7 +182,7 @@ def calculer_team_stats(df):
     stats = {}
     for (team, lg, saison), grp in tr.groupby(["Team", "DisplayLeague", "Season"]):
         grp = grp.sort_values("Date")
-        if len(grp) < 3:
+        if len(grp) < 1:
             continue
         h = grp[grp["Venue"] == "H"]
         a = grp[grp["Venue"] == "A"]
