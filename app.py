@@ -760,10 +760,30 @@ if "dates_filtrees" not in st.session_state:
 if "filtre_rapide" not in st.session_state:
     st.session_state.filtre_rapide = None
 
+# Init état pour vues sauvegardées (Matchs)
+if "vues_matchs" not in st.session_state:
+    st.session_state.vues_matchs = {}
+if "__charger_vue_matchs" not in st.session_state:
+    st.session_state.__charger_vue_matchs = None
+
 # ============================================================
 # ONGLET MATCHS
 # ============================================================
 with tab_matchs:
+    # Si une vue a été demandée au run précédent, l'appliquer maintenant (avant tous les widgets)
+    if st.session_state.__charger_vue_matchs is not None:
+        nom_vue = st.session_state.__charger_vue_matchs
+        vue = st.session_state.vues_matchs.get(nom_vue, {})
+        if vue:
+            st.session_state["m_season"] = vue.get("saison", "En cours (par défaut)")
+            st.session_state["m_league"] = vue.get("ligue", "Toutes les ligues")
+            st.session_state["m_search"] = vue.get("recherche", "")
+            st.session_state["m_type_stats"] = vue.get("type_stats", "Buts (défaut)")
+            st.session_state["vue_match"] = vue.get("vue", "📊 Tableau")
+            st.session_state.dates_filtrees = vue.get("dates_filtrees", [])
+            st.session_state.filtre_rapide = vue.get("filtre_rapide", None)
+        st.session_state.__charger_vue_matchs = None  # reset pour ne pas recharger en boucle
+
     # Chips de filtres rapides
     chip0, chip1, chip2, chip3, chip4, chip5, _ = st.columns([1, 1.2, 1, 1.3, 1.5, 0.8, 2.2])
     today = pd.Timestamp.now().normalize()
@@ -795,7 +815,68 @@ with tab_matchs:
         if st.button("🔙 Tout", key="chip_reset"):
             st.session_state.dates_filtrees = []
             st.session_state.filtre_rapide = None
+# ============================================================
+    # ⭐ VUES SAUVEGARDÉES (filtres préférés - session only)
+    # ============================================================
+    with st.expander("⭐ Mes vues sauvegardées", expanded=False):
+        st.caption("💡 Sauvegarde une combinaison de filtres pour la rappeler en 1 clic. Les vues sont gardées pendant la session de navigation.")
 
+        # Affichage des vues existantes
+        if st.session_state.vues_matchs:
+            for nom_vue, params in list(st.session_state.vues_matchs.items()):
+                col_nom, col_resume, col_load, col_del = st.columns([2, 4, 1, 1])
+                with col_nom:
+                    st.markdown(f"**⭐ {nom_vue}**")
+                with col_resume:
+                    resume = []
+                    if params.get("ligue") and params["ligue"] != "Toutes les ligues":
+                        resume.append(params["ligue"])
+                    if params.get("filtre_rapide"):
+                        labels_rapide = {"yesterday": "Hier", "today": "Aujourd'hui",
+                                         "tomorrow": "Demain", "weekend": "Week-end",
+                                         "week": "7 jours"}
+                        resume.append(labels_rapide.get(params["filtre_rapide"], ""))
+                    if params.get("type_stats") and params["type_stats"] != "Buts (défaut)":
+                        resume.append(params["type_stats"])
+                    if params.get("recherche"):
+                        resume.append(f"🔍 {params['recherche']}")
+                    st.caption(" · ".join(resume) if resume else "Vue par défaut")
+                with col_load:
+                    if st.button("Charger", key=f"load_vue_{nom_vue}"):
+                        st.session_state.__charger_vue_matchs = nom_vue
+                        st.rerun()
+                with col_del:
+                    if st.button("🗑️", key=f"del_vue_{nom_vue}"):
+                        del st.session_state.vues_matchs[nom_vue]
+                        st.rerun()
+        else:
+            st.info("Aucune vue sauvegardée pour l'instant.")
+
+        # Formulaire pour sauvegarder la vue actuelle
+        st.markdown("---")
+        col_nom_save, col_btn_save = st.columns([4, 1])
+        with col_nom_save:
+            nouveau_nom = st.text_input("Nom de la vue à sauvegarder",
+                                        placeholder="ex: Mes ligues majeures, Aujourd'hui Premier League...",
+                                        key="nouveau_nom_vue",
+                                        label_visibility="collapsed")
+        with col_btn_save:
+            if st.button("💾 Sauvegarder", key="save_vue_btn", use_container_width=True):
+                if not nouveau_nom or not nouveau_nom.strip():
+                    st.warning("Donne un nom à ta vue.")
+                else:
+                    nom_propre = nouveau_nom.strip()
+                    st.session_state.vues_matchs[nom_propre] = {
+                        "saison": st.session_state.get("m_season", "En cours (par défaut)"),
+                        "ligue": st.session_state.get("m_league", "Toutes les ligues"),
+                        "recherche": st.session_state.get("m_search", ""),
+                        "type_stats": st.session_state.get("m_type_stats", "Buts (défaut)"),
+                        "vue": st.session_state.get("vue_match", "📊 Tableau"),
+                        "dates_filtrees": list(st.session_state.dates_filtrees),
+                        "filtre_rapide": st.session_state.filtre_rapide,
+                    }
+                    st.success(f"✅ Vue '{nom_propre}' sauvegardée !")
+                    st.rerun()
     # Filtres principaux
     if mode_mobile:
         fcol1 = fcol2 = fcol3 = fcol4 = fcol5 = st.container()

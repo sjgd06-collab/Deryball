@@ -32,7 +32,15 @@ LIGUES = [
     ("G1",  "Super League",       "Greece",      "2526"),
     ("SC0", "Premiership",        "Scotland",    "2526"),
 ]
+# Saisons à télécharger pour les ligues européennes
+# (saison passée complète + saison en cours). Il suffira d'éditer
+# cette ligne chaque été pour faire basculer la nouvelle saison.
+SAISONS_EUROPE = ["2526", "2627"]
 
+
+def libelle_saison(code_saison):
+    """'2526' -> '2025-26'"""
+    return f"20{code_saison[:2]}-{code_saison[2:]}"
 # Ligues en "format extra" (calendrier civil, autre URL)
 LIGUES_EXTRA = [
     # (code, nom, pays)
@@ -58,6 +66,13 @@ def telecharger_csv_principal(code, saison):
     try:
         r = requests.get(url, timeout=30)
         r.raise_for_status()
+        # Garde-fou : si le fichier n'existe pas encore, le serveur renvoie
+        # une page HTML (statut 300) au lieu d'un CSV. On détecte ça et on
+        # saute proprement au lieu de laisser pandas planter.
+        debut = r.content[:200].lstrip().lower()
+        if debut.startswith(b"<!doctype") or debut.startswith(b"<html"):
+            print("(pas encore publié)", end=" ")
+            return None
         # football-data.co.uk utilise parfois latin-1
         try:
             return pd.read_csv(StringIO(r.content.decode("utf-8")))
@@ -83,7 +98,7 @@ def telecharger_csv_extra(code):
         return None
 
 
-def normaliser_principal(df, code, nom, pays):
+def normaliser_principal(df, code, nom, pays, saison_label):
     """Harmonise les colonnes d'une ligue principale."""
     if df is None or len(df) == 0:
         return None
@@ -92,7 +107,7 @@ def normaliser_principal(df, code, nom, pays):
     df["League"] = code
     df["LeagueName"] = nom
     df["Country"] = pays
-    df["Season"] = "2025-26"
+    df["Season"] = saison_label
     # Convertir Date au format ISO (football-data.co.uk utilise DD/MM/YYYY)
     df["Date"] = pd.to_datetime(df["Date"], dayfirst=True, errors="coerce").dt.strftime("%Y-%m-%d")
     # Calculer TotalGoals et Is_00
@@ -167,15 +182,16 @@ def main():
     tous_les_df = []
 
     print("\n📥 Téléchargement des ligues principales...")
-    for code, nom, pays, saison in LIGUES:
-        print(f"  • {code} ({nom}, {pays})...", end=" ")
-        df = telecharger_csv_principal(code, saison)
-        df_norm = normaliser_principal(df, code, nom, pays)
-        if df_norm is not None:
-            print(f"✓ {len(df_norm)} matchs")
-            tous_les_df.append(df_norm)
-        else:
-            print("✗")
+    for code, nom, pays, _saison in LIGUES:
+        for saison in SAISONS_EUROPE:
+            print(f"  • {code} {saison} ({nom}, {pays})...", end=" ")
+            df = telecharger_csv_principal(code, saison)
+            df_norm = normaliser_principal(df, code, nom, pays, libelle_saison(saison))
+            if df_norm is not None:
+                print(f"✓ {len(df_norm)} matchs")
+                tous_les_df.append(df_norm)
+            else:
+                print("✗")
 
     print("\n📥 Téléchargement des ligues extra...")
     for code, nom, pays in LIGUES_EXTRA:
