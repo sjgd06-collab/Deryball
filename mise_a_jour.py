@@ -10,7 +10,7 @@ import requests
 from io import StringIO
 from pathlib import Path
 from datetime import datetime
-
+from stats import inferer_saison
 # ============================================================
 # CONFIGURATION DES LIGUES SUIVIES
 # ============================================================
@@ -216,9 +216,11 @@ def main():
     df_combine["Date_dt"] = pd.to_datetime(df_combine["Date"], errors="coerce")
     df_combine = df_combine.dropna(subset=["Date_dt"])
     # On garde tout ce qui est à partir du 1er juillet 2024
-    df_combine = df_combine[df_combine["Date_dt"] >= "2024-07-01"]
+    saison_actuelle = {lg: inferer_saison(lg, pd.Timestamp.today()) for lg in df_combine["League"].unique()}
+    saison_ligne = df_combine.apply(lambda r: inferer_saison(r["League"], r["Date_dt"]), axis=1)
+    df_combine = df_combine[saison_ligne == df_combine["League"].map(saison_actuelle)]
     df_combine = df_combine.drop(columns=["Date_dt"])
-    print(f"\n🔍 Filtrage : conservation des saisons 2024-25 et 2025-26 uniquement")
+    print(f"\n🔍 Filtrage : conservation de la saison en cours uniquement")
     print(f"   Matchs après filtrage : {len(df_combine)}")
     # Créer le dossier data si nécessaire
     FICHIER_SORTIE.parent.mkdir(parents=True, exist_ok=True)

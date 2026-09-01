@@ -74,7 +74,9 @@ def charger_et_preparer(chemin_csv):
     df["DisplayLeague"] = df.apply(designer, axis=1)
 
     df["Season"] = df.apply(lambda r: inferer_saison(r["League"], r["Date"]), axis=1)
-
+    # Version lite : ne garder que la saison en cours par compétition
+    _saison_actuelle = df.sort_values("Date").groupby("DisplayLeague").tail(1).set_index("DisplayLeague")["Season"].to_dict()
+    df = df[df.apply(lambda r: r["Season"] == _saison_actuelle.get(r["DisplayLeague"]), axis=1)].reset_index(drop=True)
     uk_tz = ZoneInfo("Europe/London")
     ny_tz = ZoneInfo("America/New_York")
     def vers_ny_heure(date, heure):
