@@ -842,6 +842,95 @@ def _section_heatmap(row):
 # ============================================================
 # RENDU D'UNE CARTE
 # ============================================================
+def _heat_forme(rate):
+    """Dégradé vert selon un taux [0..1]. Retour : (fond, couleur_texte)."""
+    if rate is None:
+        return ("transparent", "#c9c9d4")
+    if rate < 0.34:
+        return ("transparent", "#c9c9d4")
+    if rate < 0.67:
+        return ("#C0DD97", "#173404")
+    return ("#97C459", "#173404")
+
+
+def _cellule_compte(m, key):
+    """Cellule 'x/N' avec chaleur selon x/N."""
+    n = m.get("N", 0)
+    if not n:
+        return '<td style="padding:6px 3px;text-align:center;color:#7a7a88;">—</td>'
+    x = m.get(key, 0)
+    bg, col = _heat_forme(x / n if n else None)
+    poids = "font-weight:600;" if bg != "transparent" else ""
+    return (f'<td style="padding:6px 3px;text-align:center;font-variant-numeric:tabular-nums;'
+            f'background:{bg};color:{col};{poids}">{x}/{n}</td>')
+
+
+def _cellule_moy(m, key, heat=True):
+    """Cellule moyenne (BM/BE). Chaleur verte sur BM seulement (heat=True)."""
+    v = m.get(key)
+    if v is None:
+        return '<td style="padding:6px 3px;text-align:center;color:#7a7a88;">—</td>'
+    if heat:
+        bg, col = _heat_forme(min(v / 2.5, 1.0))
+    else:
+        bg, col = ("transparent", "#c9c9d4")
+    poids = "font-weight:600;" if bg != "transparent" else ""
+    return (f'<td style="padding:6px 3px;text-align:center;font-variant-numeric:tabular-nums;'
+            f'background:{bg};color:{col};{poids}">{v:.2f}</td>')
+
+
+def _section_forme(row):
+    """Grille de forme : 3 fenêtres (5/10/saison) x 3 périmètres (combiné/dom/ext) x 6 stats.
+    Lit row['FormeStats'] (dict produit par stats_forme_match). Rien si absent."""
+    forme = row.get("FormeStats")
+    if not isinstance(forme, dict) or not forme:
+        return ""
+
+    home = _esc(row.get("HomeTeam", "Domicile"))
+    away = _esc(row.get("AwayTeam", "Extérieur"))
+    perimetres = [
+        ("combine", "Combiné 2 éq.", "#8b7bd8"),
+        ("domicile", f"{home} (dom)", "#4db6ac"),
+        ("exterieur", f"{away} (ext)", "#e6a06b"),
+    ]
+    fenetres = [("5", "5 derniers matchs"), ("10", "10 derniers matchs"), ("saison", "Saison totale")]
+    entetes = ["BTTS", "O0.5", "O1.5", "O2.5", "BM", "BE"]
+
+    blocs = ""
+    for fen_key, fen_lab in fenetres:
+        data = forme.get(fen_key, {})
+        th = "".join(f'<th style="padding:5px 3px;font-weight:500;color:#7a7a88;'
+                     f'text-align:center;font-size:11px;">{h}</th>' for h in entetes)
+        corps = ""
+        for peri_key, peri_lab, couleur in perimetres:
+            m = data.get(peri_key, {"N": 0})
+            pastille = (f'<span style="display:inline-block;width:8px;height:8px;border-radius:2px;'
+                        f'background:{couleur};margin-right:6px;vertical-align:1px;"></span>')
+            corps += (
+                f'<tr style="border-top:0.5px solid rgba(255,255,255,0.06);">'
+                f'<td style="padding:6px 3px;color:#d7d7de;white-space:nowrap;">{pastille}{peri_lab}</td>'
+                f'{_cellule_compte(m, "BTTS")}{_cellule_compte(m, "O05")}'
+                f'{_cellule_compte(m, "O15")}{_cellule_compte(m, "O25")}'
+                f'{_cellule_moy(m, "BM", heat=True)}{_cellule_moy(m, "BE", heat=False)}'
+                f'</tr>'
+            )
+        blocs += (
+            f'<div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;'
+            f'color:#9a9aa8;margin:12px 0 4px;">{fen_lab}</div>'
+            f'<table style="width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed;">'
+            f'<colgroup><col style="width:34%"><col><col><col><col><col style="width:11%"><col style="width:11%"></colgroup>'
+            f'<thead><tr><th></th>{th}</tr></thead><tbody>{corps}</tbody></table>'
+        )
+
+    return (
+        '<div class="db-section-title">📊 Forme (même compétition)</div>'
+        f'{blocs}'
+        '<div style="font-size:11px;color:#7a7a88;margin-top:6px;">'
+        'Comptages « x / N » · BM = buts marqués/match · BE = buts encaissés/match · '
+        'vert = tendance aux buts plus forte.</div>'
+    )
+
+
 def rendre_carte_match_html(row, mode_compact=False):
     """
     Génère le HTML <details>/<summary> pour une carte de match.
@@ -996,12 +1085,7 @@ def rendre_carte_match_html(row, mode_compact=False):
         </div>
     </summary>
     <div class="db-card-body">
-        {poisson_html}
-        {xg_html}
-        {compare_html}
-        {_section_extras(row)}
-        {_section_heatmap(row)}
-        {h2h_html}
+        {_section_forme(row)}
     </div>
 </details>""")
 

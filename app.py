@@ -3,7 +3,7 @@ Deryball — Application Streamlit principale.
 """
 import streamlit as st
 import pandas as pd
-from stats import calculer_tout
+from stats import calculer_tout, stats_forme_match
 from cards import CARDS_CSS, rendre_cartes_matchs
 
 st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
@@ -657,6 +657,7 @@ df_brut = donnees["df"]
 team_stats = donnees["team_stats"]
 matchups = donnees["matchups"]
 saison_courante = donnees["saison_courante"]
+tr_journal = donnees["tr"]
 
 @st.cache_data(show_spinner="Préparation des stats détaillées...")
 def precalculer_stats_complet():
@@ -936,6 +937,12 @@ with tab_matchs:
             df_cartes = df_aff.copy()
             if "TimeNY" in df_cartes.columns:
                 df_cartes = df_cartes.sort_values(["DateNY", "TimeNY"])
+            if len(df_cartes) > 0:
+                df_cartes["FormeStats"] = [
+                    stats_forme_match(tr_journal, r["HomeTeam"], r["AwayTeam"],
+                                      r["League"], saison_courante.get(r["League"]))
+                    for _, r in df_cartes.iterrows()
+                ]
             rendre_cartes_matchs(df_cartes, st)
     else:
         # ----- VUE TABLEAU (originale) -----

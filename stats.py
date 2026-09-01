@@ -152,6 +152,53 @@ def construire_team_rows(df):
     tr["GD"] = tr["GF"] - tr["GA"]
     return tr
 
+def _metriques_forme(sub):
+    """Calcule les 6 stats de forme sur un sous-ensemble du journal d'équipe."""
+    n = len(sub)
+    if n == 0:
+        return {"N": 0, "BTTS": 0, "O05": 0, "O15": 0, "O25": 0, "BM": None, "BE": None}
+    return {
+        "N": n,
+        "BTTS": int(sub["BTTS"].sum()),
+        "O05": int(sub["Over05"].sum()),
+        "O15": int(sub["Over15"].sum()),
+        "O25": int(sub["Over25"].sum()),
+        "BM": round(float(sub["GF"].mean()), 2),
+        "BE": round(float(sub["GA"].mean()), 2),
+    }
+
+
+def stats_forme_match(tr, home_team, away_team, display_league, saison_courante):
+    """
+    Stats de forme d'un match, par fenetre et par perimetre, SANS melanger les competitions.
+    tr : journal des equipes (sortie de construire_team_rows).
+    Retour : res[fenetre][perimetre] = {N, BTTS, O05, O15, O25, BM, BE}
+      fenetres  : "5", "10", "saison"
+      perimetres: "combine", "domicile", "exterieur"
+    Recence pure pour 5/10 (peut traverser les saisons) ; saison courante pour "saison".
+    """
+    base = tr[tr["DisplayLeague"] == display_league]
+    dom = base[base["Team"] == home_team].sort_values("Date", ascending=False)
+    ext = base[base["Team"] == away_team].sort_values("Date", ascending=False)
+
+    def fenetre_df(eq, fen):
+        if fen == "saison":
+            return eq[eq["Season"] == saison_courante]
+        return eq.head(5 if fen == "5" else 10)
+
+    res = {}
+    for fen in ("5", "10", "saison"):
+        d = fenetre_df(dom, fen)
+        e = fenetre_df(ext, fen)
+        combine = pd.concat([d, e], ignore_index=True)
+        res[fen] = {
+            "combine": _metriques_forme(combine),
+            "domicile": _metriques_forme(d),
+            "exterieur": _metriques_forme(e),
+        }
+    return res
+
+
 def streak_courante(s):
     c = 0
     for v in reversed(s.tolist()):
@@ -763,6 +810,7 @@ def calculer_tout(chemin_csv, chemin_fixtures=None):
         "team_stats": team_df,
         "matchups": matchups_df,
         "saison_courante": courante,
+        "tr": construire_team_rows(df),
     }
     # ============================================================
 # 5. VALIDATION POISSON (compare prédictions vs résultats réels)
