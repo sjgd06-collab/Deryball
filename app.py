@@ -4,7 +4,7 @@ Deryball — Application Streamlit principale.
 import streamlit as st
 import pandas as pd
 from stats import calculer_tout, stats_forme_match
-from cards import CARDS_CSS, rendre_cartes_matchs
+from cards import CARDS_CSS, rendre_cartes_matchs, rendre_tableau_forme
 
 st.set_page_config(page_title="Deryball", page_icon="⚽", layout="wide")
 # ============================================================
@@ -869,6 +869,14 @@ with tab_matchs:
             label_visibility="collapsed",
         )
 
+    # 2b : sélecteurs fenêtre + périmètre pour la vue Tableau
+    if vue_match != "🎴 Détaillée":
+        colf1, colf2, _ = st.columns([2, 2, 4])
+        fenetre_forme = colf1.selectbox("Fenêtre", ["5 derniers", "10 derniers", "Saison"], index=1, key="fenetre_forme")
+        perimetre_forme = colf2.selectbox("Périmètre", ["Combiné", "Domicile", "Extérieur"], index=0, key="perimetre_forme")
+    else:
+        fenetre_forme, perimetre_forme = "10 derniers", "Combiné"
+
     # Légende des signaux d'anomalies (uniquement en vue Buts)
     if type_stats_match == "Buts (défaut)":
         if "afficher_legende_matchs" not in st.session_state:
@@ -981,11 +989,25 @@ with tab_matchs:
                         "H_Over05", "A_Over05", "H_Over15", "A_Over15",
                         "P_Over05", "P_Over15", "P_00"]
         colonnes = [c for c in colonnes if c in df_aff.columns]
-        st.dataframe(
-            appliquer_couleurs(df_aff, colonnes),
-            use_container_width=True, hide_index=True, height=600,
-            column_config=build_column_config(colonnes),
-        )
+        if type_stats_match == "Buts (défaut)":
+            _fmap = {"5 derniers": "5", "10 derniers": "10", "Saison": "saison"}
+            _pmap = {"Combiné": "combine", "Domicile": "domicile", "Extérieur": "exterieur"}
+            _dff = df_aff.copy()
+            _dff["FormeStats"] = [
+                stats_forme_match(tr_journal, r["HomeTeam"], r["AwayTeam"],
+                                  r["League"], saison_courante.get(r["League"]))
+                for _, r in _dff.iterrows()
+            ]
+            st.markdown(
+                rendre_tableau_forme(_dff, _fmap[fenetre_forme], _pmap[perimetre_forme]),
+                unsafe_allow_html=True,
+            )
+        else:
+            st.dataframe(
+                appliquer_couleurs(df_aff, colonnes),
+                use_container_width=True, hide_index=True, height=600,
+                column_config=build_column_config(colonnes),
+            )
 
     # ============================================================
     # HEATMAP POISSON DES SCORES (visible dans les 2 vues)
