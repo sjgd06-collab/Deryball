@@ -795,9 +795,9 @@ with tab_matchs:
 
     # Filtres principaux
     if mode_mobile:
-        fcol1 = fcol2 = fcol3 = fcol4 = fcol5 = st.container()
+        fcol1 = fcol2 = fcol3 = fcol4 = st.container()
     else:
-        fcol1, fcol2, fcol3, fcol4, fcol5 = st.columns([2, 2, 2, 2, 2])
+        fcol1, fcol2, fcol3, fcol4 = st.columns([2, 2, 2, 2])
 
     with fcol1:
         dates_dispo = sorted(matchups["DateNY"].unique(), reverse=True)
@@ -810,13 +810,7 @@ with tab_matchs:
         ligue_selectionnee = st.selectbox("Ligue", options=ligues, index=0, key="m_league")
     with fcol4:
         recherche = st.text_input("Rechercher équipe", placeholder="ex: Arsenal...", key="m_search")
-    with fcol5:
-        type_stats_match = st.selectbox(
-            "Type de stats",
-            options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
-            index=0,
-            key="m_type_stats"
-        )
+    type_stats_match = "Buts (défaut)"
 
     # Filtrage
     if st.session_state.dates_filtrees:
@@ -1192,7 +1186,7 @@ with tab_matchups:
                 df_display = pd.DataFrame(matchups_rows)
 
                 # 🆕 Toggle Vue Tableau / Détaillée + Type de stats
-                col_vue_c, col_type_c = st.columns([2, 2])
+                col_vue_c, _ = st.columns([2, 6])
                 with col_vue_c:
                     vue_custom = st.radio(
                         "Mode d'affichage",
@@ -1202,14 +1196,7 @@ with tab_matchups:
                         horizontal=True,
                         label_visibility="collapsed",
                     )
-                with col_type_c:
-                    type_stats_custom = st.selectbox(
-                        "Type de stats",
-                        options=["Buts (défaut)", "Tirs & corners", "Cartons & fautes"],
-                        index=0,
-                        key="mc_type_stats",
-                        label_visibility="collapsed",
-                    )
+                type_stats_custom = "Buts (défaut)"
 
                 # Légende des signaux
                 if "afficher_legende_matchups" not in st.session_state:
