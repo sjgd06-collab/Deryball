@@ -1008,72 +1008,6 @@ with tab_matchs:
                 use_container_width=True, hide_index=True, height=600,
                 column_config=build_column_config(colonnes),
             )
-
-    # ============================================================
-    # HEATMAP POISSON DES SCORES (visible dans les 2 vues)
-    # ============================================================
-    if len(df_aff) > 0 and type_stats_match == "Buts (défaut)":
-        with st.expander("🎯 Détail Poisson d'un match (heatmap des scores)", expanded=False):
-            df_aff_lbl = df_aff.copy()
-            df_aff_lbl["__label"] = (
-                df_aff_lbl["DateNY"].astype(str) + " · " +
-                df_aff_lbl["HomeTeam"].astype(str) + " vs " +
-                df_aff_lbl["AwayTeam"].astype(str) + " (" +
-                df_aff_lbl["League"].astype(str) + ")"
-            )
-            match_choisi = st.selectbox(
-                "Match à analyser",
-                options=df_aff_lbl["__label"].tolist(),
-                key="heatmap_match_select",
-            )
-            ligne = df_aff_lbl[df_aff_lbl["__label"] == match_choisi].iloc[0]
-            lam_h = ligne.get("xG_H")
-            lam_a = ligne.get("xG_A")
-
-            if pd.notna(lam_h) and pd.notna(lam_a):
-                from stats import matrice_scores
-                res = matrice_scores(lam_h, lam_a)
-
-                top3_txt = " · ".join([f"**{i}-{j}** ({100*p:.1f}%)" for i, j, p in res["top3"]])
-
-                col1, col2 = st.columns([3, 2])
-                with col1:
-                    st.markdown(f"**🏆 Top 3 scores :** {top3_txt}")
-                    st.markdown(
-                        f"**⚖️ Issue 1X2 :** "
-                        f"🏠 {ligne['HomeTeam']} **{100*res['p_home']:.0f}%** · "
-                        f"⚖️ Nul **{100*res['p_draw']:.0f}%** · "
-                        f"✈️ {ligne['AwayTeam']} **{100*res['p_away']:.0f}%**"
-                    )
-                with col2:
-                    st.metric("xG (🏠 / ✈️)", f"{lam_h:.2f} / {lam_a:.2f}")
-
-                st.markdown("**Probabilité de chaque score exact (%)**")
-                st.caption("🏠 buts en lignes · ✈️ buts en colonnes")
-
-                matrice = res["matrice"]
-                df_heat = pd.DataFrame(
-                    [[round(100 * matrice[i][j], 2) for j in range(6)] for i in range(6)],
-                    index=[f"🏠 {i}" for i in range(6)],
-                    columns=[f"✈️ {j}" for j in range(6)],
-                )
-                styled_heat = (
-                    df_heat.style
-                    .background_gradient(cmap="YlOrRd", vmin=0, vmax=15)
-                    .format("{:.2f}")
-                )
-                st.dataframe(styled_heat, use_container_width=False)
-
-                st.caption(
-                    f"💡 Cette matrice couvre **{100*res['couverture']:.1f}%** des scores possibles "
-                    f"(le reste = scores avec ≥6 buts pour une équipe)."
-                )
-            else:
-                st.warning("Pas de xG disponible pour ce match — stats incomplètes.")
-
-# ============================================================
-# ONGLET MATCHUPS PERSONNALISÉS
-# ============================================================
 with tab_matchups:
     st.markdown("### 🧪 Créer vos propres matchups")
     st.caption(
@@ -1300,6 +1234,13 @@ with tab_matchups:
                     Format : **+X.X BM/BE** = différence buts marqués/encaissés vs saison.
                     """)
 
+                if vue_custom != "🎴 Détaillée":
+                    cfc1, cfc2, _ = st.columns([2, 2, 4])
+                    fenetre_forme_c = cfc1.selectbox("Fenêtre", ["5 derniers", "10 derniers", "Saison"], index=1, key="fenetre_forme_c")
+                    perimetre_forme_c = cfc2.selectbox("Périmètre", ["Combiné", "Domicile", "Extérieur"], index=0, key="perimetre_forme_c")
+                else:
+                    fenetre_forme_c, perimetre_forme_c = "10 derniers", "Combiné"
+
                 if vue_custom == "🎴 Détaillée":
                     df_display["FormeStats"] = [
                         stats_forme_match(tr_journal, r["HomeTeam"], r["AwayTeam"],
@@ -1347,71 +1288,22 @@ with tab_matchups:
                                            "H_Over05", "A_Over05", "H_Over15", "A_Over15",
                                            "P_Over05", "P_Over15", "P_00"]
                     colonnes_custom = [c for c in colonnes_custom if c in df_display.columns]
-                    st.dataframe(
-                        appliquer_couleurs(df_display, colonnes_custom),
-                        use_container_width=True, hide_index=True, height=400,
-                        column_config=build_column_config(colonnes_custom),
-                    )
-                    # ============================================================
-                # HEATMAP POISSON DES SCORES (visible dans les 2 vues)
-                # ============================================================
-                with st.expander("🎯 Détail Poisson d'un matchup (heatmap des scores)", expanded=False):
-                    df_display_lbl = df_display.copy()
-                    df_display_lbl["__label"] = (
-                        df_display_lbl["HomeTeam"].astype(str) + " (" +
-                        df_display_lbl["H_Ligue"].astype(str) + ") vs " +
-                        df_display_lbl["AwayTeam"].astype(str) + " (" +
-                        df_display_lbl["A_Ligue"].astype(str) + ")"
-                    )
-                    matchup_choisi = st.selectbox(
-                        "Matchup à analyser",
-                        options=df_display_lbl["__label"].tolist(),
-                        key="heatmap_matchup_select",
-                    )
-                    ligne = df_display_lbl[df_display_lbl["__label"] == matchup_choisi].iloc[0]
-                    lam_h = ligne.get("xG_H")
-                    lam_a = ligne.get("xG_A")
-
-                    if pd.notna(lam_h) and pd.notna(lam_a):
-                        from stats import matrice_scores
-                        res = matrice_scores(lam_h, lam_a)
-
-                        top3_txt = " · ".join([f"**{i}-{j}** ({100*p:.1f}%)" for i, j, p in res["top3"]])
-
-                        col1, col2 = st.columns([3, 2])
-                        with col1:
-                            st.markdown(f"**🏆 Top 3 scores :** {top3_txt}")
-                            st.markdown(
-                                f"**⚖️ Issue 1X2 :** "
-                                f"🏠 {ligne['HomeTeam']} **{100*res['p_home']:.0f}%** · "
-                                f"⚖️ Nul **{100*res['p_draw']:.0f}%** · "
-                                f"✈️ {ligne['AwayTeam']} **{100*res['p_away']:.0f}%**"
-                            )
-                        with col2:
-                            st.metric("xG (🏠 / ✈️)", f"{lam_h:.2f} / {lam_a:.2f}")
-
-                        st.markdown("**Probabilité de chaque score exact (%)**")
-                        st.caption("🏠 buts en lignes · ✈️ buts en colonnes")
-
-                        matrice = res["matrice"]
-                        df_heat = pd.DataFrame(
-                            [[round(100 * matrice[i][j], 2) for j in range(6)] for i in range(6)],
-                            index=[f"🏠 {i}" for i in range(6)],
-                            columns=[f"✈️ {j}" for j in range(6)],
-                        )
-                        styled_heat = (
-                            df_heat.style
-                            .background_gradient(cmap="YlOrRd", vmin=0, vmax=15)
-                            .format("{:.2f}")
-                        )
-                        st.dataframe(styled_heat, use_container_width=False)
-
-                        st.caption(
-                            f"💡 Cette matrice couvre **{100*res['couverture']:.1f}%** des scores possibles "
-                            f"(le reste = scores avec ≥6 buts pour une équipe)."
+                    if type_stats_custom == "Buts (défaut)":
+                        _fmapc = {"5 derniers": "5", "10 derniers": "10", "Saison": "saison"}
+                        _pmapc = {"Combiné": "combine", "Domicile": "domicile", "Extérieur": "exterieur"}
+                        df_display["FormeStats"] = [
+                            stats_forme_match(tr_journal, r["HomeTeam"], r["AwayTeam"],
+                                              r["H_Ligue"], saison_courante.get(r["H_Ligue"]),
+                                              away_league=r["A_Ligue"], saison_away=saison_courante.get(r["A_Ligue"]))
+                            for _, r in df_display.iterrows()
+                        ]
+                        st.markdown(
+                            rendre_tableau_forme(df_display, _fmapc[fenetre_forme_c], _pmapc[perimetre_forme_c], custom=True),
+                            unsafe_allow_html=True,
                         )
                     else:
-                        st.warning("Pas de xG disponible pour ce matchup — stats incomplètes.")
-            else:
-                st.warning("Aucun matchup valide. Vérifie que les équipes ont des stats disponibles.")
-
+                        st.dataframe(
+                            appliquer_couleurs(df_display, colonnes_custom),
+                            use_container_width=True, hide_index=True, height=400,
+                            column_config=build_column_config(colonnes_custom),
+                        )

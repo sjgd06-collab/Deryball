@@ -935,35 +935,38 @@ def _section_forme(row):
     )
 
 
-def rendre_tableau_forme(df, fen, peri):
-    """Table condensée : colonnes de base + 6 stats de forme (fenêtre + périmètre choisis), avec chaleur."""
-    base_h = ["Heure", "Ligue", "Domicile", "Extérieur", "Score"]
-    stats_h = ["BTTS", "O0.5", "O1.5", "O2.5", "BM", "BE"]
+def rendre_tableau_forme(df, fen, peri, custom=False):
+    """Table condensée : colonnes de base + 6 stats de forme (fenêtre + périmètre choisis), avec chaleur.
+    custom=True : matchups perso (Domicile / Ligue / Extérieur / Ligue, sans Heure ni Score)."""
+    if custom:
+        base_h = ["Domicile", "Ligue", "Extérieur", "Ligue"]
+        base_keys = ["HomeTeam", "H_Ligue", "AwayTeam", "A_Ligue"]
+    else:
+        base_h = ["Heure", "Ligue", "Domicile", "Extérieur", "Score"]
+        base_keys = ["TimeNY", "League", "HomeTeam", "AwayTeam", "__score__"]
     th = "".join(
         f'<th style="padding:7px 6px;text-align:left;font-weight:500;color:#7a7a88;'
         f'font-size:12px;white-space:nowrap;">{h}</th>' for h in base_h
     )
     th += "".join(
         f'<th style="padding:7px 4px;text-align:center;font-weight:500;color:#7a7a88;'
-        f'font-size:12px;">{h}</th>' for h in stats_h
+        f'font-size:12px;">{h}</th>' for h in ["BTTS", "O0.5", "O1.5", "O2.5", "BM", "BE"]
     )
     lignes = ""
     for _, row in df.iterrows():
         forme = row.get("FormeStats") or {}
         m = forme.get(fen, {}).get(peri, {"N": 0})
-        hg = row.get("FTHG")
-        ag = row.get("FTAG")
-        if row.get("IsUpcoming") is True or hg is None or (isinstance(hg, float) and hg != hg):
-            score = '<span style="color:#8b7bd8;">À venir</span>'
-        else:
-            score = f"{int(hg)}-{int(ag)}"
-        base_vals = [
-            _esc(str(row.get("TimeNY", "") or "")),
-            _esc(str(row.get("League", "") or "")),
-            _esc(str(row.get("HomeTeam", "") or "")),
-            _esc(str(row.get("AwayTeam", "") or "")),
-            score,
-        ]
+        base_vals = []
+        for k in base_keys:
+            if k == "__score__":
+                hg = row.get("FTHG")
+                ag = row.get("FTAG")
+                if row.get("IsUpcoming") is True or hg is None or (isinstance(hg, float) and hg != hg):
+                    base_vals.append('<span style="color:#8b7bd8;">À venir</span>')
+                else:
+                    base_vals.append(f"{int(hg)}-{int(ag)}")
+            else:
+                base_vals.append(_esc(str(row.get(k, "") or "")))
         tds = "".join(
             f'<td style="padding:7px 6px;color:#d7d7de;white-space:nowrap;">{v}</td>'
             for v in base_vals
