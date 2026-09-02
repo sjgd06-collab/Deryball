@@ -843,14 +843,18 @@ def _section_heatmap(row):
 # RENDU D'UNE CARTE
 # ============================================================
 def _heat_forme(rate):
-    """Dégradé vert selon un taux [0..1]. Retour : (fond, couleur_texte)."""
+    """Dégradé divergent rouge→vert en 5 paliers selon le taux [0..1]."""
     if rate is None:
         return ("transparent", "#c9c9d4")
-    if rate < 0.34:
-        return ("transparent", "#c9c9d4")
-    if rate < 0.67:
-        return ("#C0DD97", "#173404")
-    return ("#97C459", "#173404")
+    if rate < 0.20:
+        return ("#E0685F", "#ffffff")   # 0-19  : rouge
+    if rate < 0.40:
+        return ("#EE9F4C", "#3f2200")   # 20-39 : orange
+    if rate < 0.60:
+        return ("#F1CE52", "#463800")   # 40-59 : jaune
+    if rate < 0.80:
+        return ("#9FCB63", "#1b3606")   # 60-79 : vert pâle
+    return ("#2E7D32", "#ffffff")       # 80-100: vert foncé
 
 
 def _cellule_compte(m, key):
@@ -911,7 +915,7 @@ def _section_forme(row):
                 f'<td style="padding:6px 3px;color:#d7d7de;white-space:nowrap;">{pastille}{peri_lab}</td>'
                 f'{_cellule_compte(m, "BTTS")}{_cellule_compte(m, "O05")}'
                 f'{_cellule_compte(m, "O15")}{_cellule_compte(m, "O25")}'
-                f'{_cellule_moy(m, "BM", heat=True)}{_cellule_moy(m, "BE", heat=False)}'
+                f'{_cellule_moy(m, "BM", heat=False)}{_cellule_moy(m, "BE", heat=False)}'
                 f'</tr>'
             )
         blocs += (
@@ -967,7 +971,7 @@ def rendre_tableau_forme(df, fen, peri):
         tds += (
             _cellule_compte(m, "BTTS") + _cellule_compte(m, "O05")
             + _cellule_compte(m, "O15") + _cellule_compte(m, "O25")
-            + _cellule_moy(m, "BM", heat=True) + _cellule_moy(m, "BE", heat=False)
+            + _cellule_moy(m, "BM", heat=False) + _cellule_moy(m, "BE", heat=False)
         )
         lignes += f'<tr style="border-top:0.5px solid rgba(255,255,255,0.06);">{tds}</tr>'
     html = (
