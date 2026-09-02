@@ -424,32 +424,6 @@ def matrice_scores(lam_h, lam_a, max_g=6, rho=-0.10):
         "couverture": total,  # somme avant normalisation, indique si on couvre ≥95%
     }
 
-def recalculer_probs_avec_rho(matchups_df, rho):
-    """
-    Recalcule P_* pour un rho donné en partant des xG_H/xG_A déjà calculés.
-    Utile pour comparer DC vs Poisson pur dans la validation.
-    """
-    df = matchups_df.copy()
-    new_rows = []
-    for _, row in df.iterrows():
-        lam_h = row.get("xG_H")
-        lam_a = row.get("xG_A")
-        if pd.isna(lam_h) or pd.isna(lam_a):
-            new_rows.append({"P_Over05": None, "P_Over15": None,
-                             "P_Over25": None, "P_BTTS": None, "P_00": None})
-            continue
-        probs = probs_match(lam_h, lam_a, rho=rho)
-        new_rows.append({
-            "P_Over05": round(100 * probs["over05"], 1),
-            "P_Over15": round(100 * probs["over15"], 1),
-            "P_Over25": round(100 * probs["over25"], 1),
-            "P_BTTS":   round(100 * probs["btts"], 1),
-            "P_00":     round(100 * probs["p00"], 1),
-        })
-    np_df = pd.DataFrame(new_rows)
-    for col in ["P_Over05", "P_Over15", "P_Over25", "P_BTTS", "P_00"]:
-        df[col] = np_df[col].values
-    return df
 def construire_index_h2h(df):
     """
     Pré-calcule un index des confrontations par paire d'équipes.
@@ -488,87 +462,6 @@ def h2h_stats(index_h2h, home_team, away_team, jusqu_a_date):
         "H2H_O25_pct": round(100 * (total > 2.5).mean(), 1),
         "H2H_00_pct": round(100 * ((past["FTHG"] == 0) & (past["FTAG"] == 0)).mean(), 1),
     }
-def detecter_anomalies(stats):
-    """
-    Compare les stats récentes (5 et 10 derniers) avec la saison entière.
-    Retourne (emojis, détails_texte) pour utilisation en tooltip.
-    """
-    if not stats:
-        return "", ""
-
-    SEUIL = 20  # points de pourcentage
-    SEUIL_BUTS = 0.6  # buts/match
-
-    signaux = []
-    details = []
-
-    # Stats saison
-    gf_saison = stats.get("GF_pg")
-    ga_saison = stats.get("GA_pg")
-    over25_saison = stats.get("Over25_pct")
-    btts_saison = stats.get("BTTS_pct")
-
-    # Stats récentes (5 derniers - prioritaires) avec fallback 10 derniers
-    gf_recent = stats.get("L5_GF_pg") or stats.get("L10_GF_pg")
-    ga_recent = stats.get("L5_GA_pg") or stats.get("L10_GA_pg")
-    over25_recent = stats.get("L5_Over25_pct") or stats.get("L10_Over25_pct")
-    btts_recent = stats.get("L5_BTTS_pct") or stats.get("L10_BTTS_pct")
-    fenetre = "5 derniers" if stats.get("L5_GF_pg") is not None else "10 derniers"
-
-    # 1. Surforme attaque
-    if gf_saison is not None and gf_recent is not None:
-        if gf_recent - gf_saison >= SEUIL_BUTS:
-            signaux.append("📈")
-            details.append(f"📈 Surforme attaque : {gf_recent:.1f} buts/m sur {fenetre} vs {gf_saison:.1f} en saison")
-        elif gf_saison - gf_recent >= SEUIL_BUTS:
-            signaux.append("📉")
-            details.append(f"📉 Sousforme attaque : {gf_recent:.1f} buts/m sur {fenetre} vs {gf_saison:.1f} en saison")
-
-    # 2. Surforme/sousforme défense
-    if ga_saison is not None and ga_recent is not None:
-        if ga_saison - ga_recent >= SEUIL_BUTS:
-            signaux.append("🛡️")
-            details.append(f"🛡️ Surforme défense : {ga_recent:.1f} encaissés/m sur {fenetre} vs {ga_saison:.1f} en saison")
-        elif ga_recent - ga_saison >= SEUIL_BUTS:
-            signaux.append("⚠️")
-            details.append(f"⚠️ Sousforme défense : {ga_recent:.1f} encaissés/m sur {fenetre} vs {ga_saison:.1f} en saison")
-
-    # 3. Tendance Over/Under
-    if over25_saison is not None and over25_recent is not None:
-        if over25_recent - over25_saison >= SEUIL:
-            signaux.append("🔥")
-            details.append(f"🔥 Tendance Over : {over25_recent:.0f}% O2.5 sur {fenetre} vs {over25_saison:.0f}% en saison")
-        elif over25_saison - over25_recent >= SEUIL:
-            signaux.append("🧊")
-            details.append(f"🧊 Tendance Under : {over25_recent:.0f}% O2.5 sur {fenetre} vs {over25_saison:.0f}% en saison")
-
-    # 4. Tendance BTTS
-    if btts_saison is not None and btts_recent is not None:
-        if btts_recent - btts_saison >= SEUIL:
-            signaux.append("💥")
-            details.append(f"💥 Tendance BTTS : {btts_recent:.0f}% BTTS sur {fenetre} vs {btts_saison:.0f}% en saison")
-        elif btts_saison - btts_recent >= SEUIL:
-            signaux.append("🚫")
-            details.append(f"🚫 Anti-BTTS : {btts_recent:.0f}% BTTS sur {fenetre} vs {btts_saison:.0f}% en saison")
-
-    # Construire un mini-résumé chiffré pour l'affichage compact
-    resume_chiffre = []
-    if gf_saison is not None and gf_recent is not None:
-        diff_gf = gf_recent - gf_saison
-        if abs(diff_gf) >= SEUIL_BUTS:
-            signe = "+" if diff_gf > 0 else ""
-            resume_chiffre.append(f"{signe}{diff_gf:.1f} BM")
-    if ga_saison is not None and ga_recent is not None:
-        diff_ga = ga_recent - ga_saison
-        if abs(diff_ga) >= SEUIL_BUTS:
-            signe = "+" if diff_ga > 0 else ""
-            resume_chiffre.append(f"{signe}{diff_ga:.1f} BE")
-
-    affichage_court = "".join(signaux)
-    if resume_chiffre:
-        affichage_court += " " + " ".join(resume_chiffre)
-
-    return affichage_court, " | ".join(details)
 def construire_matchups(df, team_stats):
     index_h2h = construire_index_h2h(df)  # ← AJOUTER CETTE LIGNE
     matchups = []
@@ -615,8 +508,6 @@ def construire_matchups(df, team_stats):
             "A_Fouls_pg": a.get("Fouls_pg"),
         }
         # Anomalies (forme récente vs saison)
-        h_emojis, h_details = detecter_anomalies(h)
-        a_emojis, a_details = detecter_anomalies(a)
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -644,10 +535,6 @@ def construire_matchups(df, team_stats):
             "P_00": round(100 * probs["p00"], 1),
             **h_extra,
             **a_extra,
-            "H_Signaux": h_emojis,
-            "H_Signaux_detail": h_details if h_details else "Aucune anomalie détectée",
-            "A_Signaux": a_emojis,
-            "A_Signaux_detail": a_details if a_details else "Aucune anomalie détectée",
             **h2h,
         })
     return pd.DataFrame(matchups)
@@ -705,8 +592,6 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
             "A_Fouls_pg": a.get("Fouls_pg"),
         }
         # Anomalies (forme récente vs saison)
-        h_emojis, h_details = detecter_anomalies(h)
-        a_emojis, a_details = detecter_anomalies(a)
         matchups.append({
             "Date": row["Date"].strftime("%Y-%m-%d"),
             "DateNY": row["DateNY"],
@@ -734,10 +619,6 @@ def construire_matchups_avec_historique(df_a_traiter, team_stats, df_historique)
             "P_00": round(100 * probs["p00"], 1),
             **h_extra,
             **a_extra,
-            "H_Signaux": h_emojis,
-            "H_Signaux_detail": h_details if h_details else "Aucune anomalie détectée",
-            "A_Signaux": a_emojis,
-            "A_Signaux_detail": a_details if a_details else "Aucune anomalie détectée",
             **h2h,
         })
     return pd.DataFrame(matchups)
@@ -822,101 +703,3 @@ def calculer_tout(chemin_csv, chemin_fixtures=None):
     # ============================================================
 # 5. VALIDATION POISSON (compare prédictions vs résultats réels)
 # ============================================================
-
-def calculer_validation_poisson(matchups_df):
-    """
-    Filtre aux matchs joués et ajoute des colonnes Real_* (0/1) pour chaque marché.
-    """
-    df = matchups_df.copy()
-    if "IsUpcoming" in df.columns:
-        df = df[df["IsUpcoming"] != True]
-
-    def parse_score(s):
-        try:
-            h, a = str(s).split("-")
-            return int(h), int(a)
-        except Exception:
-            return None, None
-
-    parsed = df["Score"].apply(parse_score)
-    df["Actual_H"] = [p[0] for p in parsed]
-    df["Actual_A"] = [p[1] for p in parsed]
-    df = df.dropna(subset=["Actual_H", "Actual_A"]).copy()
-    df["Actual_H"] = df["Actual_H"].astype(int)
-    df["Actual_A"] = df["Actual_A"].astype(int)
-    df["Actual_Total"] = df["Actual_H"] + df["Actual_A"]
-
-    df["Real_Over05"] = (df["Actual_Total"] >= 1).astype(int)
-    df["Real_Over15"] = (df["Actual_Total"] >= 2).astype(int)
-    df["Real_Over25"] = (df["Actual_Total"] >= 3).astype(int)
-    df["Real_BTTS"] = ((df["Actual_H"] > 0) & (df["Actual_A"] > 0)).astype(int)
-    df["Real_00"] = ((df["Actual_H"] == 0) & (df["Actual_A"] == 0)).astype(int)
-    return df
-
-
-def metriques_calibration(df_validation):
-    """
-    Pour chaque marché, calcule : taux prédit moyen, taux réel, écart, Brier, accuracy.
-    """
-    marches = [
-        ("Over 0.5", "P_Over05", "Real_Over05"),
-        ("Over 1.5", "P_Over15", "Real_Over15"),
-        ("Over 2.5", "P_Over25", "Real_Over25"),
-        ("BTTS",     "P_BTTS",   "Real_BTTS"),
-        ("0-0",      "P_00",     "Real_00"),
-    ]
-    rows = []
-    for nom, col_pred, col_real in marches:
-        if col_pred not in df_validation.columns or col_real not in df_validation.columns:
-            continue
-        sub = df_validation[[col_pred, col_real]].dropna()
-        if len(sub) == 0:
-            continue
-        pred = sub[col_pred] / 100.0   # convertir % en proba [0,1]
-        real = sub[col_real]
-        brier = ((pred - real) ** 2).mean()
-        accuracy = ((pred > 0.5).astype(int) == real).mean()
-        rows.append({
-            "Marché": nom,
-            "N matchs": int(len(sub)),
-            "% prédit moy": round(100 * pred.mean(), 1),
-            "% réel": round(100 * real.mean(), 1),
-            "Écart (pp)": round(100 * (pred.mean() - real.mean()), 1),
-            "Brier": round(brier, 4),
-            "Accuracy": round(100 * accuracy, 1),
-        })
-    return pd.DataFrame(rows)
-
-
-def calibration_par_buckets(df_validation, col_pred, col_real):
-    """
-    Découpe les prédictions en tranches fixes de 10 points et compare au réel.
-    """
-    sub = df_validation[[col_pred, col_real]].dropna().copy()
-    if len(sub) == 0:
-        return pd.DataFrame()
-    bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100.01]
-    labels = ["0-10%", "10-20%", "20-30%", "30-40%", "40-50%",
-              "50-60%", "60-70%", "70-80%", "80-90%", "90-100%"]
-    sub["Tranche"] = pd.cut(sub[col_pred], bins=bins, labels=labels, include_lowest=True)
-    agg = sub.groupby("Tranche", observed=True).agg(
-        N=(col_pred, "size"),
-        Pred_moyen=(col_pred, "mean"),
-        Real_pct=(col_real, "mean"),
-    ).reset_index()
-    agg["Pred_moyen"] = agg["Pred_moyen"].round(1)
-    agg["Real_pct"] = (agg["Real_pct"] * 100).round(1)
-    agg["Écart (pp)"] = (agg["Pred_moyen"] - agg["Real_pct"]).round(1)
-    return agg.rename(columns={"Pred_moyen": "% prédit moy", "Real_pct": "% réel"})
-
-
-def plus_grandes_surprises(df_validation, col_pred, col_real, n=10):
-    """
-    Renvoie les n matchs où la prédiction était la plus loin du résultat (en pp).
-    """
-    df = df_validation.copy()
-    df["Écart (pp)"] = (df[col_pred] - df[col_real] * 100).round(1)
-    df = df.reindex(df["Écart (pp)"].abs().sort_values(ascending=False).index).head(n)
-    cols = ["Date", "League", "HomeTeam", "AwayTeam", "Score", col_pred, col_real, "Écart (pp)"]
-    cols = [c for c in cols if c in df.columns]
-    return df[cols].rename(columns={col_pred: "% prédit", col_real: "Réel (0/1)"})

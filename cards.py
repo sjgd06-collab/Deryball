@@ -533,16 +533,6 @@ def _safe_pct(v):
         return None
 
 
-def _safe_num(v):
-    """Convertit en float ou None."""
-    if v is None or pd.isna(v):
-        return None
-    try:
-        return float(v)
-    except (ValueError, TypeError):
-        return None
-
-
 def _fmt_pos(pos):
     """Formate la position : 1 -> '1er', 2 -> '2e', etc."""
     if pos is None or pd.isna(pos):
@@ -573,275 +563,6 @@ def _minify_html(s):
     return "".join(line.strip() for line in s.split("\n"))
 
 
-def _form_pills(form_str):
-    """Génère le HTML des pastilles V/N/D."""
-    if not form_str:
-        return ""
-    return "".join(
-        f'<div class="db-form-pill {c}">{c}</div>'
-        for c in str(form_str)
-    )
-
-
-def _pois_cell(label, value):
-    """Cellule individuelle de la zone Poisson."""
-    v = _safe_pct(value)
-    if v is None:
-        return f"""<div class="db-pois-cell">
-            <div class="db-pois-label">{label}</div>
-            <div class="db-pois-value">—</div>
-            <div class="db-pois-bar"></div>
-        </div>"""
-    return f"""<div class="db-pois-cell">
-        <div class="db-pois-label">{label}</div>
-        <div class="db-pois-value">{v:.1f}%</div>
-        <div class="db-pois-bar"><div class="db-pois-bar-fill" style="width:{v:.0f}%"></div></div>
-    </div>"""
-
-
-def _metric_line(label, value, is_low_good=False):
-    """Ligne de métrique avec barre dans la zone comparaison."""
-    v = _safe_pct(value)
-    if v is None:
-        return f"""<div class="db-metric-line">
-            <span class="db-metric-name">{label}</span>
-            <span class="db-metric-bar"></span>
-            <span class="db-metric-val">—</span>
-        </div>"""
-
-    # Couleur de la barre selon contexte
-    if is_low_good:
-        # Pour % 0-0 : bas = bon, haut = warning
-        if v <= 10:
-            cls = "success"
-        elif v >= 25:
-            cls = "warning"
-        else:
-            cls = ""
-    else:
-        # Pour Over/BTTS : haut = bon
-        if v >= 70:
-            cls = "success"
-        elif v < 40:
-            cls = "danger"
-        else:
-            cls = ""
-
-    return f"""<div class="db-metric-line">
-        <span class="db-metric-name">{label}</span>
-        <span class="db-metric-bar"><span class="db-metric-bar-fill {cls}" style="width:{v:.0f}%"></span></span>
-        <span class="db-metric-val">{v:.1f}%</span>
-    </div>"""
-
-def _section_extras(row):
-    """
-    Mini-section avec les stats détaillées (corners, cartons) si disponibles.
-    Retourne du HTML vide si aucune stat n'est dispo.
-    """
-    h_corners = _safe_num(row.get("H_Corners_pg"))
-    a_corners = _safe_num(row.get("A_Corners_pg"))
-    h_corners_total = _safe_num(row.get("H_CornersTotal_pg"))
-    a_corners_total = _safe_num(row.get("A_CornersTotal_pg"))
-    h_corners_o95 = _safe_pct(row.get("H_CornersOver95"))
-    a_corners_o95 = _safe_pct(row.get("A_CornersOver95"))
-
-    h_yellow = _safe_num(row.get("H_Yellow_pg"))
-    a_yellow = _safe_num(row.get("A_Yellow_pg"))
-    h_yellow_total = _safe_num(row.get("H_YellowsTotal_pg"))
-    a_yellow_total = _safe_num(row.get("A_YellowsTotal_pg"))
-    h_yellow_o35 = _safe_pct(row.get("H_YellowsOver35"))
-    a_yellow_o35 = _safe_pct(row.get("A_YellowsOver35"))
-
-    has_corners = any(v is not None for v in [h_corners, a_corners, h_corners_total, a_corners_total])
-    has_cartons = any(v is not None for v in [h_yellow, a_yellow, h_yellow_total, a_yellow_total])
-
-    if not has_corners and not has_cartons:
-        return ""  # rien à afficher
-
-    # Helpers pour valeurs vides
-    def fnum(v, suffix=""):
-        return f"{v:.1f}{suffix}" if v is not None else "—"
-
-    def fpct(v):
-        return f"{v:.0f}%" if v is not None else "—"
-
-    # Moyenne des totaux des 2 équipes (estimation Over)
-    corners_total_moy = None
-    if h_corners_total is not None and a_corners_total is not None:
-        corners_total_moy = (h_corners_total + a_corners_total) / 2
-    elif h_corners_total is not None:
-        corners_total_moy = h_corners_total
-    elif a_corners_total is not None:
-        corners_total_moy = a_corners_total
-
-    yellows_total_moy = None
-    if h_yellow_total is not None and a_yellow_total is not None:
-        yellows_total_moy = (h_yellow_total + a_yellow_total) / 2
-    elif h_yellow_total is not None:
-        yellows_total_moy = h_yellow_total
-    elif a_yellow_total is not None:
-        yellows_total_moy = a_yellow_total
-
-    # Moyenne des % Over (estimation pour le match)
-    corners_o95_moy = None
-    if h_corners_o95 is not None and a_corners_o95 is not None:
-        corners_o95_moy = (h_corners_o95 + a_corners_o95) / 2
-    elif h_corners_o95 is not None:
-        corners_o95_moy = h_corners_o95
-    elif a_corners_o95 is not None:
-        corners_o95_moy = a_corners_o95
-
-    yellows_o35_moy = None
-    if h_yellow_o35 is not None and a_yellow_o35 is not None:
-        yellows_o35_moy = (h_yellow_o35 + a_yellow_o35) / 2
-    elif h_yellow_o35 is not None:
-        yellows_o35_moy = h_yellow_o35
-    elif a_yellow_o35 is not None:
-        yellows_o35_moy = a_yellow_o35
-
-    # Bloc Corners
-    if has_corners:
-        corners_block = f"""
-        <div class="db-extras-block">
-            <div class="db-extras-title">🚩 Corners par match</div>
-            <div class="db-extras-teams">
-                <div class="db-extras-team">
-                    <span class="db-extras-team-label">🏠 Domicile</span>
-                    <span class="db-extras-team-val">{fnum(h_corners)}</span>
-                </div>
-                <div class="db-extras-team">
-                    <span class="db-extras-team-label">✈️ Extérieur</span>
-                    <span class="db-extras-team-val">{fnum(a_corners)}</span>
-                </div>
-            </div>
-            <div class="db-extras-summary">
-                <div class="db-extras-summary-line">
-                    <span class="db-extras-summary-name">Total moyen/match</span>
-                    <span class="db-extras-summary-val">{fnum(corners_total_moy)}</span>
-                </div>
-                <div class="db-extras-summary-line">
-                    <span class="db-extras-summary-name">Over 9.5 (moyenne)</span>
-                    <span class="db-extras-summary-val">{fpct(corners_o95_moy)}</span>
-                </div>
-            </div>
-        </div>"""
-    else:
-        corners_block = '<div class="db-extras-block"><div class="db-extras-title">🚩 Corners</div><div class="db-extras-empty">Données non disponibles</div></div>'
-
-    # Bloc Cartons
-    if has_cartons:
-        cartons_block = f"""
-        <div class="db-extras-block">
-            <div class="db-extras-title">🟨 Cartons jaunes par match</div>
-            <div class="db-extras-teams">
-                <div class="db-extras-team">
-                    <span class="db-extras-team-label">🏠 Domicile</span>
-                    <span class="db-extras-team-val">{fnum(h_yellow)}</span>
-                </div>
-                <div class="db-extras-team">
-                    <span class="db-extras-team-label">✈️ Extérieur</span>
-                    <span class="db-extras-team-val">{fnum(a_yellow)}</span>
-                </div>
-            </div>
-            <div class="db-extras-summary">
-                <div class="db-extras-summary-line">
-                    <span class="db-extras-summary-name">Total moyen/match</span>
-                    <span class="db-extras-summary-val">{fnum(yellows_total_moy)}</span>
-                </div>
-                <div class="db-extras-summary-line">
-                    <span class="db-extras-summary-name">Over 3.5 (moyenne)</span>
-                    <span class="db-extras-summary-val">{fpct(yellows_o35_moy)}</span>
-                </div>
-            </div>
-        </div>"""
-    else:
-        cartons_block = '<div class="db-extras-block"><div class="db-extras-title">🟨 Cartons</div><div class="db-extras-empty">Données non disponibles</div></div>'
-
-    return f"""
-    <div class="db-section-title">🏟️ Stats détaillées</div>
-    <div class="db-extras-row">
-        {corners_block}
-        {cartons_block}
-    </div>"""
-def _heat_color(p_pct):
-    """Retourne une couleur de fond selon la probabilité (en %).
-    Gradient jaune → orange → rouge."""
-    if p_pct < 0.5:
-        return "rgba(255,255,255,0.02)"
-    elif p_pct < 2:
-        return "rgba(254,224,144,0.25)"
-    elif p_pct < 5:
-        return "rgba(253,174,97,0.35)"
-    elif p_pct < 8:
-        return "rgba(244,109,67,0.5)"
-    elif p_pct < 12:
-        return "rgba(215,48,39,0.6)"
-    else:
-        return "rgba(165,0,38,0.75)"
-
-
-def _section_heatmap(row):
-    """Génère la heatmap Poisson 6x6 + résumé top 3 / 1X2 / xG en HTML pur."""
-    xg_h = _safe_num(row.get("xG_H"))
-    xg_a = _safe_num(row.get("xG_A"))
-    if xg_h is None or xg_a is None:
-        return ""
-
-    try:
-        res = matrice_scores(xg_h, xg_a)
-    except Exception:
-        return ""
-
-    matrice = res["matrice"]
-    top3 = res["top3"]
-    p_home = res["p_home"]
-    p_draw = res["p_draw"]
-    p_away = res["p_away"]
-
-    home_team = _esc(row.get("HomeTeam", "🏠"))
-    away_team = _esc(row.get("AwayTeam", "✈️"))
-
-    # Top 3 scores
-    top3_html = " · ".join(
-        f'<span class="accent">{i}-{j}</span> <strong>({100*p:.1f}%)</strong>'
-        for i, j, p in top3
-    )
-
-    # Trouver la case la plus probable (pour la surligner)
-    max_p = max(matrice[i][j] for i in range(6) for j in range(6))
-
-    # Construire la table HTML 6x6
-    head = '<th></th>' + "".join(f'<th>✈️ {j}</th>' for j in range(6))
-    rows_html = ""
-    for i in range(6):
-        row_cells = f'<th>🏠 {i}</th>'
-        for j in range(6):
-            p = matrice[i][j]
-            p_pct = 100 * p
-            bg = _heat_color(p_pct)
-            is_best = "heat-best" if p == max_p else ""
-            row_cells += f'<td class="{is_best}" style="background:{bg};">{p_pct:.1f}</td>'
-        rows_html += f'<tr>{row_cells}</tr>'
-
-    return f"""
-    <div class="db-section-title">🎯 Heatmap Poisson des scores</div>
-    <div class="db-heat-row">
-        <div class="db-heat-summary">
-            <div class="db-heat-summary-line">🏆 <strong>Top 3 :</strong> {top3_html}</div>
-            <div class="db-heat-summary-line">⚖️ <strong>1X2 :</strong> 🏠 {home_team} <strong>{100*p_home:.0f}%</strong> · ⚖️ Nul <strong>{100*p_draw:.0f}%</strong> · ✈️ {away_team} <strong>{100*p_away:.0f}%</strong></div>
-            <div class="db-heat-summary-line">🎯 <strong>xG :</strong> 🏠 <strong>{xg_h:.2f}</strong> · ✈️ <strong>{xg_a:.2f}</strong></div>
-        </div>
-        <div class="db-heat-table-wrap">
-            <table class="db-heat-table">
-                <thead><tr>{head}</tr></thead>
-                <tbody>{rows_html}</tbody>
-            </table>
-        </div>
-        <div class="db-heat-caption">Probabilités en % · cellule la plus probable surlignée · couvre {100*res['couverture']:.0f}% des scores</div>
-    </div>"""
-# ============================================================
-# RENDU D'UNE CARTE
-# ============================================================
 def _heat_forme(rate):
     """Dégradé divergent rouge→vert en 5 paliers selon le taux [0..1]."""
     if rate is None:
@@ -985,11 +706,8 @@ def rendre_tableau_forme(df, fen, peri, custom=False):
 
 
 def rendre_carte_match_html(row, mode_compact=False):
-    """
-    Génère le HTML <details>/<summary> pour une carte de match.
-    Le header contient : heure, ligue, équipes + score + positions, prédiction.
-    Le body contient : Poisson, comparaison équipes, H2H.
-    """
+    """Génère le HTML <details>/<summary> d'une carte de match : en-tête (heure, ligue,
+    équipes, positions, score, prédiction O2.5) + grille Forme."""
     is_upcoming = (
         (row.get("Score") == "À VENIR")
         or bool(row.get("IsUpcoming", False))
@@ -1000,125 +718,18 @@ def rendre_carte_match_html(row, mode_compact=False):
     if is_upcoming:
         score_html = '<span class="db-card-score upcoming">À venir</span>'
     else:
-        # Format "1-2" -> "1 — 2" pour respirer
         score_aff = _esc(str(score_raw).replace("-", " — "))
         score_html = f'<span class="db-card-score">{score_aff}</span>'
 
     h_pos_aff = _fmt_pos(row.get("H_Pos"))
     a_pos_aff = _fmt_pos(row.get("A_Pos"))
 
-    # Prédiction la plus marquante en header (Over 2.5)
     p_o25 = _safe_pct(row.get("P_Over25"))
     pred_html = f'<span class="db-card-pred">{p_o25:.0f}% O2.5</span>' if p_o25 is not None else ""
 
-    # Signaux d'anomalies (à côté des noms si présents)
-    h_sig = _esc(row.get("H_Signaux", "")).strip()
-    a_sig = _esc(row.get("A_Signaux", "")).strip()
-    h_sig_html = f' <span class="db-card-signaux">{h_sig}</span>' if h_sig else ""
-    a_sig_html = f' <span class="db-card-signaux">{a_sig}</span>' if a_sig else ""
-
-    # Heure & ligue
     time_aff = _esc(row.get("TimeNY") or row.get("Time") or "—")
     league_aff = _esc(row.get("League", ""))
 
-    # ---- POISSON ----
-    poisson_html = f"""
-    <div class="db-section-title">🎯 Indice Poisson</div>
-    <div class="db-poisson-row">
-        {_pois_cell("Over 0.5", row.get("P_Over05"))}
-        {_pois_cell("Over 1.5", row.get("P_Over15"))}
-        {_pois_cell("Over 2.5", row.get("P_Over25"))}
-        {_pois_cell("BTTS",     row.get("P_BTTS"))}
-        {_pois_cell("0-0",      row.get("P_00"))}
-    </div>"""
-
-    xg_h = _safe_num(row.get("xG_H"))
-    xg_a = _safe_num(row.get("xG_A"))
-    if xg_h is not None and xg_a is not None:
-        xg_html = f"""
-        <div class="db-xg-line">
-            <span>xG Domicile : <span class="db-xg-num">{xg_h:.2f}</span></span>
-            <span>xG Extérieur : <span class="db-xg-num">{xg_a:.2f}</span></span>
-        </div>"""
-    else:
-        xg_html = ""
-
-    # ---- COMPARAISON ÉQUIPES ----
-    home_card = f"""
-    <div class="db-compare-card home">
-        <div class="db-compare-head">
-            <div class="db-compare-name">{_esc(row.get('HomeTeam', ''))}</div>
-            <div class="db-compare-badge home">Domicile</div>
-            {f'<div class="db-compare-signaux">{h_sig}</div>' if h_sig else ''}
-        </div>
-        <div class="db-form-line">{_form_pills(row.get('H_Form', ''))}</div>
-        {_metric_line("Over 0.5", row.get("H_Over05"))}
-        {_metric_line("Over 1.5", row.get("H_Over15"))}
-        {_metric_line("Over 2.5", row.get("H_Over25"))}
-        {_metric_line("BTTS",     row.get("H_BTTS"))}
-        {_metric_line("% 0-0",    row.get("H_00_Pct"), is_low_good=True)}
-    </div>"""
-
-    away_card = f"""
-    <div class="db-compare-card away">
-        <div class="db-compare-head">
-            <div class="db-compare-name">{_esc(row.get('AwayTeam', ''))}</div>
-            <div class="db-compare-badge away">Extérieur</div>
-            {f'<div class="db-compare-signaux">{a_sig}</div>' if a_sig else ''}
-        </div>
-        <div class="db-form-line">{_form_pills(row.get('A_Form', ''))}</div>
-        {_metric_line("Over 0.5", row.get("A_Over05"))}
-        {_metric_line("Over 1.5", row.get("A_Over15"))}
-        {_metric_line("Over 2.5", row.get("A_Over25"))}
-        {_metric_line("BTTS",     row.get("A_BTTS"))}
-        {_metric_line("% 0-0",    row.get("A_00_Pct"), is_low_good=True)}
-    </div>"""
-
-    compare_html = f"""
-    <div class="db-section-title">⚖️ Comparaison équipes</div>
-    <div class="db-compare-row">
-        {home_card}
-        {away_card}
-    </div>"""
-
-    # ---- H2H ----
-    h2h_n_raw = row.get("H2H_N", 0)
-    try:
-        h2h_n = int(h2h_n_raw) if not pd.isna(h2h_n_raw) else 0
-    except (ValueError, TypeError):
-        h2h_n = 0
-
-    if h2h_n > 0:
-        h2h_avg = _safe_num(row.get("H2H_AvgGoals"))
-        h2h_o25 = _safe_pct(row.get("H2H_O25_pct"))
-        h2h_btts = _safe_pct(row.get("H2H_BTTS_pct"))
-        h2h_00 = _safe_pct(row.get("H2H_00_pct"))
-
-        avg_aff = f"{h2h_avg:.2f}" if h2h_avg is not None else "—"
-        o25_aff = f"{h2h_o25:.1f}%" if h2h_o25 is not None else "—"
-        btts_aff = f"{h2h_btts:.1f}%" if h2h_btts is not None else "—"
-        z00_aff = f"{h2h_00:.1f}%" if h2h_00 is not None else "—"
-
-        h2h_html = f"""
-        <div class="db-section-title">⚔️ Confrontations directes</div>
-        <div class="db-h2h-row">
-            <div class="db-h2h-big">
-                <div class="db-h2h-big-num">{h2h_n}</div>
-                <div class="db-h2h-big-lab">matchs</div>
-            </div>
-            <div class="db-h2h-stats">
-                <div><div class="db-h2h-st-val">{avg_aff}</div><div class="db-h2h-st-lab">Buts/match</div></div>
-                <div><div class="db-h2h-st-val">{o25_aff}</div><div class="db-h2h-st-lab">Over 2.5</div></div>
-                <div><div class="db-h2h-st-val">{btts_aff}</div><div class="db-h2h-st-lab">BTTS</div></div>
-                <div><div class="db-h2h-st-val">{z00_aff}</div><div class="db-h2h-st-lab">0-0</div></div>
-            </div>
-        </div>"""
-    else:
-        h2h_html = """
-        <div class="db-section-title">⚔️ Confrontations directes</div>
-        <div class="db-h2h-empty">Aucune confrontation passée trouvée entre ces 2 équipes.</div>"""
-
-    # ---- ASSEMBLAGE ----
     return _minify_html(f"""<details class="db-card">
     <summary>
         <div class="db-card-meta">
@@ -1126,11 +737,11 @@ def rendre_carte_match_html(row, mode_compact=False):
             <div class="db-card-league">{league_aff}</div>
         </div>
         <div class="db-card-teams">
-            <span class="db-card-team-name">{_esc(row.get('HomeTeam', ''))}</span>{h_sig_html}
+            <span class="db-card-team-name">{_esc(row.get('HomeTeam', ''))}</span>
             <span class="db-card-pos">{h_pos_aff}</span>
             {score_html}
             <span class="db-card-pos">{a_pos_aff}</span>
-            <span class="db-card-team-name">{_esc(row.get('AwayTeam', ''))}</span>{a_sig_html}
+            <span class="db-card-team-name">{_esc(row.get('AwayTeam', ''))}</span>
         </div>
         <div class="db-card-right">
             {pred_html}

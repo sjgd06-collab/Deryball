@@ -534,8 +534,6 @@ DESCRIPTIONS_COLONNES = {
     "A_YellowsOver35": "% matchs avec plus de 3.5 jaunes (équipe à l'extérieur)",
     "A_Red_pg": "Cartons rouges par match (équipe à l'extérieur)",
     "A_Fouls_pg": "Fautes par match (équipe à l'extérieur)",
-    "H_Signaux": "Anomalies détectées chez l'équipe à domicile (forme récente vs saison)",
-    "A_Signaux": "Anomalies détectées chez l'équipe à l'extérieur (forme récente vs saison)",
 }
 # ============================================================
 # LABELS COURTS ET LISIBLES POUR LES COLONNES
@@ -871,31 +869,6 @@ with tab_matchs:
     else:
         fenetre_forme, perimetre_forme = "10 derniers", "Combiné"
 
-    # Légende des signaux d'anomalies (uniquement en vue Buts)
-    if type_stats_match == "Buts (défaut)":
-        if "afficher_legende_matchs" not in st.session_state:
-            st.session_state.afficher_legende_matchs = False
-
-        col_legende, _ = st.columns([2, 8])
-        with col_legende:
-            label = "🚨 Masquer la légende des signaux" if st.session_state.afficher_legende_matchs else "🚨 Afficher la légende des signaux"
-            if st.button(label, key="btn_legende_matchs"):
-                st.session_state.afficher_legende_matchs = not st.session_state.afficher_legende_matchs
-                st.rerun()
-
-        if st.session_state.afficher_legende_matchs:
-            st.markdown("""
-            Comparaison **forme récente** (5-10 derniers) vs **saison**.
-
-            | Emoji | Signification |
-            |---|---|
-            | 📈 / 📉 | Attaque en surforme / sousforme |
-            | 🛡️ / ⚠️ | Défense en surforme / sousforme |
-            | 🔥 / 🧊 | Tendance Over / Under 2.5 |
-            | 💥 / 🚫 | Tendance BTTS / Anti-BTTS |
-
-            **+X.X BM** = buts marqués/match en plus que la saison · **+X.X BE** = buts encaissés/match en plus
-            """)
 
     # ============================================================
     # 🆕 AFFICHAGE CONDITIONNEL : TABLEAU OU CARTES
@@ -1198,28 +1171,6 @@ with tab_matchups:
                     )
                 type_stats_custom = "Buts (défaut)"
 
-                # Légende des signaux
-                if "afficher_legende_matchups" not in st.session_state:
-                    st.session_state.afficher_legende_matchups = False
-
-                col_leg, _ = st.columns([2, 8])
-                with col_leg:
-                    label = "🚨 Masquer légende" if st.session_state.afficher_legende_matchups else "🚨 Afficher légende"
-                    if st.button(label, key="btn_legende_matchups"):
-                        st.session_state.afficher_legende_matchups = not st.session_state.afficher_legende_matchups
-                        st.rerun()
-
-                if st.session_state.afficher_legende_matchups:
-                    st.markdown("""
-                    | Emoji | Signification |
-                    |---|---|
-                    | 📈 / 📉 | Attaque en surforme / sousforme |
-                    | 🛡️ / ⚠️ | Défense en surforme / sousforme |
-                    | 🔥 / 🧊 | Tendance Over / Under 2.5 |
-                    | 💥 / 🚫 | Tendance BTTS / Anti-BTTS |
-
-                    Format : **+X.X BM/BE** = différence buts marqués/encaissés vs saison.
-                    """)
 
                 if vue_custom != "🎴 Détaillée":
                     cfc1, cfc2, _ = st.columns([2, 2, 4])
