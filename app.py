@@ -1301,6 +1301,12 @@ with tab_matchups:
                     """)
 
                 if vue_custom == "🎴 Détaillée":
+                    df_display["FormeStats"] = [
+                        stats_forme_match(tr_journal, r["HomeTeam"], r["AwayTeam"],
+                                          r["H_Ligue"], saison_courante.get(r["H_Ligue"]),
+                                          away_league=r["A_Ligue"], saison_away=saison_courante.get(r["A_Ligue"]))
+                        for _, r in df_display.iterrows()
+                    ]
                     rendre_cartes_matchs(df_display, st)
                 else:
                     # Liste de colonnes selon le type de stats

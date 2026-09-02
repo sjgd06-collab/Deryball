@@ -170,28 +170,33 @@ def _metriques_forme(sub):
     }
 
 
-def stats_forme_match(tr, home_team, away_team, display_league, saison_courante):
+def stats_forme_match(tr, home_team, away_team, home_league, saison_home,
+                      away_league=None, saison_away=None):
     """
     Stats de forme d'un match, par fenetre et par perimetre, SANS melanger les competitions.
     tr : journal des equipes (sortie de construire_team_rows).
+    home_league / away_league : DisplayLeague de chaque equipe (away_league = home_league par defaut).
+    saison_home / saison_away : saison courante de chaque ligue (saison_away = saison_home par defaut).
     Retour : res[fenetre][perimetre] = {N, BTTS, O05, O15, O25, BM, BE}
-      fenetres  : "5", "10", "saison"
-      perimetres: "combine", "domicile", "exterieur"
+      fenetres  : "5", "10", "saison"  ;  perimetres : "combine", "domicile", "exterieur"
     Recence pure pour 5/10 (peut traverser les saisons) ; saison courante pour "saison".
     """
-    base = tr[tr["DisplayLeague"] == display_league]
-    dom = base[base["Team"] == home_team].sort_values("Date", ascending=False)
-    ext = base[base["Team"] == away_team].sort_values("Date", ascending=False)
+    if away_league is None:
+        away_league = home_league
+    if saison_away is None:
+        saison_away = saison_home
+    dom = tr[(tr["DisplayLeague"] == home_league) & (tr["Team"] == home_team)].sort_values("Date", ascending=False)
+    ext = tr[(tr["DisplayLeague"] == away_league) & (tr["Team"] == away_team)].sort_values("Date", ascending=False)
 
-    def fenetre_df(eq, fen):
+    def fenetre_df(eq, fen, saison):
         if fen == "saison":
-            return eq[eq["Season"] == saison_courante]
+            return eq[eq["Season"] == saison]
         return eq.head(5 if fen == "5" else 10)
 
     res = {}
     for fen in ("5", "10", "saison"):
-        d = fenetre_df(dom, fen)
-        e = fenetre_df(ext, fen)
+        d = fenetre_df(dom, fen, saison_home)
+        e = fenetre_df(ext, fen, saison_away)
         combine = pd.concat([d, e], ignore_index=True)
         res[fen] = {
             "combine": _metriques_forme(combine),
