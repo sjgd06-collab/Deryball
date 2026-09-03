@@ -1087,13 +1087,11 @@ with tab_matchups:
                 h = stats_complet[hk]
                 a = stats_complet[ak]
 
-                from stats import probs_match, h2h_stats, detecter_anomalies
+                from stats import probs_match, h2h_stats
                 lam_h = h["HomeAttack"] * a["AwayDefense"] * h["_lg_h"]
                 lam_a = a["AwayAttack"] * h["HomeDefense"] * a["_lg_a"]
                 probs = probs_match(lam_h, lam_a)
                 h2h = h2h_stats(idx_h2h, m_match["HomeTeam"], m_match["AwayTeam"], today)
-                h_emojis, h_details = detecter_anomalies(h)
-                a_emojis, a_details = detecter_anomalies(a)
 
                 matchups_rows.append({
                     "HomeTeam": m_match["HomeTeam"],
@@ -1104,8 +1102,6 @@ with tab_matchups:
                     "TimeNY": "—",
                     "Score": "",  # Hypothétique
                     "IsUpcoming": True,
-                    "H_Signaux": h_emojis,
-                    "A_Signaux": a_emojis,
                     "H_Pos": h["Pos"], "H_Form": h["Form5"],
                     "H_Over05": h["Over05_pct"], "H_Over15": h["Over15_pct"],
                     "H_Over25": h["Over25_pct"], "H_BTTS": h["BTTS_pct"],
