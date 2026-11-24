@@ -108,6 +108,7 @@ E0,Premier League,England,2026-27,2026-11-21,15:00,Tottenham,Ipswich,2.0,0.0,H,1
 E0,Premier League,England,2026-27,2026-11-21,17:30,Newcastle,Arsenal,2.0,2.0,D,0.0,1.0,4.0,False,12,13,3,4,6,3,3,3,0,0,20,7,6.0,4.38,1.51,1.65,2.16,5.75,4.2,1.57,1.73,2.1
 E0,Premier League,England,2026-27,2026-11-22,14:00,Hull,Brighton,2.0,0.0,H,0.0,0.0,2.0,False,11,15,5,8,3,4,2,4,0,1,7,17,6.31,4.47,1.48,1.62,2.21,6.5,4.33,1.5,1.67,2.2
 E0,Premier League,England,2026-27,2026-11-22,16:30,Liverpool,Man United,4.0,0.0,H,2.0,0.0,4.0,False,28,10,11,3,15,5,1,0,0,1,15,7,1.76,4.12,4.01,1.47,2.6,1.7,4.2,4.33,1.5,2.63
+E0,Premier League,England,2026-27,2026-11-23,20:00,Brentford,Everton,4.0,0.0,H,2.0,0.0,4.0,False,21,4,7,2,6,3,0,1,0,1,8,9,2.1,3.43,3.41,1.84,1.89,2.15,3.5,3.3,1.73,2.1
 E1,Championship,England,2026-27,2026-08-14,20:00,Wolves,Blackburn,2.0,2.0,D,1.0,1.0,4.0,False,18,10,3,5,5,5,1,3,0,0,10,16,1.48,4.27,6.5,1.82,1.91,1.49,3.9,6.25,1.91,1.91
 E1,Championship,England,2026-27,2026-08-15,12:30,Bolton,Preston,2.0,1.0,H,2.0,0.0,3.0,False,15,10,6,3,5,2,2,3,0,0,12,11,2.34,3.29,3.02,1.98,1.77,2.15,3.3,3.3,2.0,1.85
 E1,Championship,England,2026-27,2026-08-15,15:00,Bristol City,Millwall,0.0,2.0,A,0.0,1.0,2.0,False,8,24,0,3,6,6,2,2,1,0,8,12,2.49,3.38,2.73,1.89,1.85,2.5,3.4,2.65,1.98,1.88
@@ -617,6 +618,7 @@ I1,Serie A,Italy,2026-27,2026-11-22,14:00,Bologna,Udinese,1.0,1.0,D,1.0,0.0,2.0,
 I1,Serie A,Italy,2026-27,2026-11-22,14:00,Sassuolo,Genoa,0.0,2.0,A,0.0,2.0,2.0,False,25,11,7,5,5,3,1,0,0,0,11,9,2.67,3.13,2.71,2.04,1.73,2.7,3.3,2.45,1.91,1.91
 I1,Serie A,Italy,2026-27,2026-11-22,17:00,Milan,Frosinone,5.0,1.0,H,2.0,1.0,6.0,False,12,15,8,3,2,9,1,4,0,0,6,17,1.65,4.26,4.48,1.44,2.67,1.53,4.5,5.25,1.36,3.2
 I1,Serie A,Italy,2026-27,2026-11-22,19:45,Atalanta,Inter,4.0,4.0,D,1.0,2.0,8.0,False,15,16,10,6,5,6,2,1,0,0,9,10,4.84,4.46,1.59,1.39,2.88,5.0,4.33,1.6,1.4,3.0
+I1,Serie A,Italy,2026-27,2026-11-23,19:45,Monza,Fiorentina,3.0,0.0,H,1.0,0.0,3.0,False,13,17,5,8,3,7,0,1,0,0,8,13,3.6,3.74,1.94,1.61,2.24,3.75,3.8,1.91,1.62,2.3
 SP1,La Liga,Spain,2026-27,2026-08-15,18:30,Alaves,Getafe,3.0,0.0,H,0.0,0.0,3.0,False,18,6,8,2,5,3,4,3,0,1,16,13,2.32,2.76,3.75,3.32,1.32,2.35,2.8,3.75,3.2,1.36
 SP1,La Liga,Spain,2026-27,2026-08-15,20:30,Sevilla,Vallecano,2.0,1.0,H,0.0,1.0,3.0,False,13,6,4,3,1,2,4,4,1,0,18,18,2.49,2.92,3.19,2.53,1.5,2.3,3.1,3.4,2.3,1.62
 SP1,La Liga,Spain,2026-27,2026-08-16,16:00,Santander,Villarreal,2.0,2.0,D,2.0,2.0,4.0,False,17,12,3,7,6,10,2,4,0,0,14,14,3.69,3.77,1.92,1.52,2.47,3.2,3.6,2.15,1.8,2.0
@@ -745,6 +747,7 @@ SP1,La Liga,Spain,2026-27,2026-11-22,13:00,Barcelona,Villarreal,3.0,2.0,H,0.0,2.
 SP1,La Liga,Spain,2026-27,2026-11-22,15:15,Santander,Sociedad,3.0,2.0,H,2.0,1.0,5.0,False,12,31,8,7,7,14,2,2,0,0,10,10,3.08,3.89,2.07,1.38,2.94,3.25,4.2,2.0,1.33,3.4
 SP1,La Liga,Spain,2026-27,2026-11-22,17:30,Osasuna,Malaga,1.0,0.0,H,1.0,0.0,1.0,False,11,5,2,0,4,1,4,0,1,0,15,11,1.75,3.63,4.58,1.96,1.79,1.8,3.5,4.5,2.0,1.8
 SP1,La Liga,Spain,2026-27,2026-11-22,20:00,Getafe,Ath Madrid,0.0,3.0,A,0.0,2.0,3.0,False,11,20,1,10,2,7,2,2,1,0,11,11,6.36,3.93,1.53,2.1,1.69,6.25,3.9,1.55,2.0,1.8
+SP1,La Liga,Spain,2026-27,2026-11-23,20:00,Levante,Elche,1.0,1.0,D,0.0,0.0,2.0,False,18,4,2,2,5,1,4,1,0,0,14,12,2.0,3.58,3.49,1.67,2.12,2.15,3.6,3.25,1.67,2.2
 F1,Ligue 1,France,2026-27,2026-08-21,19:45,Marseille,Strasbourg,4.0,0.0,H,0.0,0.0,4.0,False,14,5,8,2,3,4,1,2,0,1,6,12,1.73,4.02,4.25,1.51,2.46,1.73,4.1,4.33,1.57,2.38
 F1,Ligue 1,France,2026-27,2026-08-22,16:15,Lens,Auxerre,5.0,2.0,H,1.0,0.0,7.0,False,12,10,9,4,4,7,1,1,0,1,6,21,1.44,4.56,6.9,1.65,2.17,1.55,4.5,5.25,1.67,2.2
 F1,Ligue 1,France,2026-27,2026-08-22,19:45,Le Mans,Brest,2.0,2.0,D,1.0,1.0,4.0,False,8,26,5,7,1,10,1,1,0,0,14,12,2.5,3.32,2.76,1.9,1.84,2.55,3.4,2.7,1.88,1.98
@@ -1274,6 +1277,7 @@ T1,Super Lig,Turkey,2026-27,2026-11-22,10:30,Erzurumspor,Goztep,0.0,1.0,A,0.0,0.
 T1,Super Lig,Turkey,2026-27,2026-11-22,13:00,Kasimpasa,Alanyaspor,2.0,1.0,H,1.0,1.0,3.0,False,14,7,4,2,4,1,5,3,0,0,25,20,1.82,3.49,3.99,1.85,1.86,1.9,3.5,3.5,1.85,1.95
 T1,Super Lig,Turkey,2026-27,2026-11-22,13:00,Konyaspor,Besiktas,2.0,4.0,A,1.0,2.0,6.0,False,10,16,6,7,2,3,1,3,0,0,10,20,5.39,4.04,1.53,1.7,2.07,5.0,3.8,1.56,1.7,2.1
 T1,Super Lig,Turkey,2026-27,2026-11-22,16:00,Trabzonspor,Eyupspor,1.0,0.0,H,1.0,0.0,1.0,False,24,7,9,1,11,4,0,2,0,0,10,8,1.07,10.48,20.28,1.2,4.17,1.12,7.5,15.0,1.33,3.4
+T1,Super Lig,Turkey,2026-27,2026-11-23,17:00,Buyuksehyr,Corum,4.0,2.0,H,0.0,1.0,6.0,False,26,11,5,3,3,1,0,3,0,0,7,6,1.86,3.74,3.56,1.51,2.43,1.76,3.75,3.75,1.57,2.35
 G1,Super League,Greece,2026-27,2026-08-22,18:00,AEK,Iraklis,4.0,0.0,H,2.0,0.0,4.0,False,24,7,11,1,5,2,1,0,0,0,19,17,1.18,6.0,13.25,1.58,2.25,1.17,6.5,13.0,1.53,2.4
 G1,Super League,Greece,2026-27,2026-08-22,18:00,Kalamata,Aris,2.0,3.0,A,1.0,1.0,5.0,False,7,19,3,7,1,10,3,3,1,0,15,23,3.33,3.0,2.16,2.26,1.57,3.4,3.0,2.25,2.3,1.6
 G1,Super League,Greece,2026-27,2026-08-22,19:30,Olympiakos,Atromitos,1.0,0.0,H,0.0,0.0,1.0,False,26,8,10,1,14,4,3,6,1,0,14,14,1.2,5.73,13.08,1.69,2.06,1.22,5.5,12.0,1.7,2.1
@@ -1349,6 +1353,7 @@ G1,Super League,Greece,2026-27,2026-11-22,15:00,Panetolikos,Volos NFC,1.0,0.0,H,
 G1,Super League,Greece,2026-27,2026-11-22,15:30,Panathinaikos,OFI Crete,2.0,0.0,H,0.0,0.0,2.0,False,20,3,7,2,4,3,1,2,0,0,23,13,1.17,6.75,11.84,1.38,2.81,1.17,7.0,11.0,1.48,2.6
 G1,Super League,Greece,2026-27,2026-11-22,17:00,Olympiakos,Iraklis,6.0,2.0,H,2.0,2.0,8.0,False,22,3,8,3,9,0,1,2,0,0,10,17,1.15,6.56,13.81,1.55,2.32,1.14,8.0,12.0,1.5,2.5
 G1,Super League,Greece,2026-27,2026-11-22,17:30,PAOK,Kifisia,4.0,0.0,H,1.0,0.0,4.0,False,21,4,9,2,8,2,1,2,0,1,15,11,1.32,4.78,7.83,1.61,2.2,1.33,4.75,8.0,1.57,2.35
+G1,Super League,Greece,2026-27,2026-11-23,15:00,Asteras Tripolis,Aris,0.0,1.0,A,0.0,0.0,1.0,False,7,5,2,2,2,1,3,1,0,0,13,9,3.38,2.92,2.19,2.51,1.47,3.4,3.1,2.2,2.08,1.73
 SC0,Premiership,Scotland,2026-27,2026-07-31,20:00,Dundee United,Rangers,1.0,1.0,D,1.0,0.0,2.0,False,11,21,3,6,5,10,1,3,0,0,16,14,4.69,4.06,1.63,1.56,2.31,5.75,4.33,1.46,1.53,2.5
 SC0,Premiership,Scotland,2026-27,2026-08-01,15:00,Falkirk,St Mirren,0.0,2.0,A,0.0,1.0,2.0,False,10,15,1,5,7,7,0,4,0,0,18,18,2.09,3.47,3.28,1.76,1.96,1.96,3.6,3.5,1.83,2.03
 SC0,Premiership,Scotland,2026-27,2026-08-01,17:30,Aberdeen,Hearts,2.0,1.0,H,0.0,1.0,3.0,False,11,21,3,4,4,6,3,2,0,1,11,17,2.88,3.46,2.3,1.74,1.99,3.2,3.4,2.15,1.73,2.1
@@ -1924,6 +1929,13 @@ ARG,Liga Profesional,Argentina,2026,2026-11-07,20:30,Boca Juniors,Defensa y Just
 ARG,Liga Profesional,Argentina,2026,2026-11-07,20:30,Rosario Central,Estudiantes Rio Cuarto,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,1.14,7.16,17.66,,,,,,,
 ARG,Liga Profesional,Argentina,2026,2026-11-08,01:00,Instituto,Newells Old Boys,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,1.79,3.21,4.71,,,,,,,
 ARG,Liga Profesional,Argentina,2026,2026-11-08,22:30,Central Cordoba,Lanus,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,5.26,3.59,1.65,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-20,23:00,Velez Sarsfield,Belgrano,3.0,2.0,H,,,5.0,False,,,,,,,,,,,,,2.34,3.09,3.03,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-21,18:00,Defensa y Justicia,Barracas Central,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.86,3.39,4.04,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-21,20:00,Argentinos Jrs,Independiente,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,2.18,2.97,3.49,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-22,19:00,Rosario Central,Gimnasia Mendoza,3.0,1.0,H,,,4.0,False,,,,,,,,,,,,,1.37,4.55,7.67,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-22,22:00,River Plate,Lanus,3.0,1.0,H,,,4.0,False,,,,,,,,,,,,,1.63,3.54,5.49,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-23,01:00,Instituto,Huracan,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,2.06,2.93,3.95,,,,,,,
+ARG,Liga Profesional,Argentina,2026,2026-11-23,20:00,Gimnasia L.P.,Newells Old Boys,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,2.16,3.05,3.44,,,,,,,
 AUT,Bundesliga,Austria,2026/2027,2026-07-31,18:30,LASK,Grazer AK,3.0,0.0,H,,,3.0,False,,,,,,,,,,,,,1.5,4.16,5.41,,,,,,,
 AUT,Bundesliga,Austria,2026/2027,2026-08-01,16:00,Tirol,Sturm Graz,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,4.06,3.58,1.78,,,,,,,
 AUT,Bundesliga,Austria,2026/2027,2026-08-01,18:30,Salzburg,Hartberg,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,1.28,5.19,8.44,,,,,,,
@@ -1996,6 +2008,12 @@ AUT,Bundesliga,Austria,2026/2027,2026-11-07,18:30,Ried,LASK,2.0,4.0,A,,,6.0,Fals
 AUT,Bundesliga,Austria,2026/2027,2026-11-08,13:30,Hartberg,Altach,3.0,0.0,H,,,3.0,False,,,,,,,,,,,,,2.41,3.38,2.64,,,,,,,
 AUT,Bundesliga,Austria,2026/2027,2026-11-08,13:30,Tirol,Austria Vienna,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,2.49,3.37,2.57,,,,,,,
 AUT,Bundesliga,Austria,2026/2027,2026-11-08,16:00,Sturm Graz,Salzburg,3.0,4.0,A,,,7.0,False,,,,,,,,,,,,,2.49,3.63,2.42,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-21,16:00,LASK,Hartberg,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,1.3,5.5,7.23,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-21,16:00,Tirol,A. Lustenau,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.82,3.7,3.68,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-21,18:30,Grazer AK,SK Rapid,0.0,3.0,A,,,3.0,False,,,,,,,,,,,,,6.67,4.69,1.37,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-22,13:30,Altach,Sturm Graz,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,3.21,3.41,2.05,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-22,13:30,Wolfsberger AC,Ried,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,2.94,3.58,2.11,,,,,,,
+AUT,Bundesliga,Austria,2026/2027,2026-11-22,16:00,Austria Vienna,Salzburg,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,4.16,3.88,1.68,,,,,,,
 BRA,Serie A,Brazil,2026,2026-01-28,22:00,Atletico-MG,Palmeiras,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,2.99,3.06,2.42,,,,,,,
 BRA,Serie A,Brazil,2026,2026-01-28,22:00,Coritiba,Bragantino,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,2.62,2.91,2.87,,,,,,,
 BRA,Serie A,Brazil,2026,2026-01-28,22:00,Internacional,Athletico-PR,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.97,3.21,3.93,,,,,,,
@@ -2346,6 +2364,15 @@ BRA,Serie A,Brazil,2026,2026-11-19,00:30,Gremio,Bahia,0.0,0.0,D,,,0.0,True,,,,,,
 BRA,Serie A,Brazil,2026,2026-11-19,22:30,Vasco,Internacional,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,1.48,4.36,5.86,,,,,,,
 BRA,Serie A,Brazil,2026,2026-11-19,22:30,Vitoria,Bragantino,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,2.59,3.36,2.56,,,,,,,
 BRA,Serie A,Brazil,2026,2026-11-20,00:30,Sao Paulo,Fluminense,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,2.44,3.14,2.87,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-21,19:30,Palmeiras,Flamengo RJ,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,2.68,3.35,2.49,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-21,20:30,Bahia,Coritiba,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.43,4.61,6.22,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-22,00:00,Chapecoense-SC,Cruzeiro,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,5.92,4.41,1.47,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-22,19:00,Athletico-PR,Remo,4.0,2.0,H,,,6.0,False,,,,,,,,,,,,,1.45,4.18,6.67,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-22,21:30,Fluminense,Mirassol,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,1.55,3.99,5.54,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-22,22:30,Bragantino,Vasco,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,2.7,3.43,2.41,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-23,22:30,Internacional,Vitoria,2.0,5.0,A,,,7.0,False,,,,,,,,,,,,,1.59,3.78,5.47,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-23,23:00,Botafogo RJ,Sao Paulo,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,2.18,3.25,3.23,,,,,,,
+BRA,Serie A,Brazil,2026,2026-11-24,00:00,Santos,Gremio,0.0,2.0,A,,,2.0,False,,,,,,,,,,,,,1.62,4.09,4.69,,,,,,,
 MEX,Liga MX,Mexico,2026/2027,2026-07-17,02:00,Necaxa,Atlante,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,1.85,3.54,3.7,,,,,,,
 MEX,Liga MX,Mexico,2026/2027,2026-07-17,04:10,Club Tijuana,Tigres UANL,3.0,1.0,H,,,4.0,False,,,,,,,,,,,,,3.37,3.32,2.01,,,,,,,
 MEX,Liga MX,Mexico,2026/2027,2026-07-18,02:00,Atl. San Luis,Cruz Azul,2.0,3.0,A,,,5.0,False,,,,,,,,,,,,,4.61,3.77,1.63,,,,,,,
@@ -2490,6 +2517,15 @@ MEX,Liga MX,Mexico,2026/2027,2026-11-08,03:10,UNAM Pumas,Club America,2.0,2.0,D,
 MEX,Liga MX,Mexico,2026/2027,2026-11-09,00:00,Queretaro,Puebla,0.0,2.0,A,,,2.0,False,,,,,,,,,,,,,1.75,3.7,4.07,,,,,,,
 MEX,Liga MX,Mexico,2026/2027,2026-11-09,02:10,Club Leon,Guadalajara Chivas,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,3.67,3.63,1.84,,,,,,,
 MEX,Liga MX,Mexico,2026/2027,2026-11-14,23:00,Queretaro,Monterrey,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,3.42,3.39,1.99,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-21,01:00,Puebla,Atl. San Luis,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,2.64,3.48,2.36,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-21,03:00,Juarez,Atlas,3.0,3.0,D,,,6.0,False,,,,,,,,,,,,,3.49,3.56,1.91,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-21,03:10,Club Tijuana,Atlante,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,1.51,4.03,5.41,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-21,22:50,Pachuca,Toluca,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,2.54,3.72,2.33,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-21,23:00,Santos Laguna,Club Leon,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,2.2,3.45,2.87,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-22,01:00,UNAM Pumas,Monterrey,0.0,2.0,A,,,2.0,False,,,,,,,,,,,,,2.6,3.31,2.48,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-22,03:00,Tigres UANL,Club America,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,3.22,3.57,2.0,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-22,23:07,Guadalajara Chivas,Cruz Azul,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,2.15,3.51,2.92,,,,,,,
+MEX,Liga MX,Mexico,2026/2027,2026-11-23,01:10,Queretaro,Necaxa,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,2.24,3.52,2.77,,,,,,,
 NOR,Eliteserien,Norway,2026,2026-03-14,15:00,HamKam,Viking,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,4.58,3.73,1.67,,,,,,,
 NOR,Eliteserien,Norway,2026,2026-03-14,17:00,Molde,Rosenborg,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,1.82,3.65,3.83,,,,,,,
 NOR,Eliteserien,Norway,2026,2026-03-15,13:30,Kristiansund,Brann,3.0,2.0,H,,,5.0,False,,,,,,,,,,,,,5.36,4.1,1.53,,,,,,,
@@ -2698,6 +2734,14 @@ NOR,Eliteserien,Norway,2026,2026-11-08,16:00,Sandefjord,Molde,5.0,5.0,D,,,10.0,F
 NOR,Eliteserien,Norway,2026,2026-11-08,16:00,Viking,KFUM Oslo,5.0,1.0,H,,,6.0,False,,,,,,,,,,,,,1.21,6.42,9.7,,,,,,,
 NOR,Eliteserien,Norway,2026,2026-11-08,18:15,Fredrikstad,Brann,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,2.7,3.78,2.2,,,,,,,
 NOR,Eliteserien,Norway,2026,2026-11-09,18:00,Kristiansund,Valerenga,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,2.83,4.01,2.05,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-20,18:00,Molde,Bodo/Glimt,2.0,4.0,A,,,6.0,False,,,,,,,,,,,,,3.76,4.52,1.66,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-21,13:00,Tromso,Viking,3.0,2.0,H,,,5.0,False,,,,,,,,,,,,,3.58,3.89,1.8,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-21,15:00,HamKam,Fredrikstad,0.0,0.0,D,,,0.0,True,,,,,,,,,,,,,2.45,3.2,2.72,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-21,17:00,Valerenga,Start,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,1.48,4.63,5.01,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-22,16:00,Aalesund,Rosenborg,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,4.23,4.37,1.6,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-22,16:00,KFUM Oslo,Brann,3.0,4.0,A,,,7.0,False,,,,,,,,,,,,,2.73,3.61,2.22,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-22,16:00,Kristiansund,Sandefjord,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,2.64,3.65,2.28,,,,,,,
+NOR,Eliteserien,Norway,2026,2026-11-22,18:15,Sarpsborg 08,Lillestrom,0.0,2.0,A,,,2.0,False,,,,,,,,,,,,,1.91,3.9,3.19,,,,,,,
 POL,Ekstraklasa,Poland,2026/2027,2026-07-24,17:00,Radomiak Radom,Wieczysta Krakow,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,2.28,3.39,2.73,,,,,,,
 POL,Ekstraklasa,Poland,2026/2027,2026-07-24,19:30,Pogon Szczecin,Legia,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,2.59,3.24,2.47,,,,,,,
 POL,Ekstraklasa,Poland,2026/2027,2026-07-25,13:45,Jagiellonia,Korona Kielce,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,1.97,3.3,3.48,,,,,,,
@@ -2822,6 +2866,15 @@ POL,Ekstraklasa,Poland,2026/2027,2026-11-07,19:15,Widzew Lodz,Pogon Szczecin,3.0
 POL,Ekstraklasa,Poland,2026/2027,2026-11-08,13:45,Jagiellonia,GKS Katowice,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,1.88,3.76,3.37,,,,,,,
 POL,Ekstraklasa,Poland,2026/2027,2026-11-08,16:30,Legia,Rakow,2.0,4.0,A,,,6.0,False,,,,,,,,,,,,,2.0,3.44,3.31,,,,,,,
 POL,Ekstraklasa,Poland,2026/2027,2026-11-08,19:15,Lech Poznan,Zaglebie,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,1.45,4.37,5.76,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-20,17:00,Piast Gliwice,Korona Kielce,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,2.45,3.36,2.56,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-20,19:30,Pogon Szczecin,Slask Wroclaw,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,1.69,3.72,4.3,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-21,13:45,Cracovia,Jagiellonia,3.0,1.0,H,,,4.0,False,,,,,,,,,,,,,2.49,3.46,2.46,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-21,16:30,Zaglebie,Gornik Zabrze,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,4.82,3.56,1.65,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-21,19:15,Radomiak Radom,Wisla,0.0,0.0,D,,,0.0,True,,,,,,,,,,,,,3.27,3.51,1.98,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-22,11:15,Rakow,Widzew Lodz,3.0,1.0,H,,,4.0,False,,,,,,,,,,,,,1.95,3.53,3.36,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-22,13:45,GKS Katowice,Lech Poznan,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,2.69,3.68,2.22,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-22,16:30,Wisla Plock,Legia,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,3.08,3.26,2.16,,,,,,,
+POL,Ekstraklasa,Poland,2026/2027,2026-11-23,18:00,Wieczysta Krakow,Motor Lublin,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,2.47,3.68,2.38,,,,,,,
 SWZ,Super League,Switzerland,2026/2027,2026-07-25,17:00,Lausanne,Grasshoppers,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,1.62,3.97,4.47,,,,,,,
 SWZ,Super League,Switzerland,2026/2027,2026-07-25,17:00,Servette,Basel,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.84,3.76,3.48,,,,,,,
 SWZ,Super League,Switzerland,2026/2027,2026-07-25,19:30,Luzern,Thun,1.0,3.0,A,,,4.0,False,,,,,,,,,,,,,1.76,3.87,3.78,,,,,,,
@@ -2900,6 +2953,12 @@ SWZ,Super League,Switzerland,2026/2027,2026-11-07,19:30,Grasshoppers,Lausanne,1.
 SWZ,Super League,Switzerland,2026/2027,2026-11-08,13:00,St. Gallen,Lugano,5.0,0.0,H,,,5.0,False,,,,,,,,,,,,,2.29,3.65,2.62,,,,,,,
 SWZ,Super League,Switzerland,2026/2027,2026-11-08,15:30,Servette,Zurich,0.0,0.0,D,,,0.0,True,,,,,,,,,,,,,1.99,3.57,3.23,,,,,,,
 SWZ,Super League,Switzerland,2026/2027,2026-11-08,15:30,Thun,Basel,3.0,3.0,D,,,6.0,False,,,,,,,,,,,,,2.19,3.75,2.73,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-21,17:00,Lugano,Grasshoppers,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,1.31,5.31,7.02,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-21,17:00,Young Boys,Thun,3.0,2.0,H,,,5.0,False,,,,,,,,,,,,,1.32,5.68,6.56,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-21,19:30,Sion,Servette,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,1.58,4.01,4.78,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-22,13:00,Zurich,St. Gallen,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,3.22,3.73,1.95,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-22,15:30,Basel,Luzern,0.0,2.0,A,,,2.0,False,,,,,,,,,,,,,2.12,3.87,2.76,,,,,,,
+SWZ,Super League,Switzerland,2026/2027,2026-11-22,15:30,Lausanne,Vaduz,2.0,2.0,D,,,4.0,False,,,,,,,,,,,,,1.74,4.09,3.67,,,,,,,
 USA,MLS,USA,2026,2026-02-21,19:30,St. Louis City,Charlotte,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,2.42,3.49,2.65,,,,,,,
 USA,MLS,USA,2026,2026-02-21,21:45,FC Cincinnati,Atlanta Utd,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,1.94,3.55,3.57,,,,,,,
 USA,MLS,USA,2026,2026-02-22,00:30,DC United,Philadelphia Union,1.0,0.0,H,,,1.0,False,,,,,,,,,,,,,2.98,3.26,2.32,,,,,,,
@@ -3410,3 +3469,12 @@ USA,MLS,USA,2026,2026-11-08,00:00,Minnesota United,San Jose Earthquakes,3.0,1.0,
 USA,MLS,USA,2026,2026-11-08,00:00,Real Salt Lake,Los Angeles Galaxy,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,1.68,4.25,3.97,,,,,,,
 USA,MLS,USA,2026,2026-11-08,00:00,San Diego FC,Sporting Kansas City,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.67,4.35,3.94,,,,,,,
 USA,MLS,USA,2026,2026-11-08,00:00,Seattle Sounders,Los Angeles FC,2.0,1.0,H,,,3.0,False,,,,,,,,,,,,,2.08,3.82,2.93,,,,,,,
+USA,MLS,USA,2026,2026-11-20,00:30,Orlando City,FC Cincinnati,1.0,3.0,A,,,4.0,False,,,,,,,,,,,,,2.32,3.91,2.5,,,,,,,
+USA,MLS,USA,2026,2026-11-20,03:00,Seattle Sounders,Real Salt Lake,1.0,1.0,D,,,2.0,False,,,,,,,,,,,,,1.98,3.61,3.3,,,,,,,
+USA,MLS,USA,2026,2026-11-21,19:00,New England Revolution,Philadelphia Union,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,2.97,3.64,2.11,,,,,,,
+USA,MLS,USA,2026,2026-11-21,21:00,FC Dallas,Portland Timbers,3.0,0.0,H,,,3.0,False,,,,,,,,,,,,,1.82,3.87,3.62,,,,,,,
+USA,MLS,USA,2026,2026-11-21,23:00,Inter Miami,Columbus Crew,0.0,3.0,A,,,3.0,False,,,,,,,,,,,,,1.57,4.49,4.38,,,,,,,
+USA,MLS,USA,2026,2026-11-22,21:00,Nashville SC,FC Cincinnati,0.0,1.0,A,,,1.0,False,,,,,,,,,,,,,1.46,4.51,5.51,,,,,,,
+USA,MLS,USA,2026,2026-11-22,23:30,Chicago Fire,Charlotte,1.0,2.0,A,,,3.0,False,,,,,,,,,,,,,1.51,4.47,4.94,,,,,,,
+USA,MLS,USA,2026,2026-11-23,01:30,Vancouver Whitecaps,Real Salt Lake,2.0,0.0,H,,,2.0,False,,,,,,,,,,,,,1.4,4.83,5.93,,,,,,,
+USA,MLS,USA,2026,2026-11-24,01:00,St. Louis City,Los Angeles FC,3.0,2.0,H,,,5.0,False,,,,,,,,,,,,,2.72,3.36,2.38,,,,,,,
